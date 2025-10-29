@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator zod {
+  provider                         = "zod-prisma-types"
+  output                           = "../src/models" // default is ./generated/zod
+  useMultipleFiles                 = true // default is false
+  writeBarrelFiles                 = true // default is true
+  createInputTypes                 = true // default is false
+  createModelTypes                 = true // default is false
+  addInputTypeValidation           = true // default is false
+  addIncludeType                   = true // default is false
+  addSelectType                    = true // default is false
+  validateWhereUniqueInput         = true // default is false
+  createOptionalDefaultValuesTypes = true // default is false
+  createRelationValuesTypes        = true // default is false
+  createPartialTypes               = true // default is false
+  useDefaultValidators             = true // default is false
+  coerceDate                       = true // default is false
+  writeNullishInModelTypes         = true // default is false
+  prismaClientPath                 = "@prisma/client" // default is client output path 
+}
+
+enum UserStatusEnum {
+  active
+  locked
+}
+
+enum ProjectStatusEnum {
+  active
+  archived
+  deleted
+}
+
+model users {
+  id        String         @id @default(uuid())
+  email     String         @unique
+  name      String?
+  bio       String?
+  address   String?
+  avatar    String?
+  verify    Boolean        @default(false)
+  // @DtoCreateHidden
+  // @DtoUpdateHidden
+  status    UserStatusEnum @default(active)
+  createdAt DateTime       @default(now())
+  // @DtoCreateHidden
+  // @DtoUpdateHidden
+  updatedAt DateTime       @updatedAt
+  // @DtoCreateHidden
+  // @DtoUpdateHidden
+  deletedAt DateTime?
+
+  accounts       accounts?
+  socialAccounts socialAccounts?
+  tokens         tokens[]
+  otps           otps?
+  projectMembers ProjectMember[]
+
+  @@map("users")
+  UserRole UserRole[]
+}
+
+model accounts {
+  id       String @id @default(uuid())
+  userId   String @unique @map("user_id")
+  user     users  @relation(fields: [userId], references: [id])
+  password String
+  salt     String
+
+  @@map("accounts")
+}
+
+model socialAccounts {
+  id                 String @id @default(uuid())
+  userId             String @unique @map("user_id")
+  user               users  @relation(fields: [userId], references: [id])
+  googleId           String @map("google_id")
+  googleAccessToken  String @map("google_access_token")
+  googleRefreshToken String @map("google_refresh_token")
+
+  @@map("Social_Accounts")
+}
+
+model tokens {
+  id           String @id @default(uuid())
+  userId       String @map("user_id")
+  user         users  @relation(fields: [userId], references: [id])
+  refreshToken String @unique @map("refresh_token")
+
+  @@map("Tokens")
+}
+
+model otps {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  user      users    @relation(fields: [userId], references: [id])
+  otp       String   @db.Char(6)
+  expiresAt DateTime @map("expires_at")
+
+  @@map("Otps")
+}
+
+model project {
+  id          String            @id @default(uuid())
+  title       String
+  description String?
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  deletedAt   DateTime?         @map("deleted_at")
+  status      ProjectStatusEnum @default(active)
+  members     ProjectMember[]
+
+  @@map("projects")
+}
+
+model roles {
+  id         String    @id @default(uuid())
+  roleName   String
+  desciption String?
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  projectMembers ProjectMember[]
+
+  @@map("roles")
+  RolePermission RolePermission[]
+  UserRole UserRole[]
+}
+
+model permission{
+  id         String   @id @default(uuid())
+  permission String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  @@map("permissions")
+  RolePermission RolePermission[]
+}
+model RolePermission{
+  id         String   @id @default(uuid())
+  roleId     String   @map("role_id")
+  permissionId String @map("permission_id")
+  permission permission @relation(fields: [permissionId], references: [id])
+  role       roles    @relation(fields: [roleId], references: [id])
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  @@map("role_permissions")
+}
+
+model UserRole{
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  roleId    String   @map("role_id")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+  user      users    @relation(fields: [userId], references: [id])
+  role      roles    @relation(fields: [roleId], references: [id])
+
+  @@map("user_roles")
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  userId    String   @map("user_id")
+  roleId    String   @map("role_id")
+  joinedAt  DateTime @default(now()) @map("joined_at")
+  project   project  @relation(fields: [projectId], references: [id])
+  user      users    @relation(fields: [userId], references: [id])
+  role      roles    @relation(fields: [roleId], references: [id])
+
+  @@map("project_members")
+}
+
