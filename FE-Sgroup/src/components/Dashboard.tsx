@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 
 export function Dashboard() {
-  const [projects, setProjects] = useState<any[]>([])
-  const [error, setError] = useState<string | null>(null)
+  const [projects, setProjects] = useState([])
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     async function fetchProjects() {

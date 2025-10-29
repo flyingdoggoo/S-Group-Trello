@@ -1,7 +1,7 @@
 import "react-toastify/dist/ReactToastify.css";
-import {Login} from "./components/ui/Login"
-import {Register} from "./components/ui/Register"
-import { Dashboard } from "./components/ui/Dashboard"
+import {Login} from "./components/Login"
+import {Register} from "./components/Register"
+import { Dashboard } from "./components/Dashboard"
 import { useState } from "react"
 import axios from 'axios'
 export default function App() {
