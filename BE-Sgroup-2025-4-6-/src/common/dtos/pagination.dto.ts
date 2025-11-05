@@ -1,10 +1,7 @@
-import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsPositive } from 'class-validator';
 import { resourceLimits } from 'worker_threads';
 import z from 'zod';
-
-extendZodWithOpenApi(z);
 
 export class PaginationDto {
 	page: number = 1;

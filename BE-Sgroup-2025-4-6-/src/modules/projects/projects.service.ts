@@ -4,18 +4,28 @@ import { ProjectResponseDto, GetProjectsResponseDto } from './dtos';
 import { NotFoundException, ConflictException } from '@/common/exceptions';
 import { ServiceResponse, ResponseStatus } from '@/common/dtos';
 import { StatusCodes } from 'http-status-codes';
-
+import { RolesRepository } from '../roles/roles.repository';
+import { ProjectMembersRepository } from '../projectMembers/projectMembers.repository';
 export class ProjectsService {
     constructor(
-        private readonly projectsRepository = new ProjectsRepository()
+        private readonly projectsRepository = new ProjectsRepository(),
+        private readonly rolesRepository = new RolesRepository(),
+        private readonly projectMemberRepository = new ProjectMembersRepository()
     ) { }
 
-    async createProject(dto: CreateProjectRequestDto): Promise<ServiceResponse<ProjectResponseDto>> {
+    async createProject(dto: CreateProjectRequestDto, userId: string): Promise<ServiceResponse<ProjectResponseDto>> {
         const project = await this.projectsRepository.createProject({
             title: dto.title,
             description: dto.description,
         });
-
+        const project_id = project.id;
+        let role_id = await this.rolesRepository.findRoleIdByUserId(userId);
+        if(!role_id){
+            role_id = "USER";
+        }
+        await this.projectMemberRepository.assignUserRoleProject(
+            project_id, userId, role_id
+        );
         return new ServiceResponse(
             ResponseStatus.Success,
             'Project created successfully',

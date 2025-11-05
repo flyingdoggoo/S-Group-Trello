@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
-export function ProjectModalCreate() {
+export function ProjectModalCreate({ projects, setProjects }: { projects: any; setProjects: any }) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [loading, setLoading] = useState(false)
@@ -36,11 +36,19 @@ export function ProjectModalCreate() {
       if (response.data && response.data.data) {
         setTitle("")
         setDescription("")
+        let newProject = response.data.data
+        console.log("New project:", newProject)
+        console.log("Current projects:", projects)
+        setProjects([...projects, newProject])
         toast.success("Project created successfully!")
       }
-    } catch (error) {
-      console.error("Error creating project:", error)
-      toast.error("Failed to create project.")
+    } catch (error : any) {
+      if(error.response?.status === 403){
+        toast.error("You do not have permission to create a project.")
+      }
+      else {
+        toast.error("Failed to create project." + (error as any).message)
+      }
     } finally {
       setLoading(false)
     }

@@ -13,7 +13,8 @@ export class ProjectsController {
     async createProject(req: Request, res: Response, next: NextFunction) {
         try {
             const dto = new CreateProjectRequestDto(req.body);
-            const result = await this.projectsService.createProject(dto);
+            const userId = req.user?.id as string; 
+            const result = await this.projectsService.createProject(dto, userId);
             
             res.status(result.code).json({
                 success: result.success,

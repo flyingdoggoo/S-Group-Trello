@@ -1,8 +1,5 @@
 export enum RolesEnum {
-    ADMIN  = 'ADMIN',
     USER   = 'USER',
-    OWNER  = 'OWNER',
-    
+    PROJECT_ADMIN  = 'PROJECT_ADMIN',
+    BOARD_ADMIN  = 'BOARD_ADMIN',
 }
-
-//khoi tao role

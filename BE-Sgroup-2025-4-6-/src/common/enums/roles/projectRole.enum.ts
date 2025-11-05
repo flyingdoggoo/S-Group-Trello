@@ -1,0 +1,4 @@
+export enum ProjectRoleEnum {
+  PROJECT_ADMIN = 'PROJECT_ADMIN',
+  PROJECT_MEMBER = 'PROJECT_MEMBER',
+}

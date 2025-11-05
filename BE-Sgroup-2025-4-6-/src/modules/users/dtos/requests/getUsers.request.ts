@@ -21,7 +21,3 @@ const getUsersRequestQuery = z.object({
 export const GetUsersRequestValidationSchema: ZodValidationSchema = {
     query: getUsersRequestQuery
 }
-
-export const GetUsersRequestSchema = {
-    query: getUsersRequestQuery
-}
