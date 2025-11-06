@@ -59,7 +59,7 @@ export function ProjectModalCreate({ projects, setProjects }: { projects: any; s
         <DialogTrigger asChild>
           <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-5 hover:bg-gray-50 cursor-pointer transition">
             <span className="text-3xl text-gray-400 mb-2">+</span>
-            <button className="text-gray-600 font-medium">Create a new board</button>
+            <button className="text-gray-600 font-medium">Create a new project</button>
           </div>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">

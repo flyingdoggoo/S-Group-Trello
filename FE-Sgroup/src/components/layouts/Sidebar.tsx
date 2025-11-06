@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Home, Folder, Settings, Menu } from "lucide-react"
+import { Home, Folder, Menu } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
-
+import { DropUpSettings } from "../ui/drop-up.settings"
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const location = useLocation()
@@ -49,16 +49,7 @@ export function AppSidebar() {
       </div>
 
       {/* Footer */}
-      <div className={`p-2 border-t ${collapsed ? "flex justify-center" : ""}`}>
-        <button
-          className={`flex items-center w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md ${
-            collapsed ? "justify-center" : ""
-          }`}
-        >
-          <Settings className="h-5 w-5" />
-          {!collapsed && <span className="ml-3">Settings</span>}
-        </button>
-      </div>
+      <DropUpSettings collapsed={collapsed} />
     </div>
   )
 }

@@ -13,6 +13,7 @@ import { tokensUpdateManyWithoutUserNestedInputSchema } from './tokensUpdateMany
 import { otpsUpdateOneWithoutUserNestedInputSchema } from './otpsUpdateOneWithoutUserNestedInputSchema';
 import { ProjectMemberUpdateManyWithoutUserNestedInputSchema } from './ProjectMemberUpdateManyWithoutUserNestedInputSchema';
 import { UserRoleUpdateManyWithoutUserNestedInputSchema } from './UserRoleUpdateManyWithoutUserNestedInputSchema';
+import { BoardMemberUpdateManyWithoutUserNestedInputSchema } from './BoardMemberUpdateManyWithoutUserNestedInputSchema';
 
 export const usersUpdateWithoutSocialAccountsInputSchema: z.ZodType<Prisma.usersUpdateWithoutSocialAccountsInput> = z.strictObject({
   id: z.union([ z.uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -31,6 +32,7 @@ export const usersUpdateWithoutSocialAccountsInputSchema: z.ZodType<Prisma.users
   otps: z.lazy(() => otpsUpdateOneWithoutUserNestedInputSchema).optional(),
   projectMembers: z.lazy(() => ProjectMemberUpdateManyWithoutUserNestedInputSchema).optional(),
   UserRole: z.lazy(() => UserRoleUpdateManyWithoutUserNestedInputSchema).optional(),
+  BoardMember: z.lazy(() => BoardMemberUpdateManyWithoutUserNestedInputSchema).optional(),
 });
 
 export default usersUpdateWithoutSocialAccountsInputSchema;

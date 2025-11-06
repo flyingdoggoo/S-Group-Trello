@@ -17,6 +17,7 @@ import { OtpsNullableScalarRelationFilterSchema } from './OtpsNullableScalarRela
 import { otpsWhereInputSchema } from './otpsWhereInputSchema';
 import { ProjectMemberListRelationFilterSchema } from './ProjectMemberListRelationFilterSchema';
 import { UserRoleListRelationFilterSchema } from './UserRoleListRelationFilterSchema';
+import { BoardMemberListRelationFilterSchema } from './BoardMemberListRelationFilterSchema';
 
 export const usersWhereInputSchema: z.ZodType<Prisma.usersWhereInput> = z.strictObject({
   AND: z.union([ z.lazy(() => usersWhereInputSchema), z.lazy(() => usersWhereInputSchema).array() ]).optional(),
@@ -39,6 +40,7 @@ export const usersWhereInputSchema: z.ZodType<Prisma.usersWhereInput> = z.strict
   otps: z.union([ z.lazy(() => OtpsNullableScalarRelationFilterSchema), z.lazy(() => otpsWhereInputSchema) ]).optional().nullable(),
   projectMembers: z.lazy(() => ProjectMemberListRelationFilterSchema).optional(),
   UserRole: z.lazy(() => UserRoleListRelationFilterSchema).optional(),
+  BoardMember: z.lazy(() => BoardMemberListRelationFilterSchema).optional(),
 });
 
 export default usersWhereInputSchema;

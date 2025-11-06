@@ -44,6 +44,24 @@ enum ProjectStatusEnum {
   deleted
 }
 
+enum BoardStatusEnum {
+  active
+  archived
+  deleted
+}
+
+enum ListStatusEnum {
+  active
+  archived
+  deleted
+}
+
+enum CardStatusEnum {
+  active
+  archived
+  deleted
+}
+
 model users {
   id        String         @id @default(uuid())
   email     String         @unique
@@ -68,9 +86,10 @@ model users {
   tokens         tokens[]
   otps           otps?
   projectMembers ProjectMember[]
+  UserRole       UserRole[]
 
   @@map("users")
-  UserRole UserRole[]
+  BoardMember BoardMember[]
 }
 
 model accounts {
@@ -122,6 +141,7 @@ model project {
   deletedAt   DateTime?         @map("deleted_at")
   status      ProjectStatusEnum @default(active)
   members     ProjectMember[]
+  Board       Board[]
 
   @@map("projects")
 }
@@ -135,42 +155,44 @@ model roles {
   deletedAt  DateTime? @map("deleted_at")
 
   projectMembers ProjectMember[]
+  RolePermission RolePermission[]
+  UserRole       UserRole[]
 
   @@map("roles")
-  RolePermission RolePermission[]
-  UserRole UserRole[]
+  BoardMember BoardMember[]
 }
 
-model permission{
-  id         String   @id @default(uuid())
-  permission String
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-  deletedAt  DateTime? @map("deleted_at")
+model permission {
+  id             String           @id @default(uuid())
+  permission     String
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  deletedAt      DateTime?        @map("deleted_at")
+  RolePermission RolePermission[]
 
   @@map("permissions")
-  RolePermission RolePermission[]
 }
-model RolePermission{
-  id         String   @id @default(uuid())
-  roleId     String   @map("role_id")
-  permissionId String @map("permission_id")
-  permission permission @relation(fields: [permissionId], references: [id])
-  role       roles    @relation(fields: [roleId], references: [id])
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-  deletedAt  DateTime? @map("deleted_at")
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  roleId       String     @map("role_id")
+  permissionId String     @map("permission_id")
+  permission   permission @relation(fields: [permissionId], references: [id])
+  role         roles      @relation(fields: [roleId], references: [id])
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  deletedAt    DateTime?  @map("deleted_at")
 
   @@map("role_permissions")
 }
 
-model UserRole{
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  roleId    String   @map("role_id")
+model UserRole {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  roleId     String   @map("role_id")
   assignedAt DateTime @default(now()) @map("assigned_at")
-  user      users    @relation(fields: [userId], references: [id])
-  role      roles    @relation(fields: [roleId], references: [id])
+  user       users    @relation(fields: [userId], references: [id])
+  role       roles    @relation(fields: [roleId], references: [id])
 
   @@map("user_roles")
 }
@@ -188,3 +210,60 @@ model ProjectMember {
   @@map("project_members")
 }
 
+model Board {
+  id          String          @id @default(uuid())
+  projectId   String          @map("project_id")
+  title       String
+  description String?
+  status      BoardStatusEnum @default(active)
+  coverUrl    String?         @map("cover_url")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  deletedAt   DateTime?       @map("deleted_at")
+  project     project         @relation(fields: [projectId], references: [id])
+  List        List[]
+
+  @@map("boards")
+  BoardMember BoardMember[]
+}
+
+model BoardMember{
+  id        String   @id @default(uuid())
+  boardId   String   @map("board_id")
+  userId    String   @map("user_id")
+  roleId    String   @map("role_id")
+  joinedAt  DateTime @default(now()) @map("joined_at")
+  board     Board    @relation(fields: [boardId], references: [id])
+  user      users    @relation(fields: [userId], references: [id])
+  role      roles    @relation(fields: [roleId], references: [id])
+
+  @@map("board_members")
+}
+
+model List {
+  id        String    @id @default(uuid())
+  boardId   String    @map("board_id")
+  title     String
+  position  Int
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  board     Board     @relation(fields: [boardId], references: [id])
+  Card      Card[]
+
+  @@map("lists")
+}
+
+model Card {
+  id          String    @id @default(uuid())
+  listId      String    @map("list_id")
+  title       String
+  description String?
+  position    Int
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+  list        List      @relation(fields: [listId], references: [id])
+
+  @@map("cards")
+}

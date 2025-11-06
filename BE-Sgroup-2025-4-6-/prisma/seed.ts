@@ -11,8 +11,16 @@ function enumValues<T extends Record<string, string>>(e: T): string[] {
 }
 
 async function seedRoles() {
-    const roles = Object.values(RolesEnum).map((roleName) => ({ roleName }));
-    await prisma.roles.createMany({ data: roles, skipDuplicates: true });
+    const desired = Object.values(RolesEnum);
+    const existing = await prisma.roles.findMany({
+        where: { roleName: { in: desired }, deletedAt: null },
+        select: { roleName: true },
+    });
+    const existingNames = new Set(existing.map(r => r.roleName));
+    const toCreate = desired.filter(name => !existingNames.has(name)).map(roleName => ({ roleName }));
+    if (toCreate.length > 0) {
+        await prisma.roles.createMany({ data: toCreate });
+    }
 }
 
 async function seedPermissions() {
@@ -21,21 +29,29 @@ async function seedPermissions() {
     enumValues(ProjectPermissionEnum).forEach((p) => permissions.add(p));
     enumValues(BoardPermissionEnum).forEach((p) => permissions.add(p));
 
-    await prisma.permission.createMany({
-        data: Array.from(permissions).map((permission) => ({ permission })),
-        skipDuplicates: true,
+    const desired = Array.from(permissions);
+    const existing = await prisma.permission.findMany({
+        where: { permission: { in: desired }, deletedAt: null },
+        select: { permission: true },
     });
+    const existingSet = new Set(existing.map(p => p.permission));
+    const toCreate = desired.filter(p => !existingSet.has(p)).map(permission => ({ permission }));
+    if (toCreate.length > 0) {
+        await prisma.permission.createMany({ data: toCreate });
+    }
 }
 
 async function seedRolePermissions() {
-    // Define default mapping from roles to permissions
     const rolePermissions: Record<RolesEnum, string[]> = {
-        [RolesEnum.USER]: [
-            // ProjectPermissionEnum.CREATE_PROJECT,
-            ProjectPermissionEnum.GET_PROJECT,
-        ],
-        [RolesEnum.PROJECT_ADMIN]: enumValues(ProjectPermissionEnum),
-        [RolesEnum.BOARD_ADMIN]: enumValues(BoardPermissionEnum),
+            [RolesEnum.USER]: [
+                ProjectPermissionEnum.CREATE_PROJECT,
+                ProjectPermissionEnum.GET_PROJECT,
+            ],
+            [RolesEnum.PROJECT_ADMIN]: [
+                ...enumValues(ProjectPermissionEnum),
+                ...enumValues(BoardPermissionEnum), // Project admin can manage boards within their projects
+            ],
+            [RolesEnum.BOARD_ADMIN]: enumValues(BoardPermissionEnum),
     };
 
     for (const [roleName, perms] of Object.entries(rolePermissions) as [RolesEnum, string[]][]) {
@@ -47,12 +63,26 @@ async function seedRolePermissions() {
             select: { id: true, permission: true },
         });
 
-        // Existing role-permissions to compare
+        // Existing role-permissions to compare (and deduplicate if needed)
         const existing = await prisma.rolePermission.findMany({
             where: { roleId: role.id, deletedAt: null },
-            select: { permissionId: true },
+            orderBy: { createdAt: 'asc' },
+            select: { id: true, permissionId: true },
         });
-        const existingSet = new Set(existing.map((rp) => rp.permissionId));
+        const firstByPermission = new Map<string, string>();
+        const dupIds: string[] = [];
+        for (const rp of existing) {
+            if (!firstByPermission.has(rp.permissionId)) {
+                firstByPermission.set(rp.permissionId, rp.id);
+            } else {
+                dupIds.push(rp.id);
+            }
+        }
+        if (dupIds.length > 0) {
+            await prisma.rolePermission.deleteMany({ where: { id: { in: dupIds } } });
+        }
+
+        const existingSet = new Set(Array.from(firstByPermission.keys()));
         const desiredSet = new Set(permissions.map((p) => p.id));
 
         const toCreate = permissions

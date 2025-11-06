@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { ProjectMemberCreateNestedManyWithoutRoleInputSchema } from './ProjectMemberCreateNestedManyWithoutRoleInputSchema';
 import { RolePermissionCreateNestedManyWithoutRoleInputSchema } from './RolePermissionCreateNestedManyWithoutRoleInputSchema';
 import { UserRoleCreateNestedManyWithoutRoleInputSchema } from './UserRoleCreateNestedManyWithoutRoleInputSchema';
+import { BoardMemberCreateNestedManyWithoutRoleInputSchema } from './BoardMemberCreateNestedManyWithoutRoleInputSchema';
 
 export const rolesCreateInputSchema: z.ZodType<Prisma.rolesCreateInput> = z.strictObject({
   id: z.uuid().optional(),
@@ -15,6 +16,7 @@ export const rolesCreateInputSchema: z.ZodType<Prisma.rolesCreateInput> = z.stri
   projectMembers: z.lazy(() => ProjectMemberCreateNestedManyWithoutRoleInputSchema).optional(),
   RolePermission: z.lazy(() => RolePermissionCreateNestedManyWithoutRoleInputSchema).optional(),
   UserRole: z.lazy(() => UserRoleCreateNestedManyWithoutRoleInputSchema).optional(),
+  BoardMember: z.lazy(() => BoardMemberCreateNestedManyWithoutRoleInputSchema).optional(),
 });
 
 export default rolesCreateInputSchema;

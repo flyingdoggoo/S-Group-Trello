@@ -8,6 +8,7 @@ import { NullableDateTimeFieldUpdateOperationsInputSchema } from './NullableDate
 import { ProjectMemberUncheckedUpdateManyWithoutRoleNestedInputSchema } from './ProjectMemberUncheckedUpdateManyWithoutRoleNestedInputSchema';
 import { RolePermissionUncheckedUpdateManyWithoutRoleNestedInputSchema } from './RolePermissionUncheckedUpdateManyWithoutRoleNestedInputSchema';
 import { UserRoleUncheckedUpdateManyWithoutRoleNestedInputSchema } from './UserRoleUncheckedUpdateManyWithoutRoleNestedInputSchema';
+import { BoardMemberUncheckedUpdateManyWithoutRoleNestedInputSchema } from './BoardMemberUncheckedUpdateManyWithoutRoleNestedInputSchema';
 
 export const rolesUncheckedUpdateInputSchema: z.ZodType<Prisma.rolesUncheckedUpdateInput> = z.strictObject({
   id: z.union([ z.uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -19,6 +20,7 @@ export const rolesUncheckedUpdateInputSchema: z.ZodType<Prisma.rolesUncheckedUpd
   projectMembers: z.lazy(() => ProjectMemberUncheckedUpdateManyWithoutRoleNestedInputSchema).optional(),
   RolePermission: z.lazy(() => RolePermissionUncheckedUpdateManyWithoutRoleNestedInputSchema).optional(),
   UserRole: z.lazy(() => UserRoleUncheckedUpdateManyWithoutRoleNestedInputSchema).optional(),
+  BoardMember: z.lazy(() => BoardMemberUncheckedUpdateManyWithoutRoleNestedInputSchema).optional(),
 });
 
 export default rolesUncheckedUpdateInputSchema;

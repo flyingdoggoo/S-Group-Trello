@@ -7,6 +7,7 @@ import { tokensUncheckedCreateNestedManyWithoutUserInputSchema } from './tokensU
 import { otpsUncheckedCreateNestedOneWithoutUserInputSchema } from './otpsUncheckedCreateNestedOneWithoutUserInputSchema';
 import { ProjectMemberUncheckedCreateNestedManyWithoutUserInputSchema } from './ProjectMemberUncheckedCreateNestedManyWithoutUserInputSchema';
 import { UserRoleUncheckedCreateNestedManyWithoutUserInputSchema } from './UserRoleUncheckedCreateNestedManyWithoutUserInputSchema';
+import { BoardMemberUncheckedCreateNestedManyWithoutUserInputSchema } from './BoardMemberUncheckedCreateNestedManyWithoutUserInputSchema';
 
 export const usersUncheckedCreateWithoutAccountsInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutAccountsInput> = z.strictObject({
   id: z.uuid().optional(),
@@ -25,6 +26,7 @@ export const usersUncheckedCreateWithoutAccountsInputSchema: z.ZodType<Prisma.us
   otps: z.lazy(() => otpsUncheckedCreateNestedOneWithoutUserInputSchema).optional(),
   projectMembers: z.lazy(() => ProjectMemberUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   UserRole: z.lazy(() => UserRoleUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  BoardMember: z.lazy(() => BoardMemberUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
 });
 
 export default usersUncheckedCreateWithoutAccountsInputSchema;

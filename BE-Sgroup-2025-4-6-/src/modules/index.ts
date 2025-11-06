@@ -1,9 +1,7 @@
-import { authRegistry, authRouter } from './auth/auth.router';
-import { healthCheckRegistry, healthCheckRouter } from './healthCheck/healthCheck.router';
-import { usersRegistry, usersRouter } from './users/users.router';
-import { projectsRegistry, projectsRouter } from './projects/projects.router';
-
-export const Registries = [healthCheckRegistry, authRegistry, usersRegistry, projectsRegistry];
+import { authRouter } from './auth/auth.router';
+import { healthCheckRouter } from './healthCheck/healthCheck.router';
+import { usersRouter } from './users/users.router';
+import { projectsRouter } from './projects/projects.router';
 
 export const Modules = {
 	healthCheckRouter,

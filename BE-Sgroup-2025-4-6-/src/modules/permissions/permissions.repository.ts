@@ -19,14 +19,12 @@ export class PermissionsRepository {
         const match = await this.prismaService.rolePermission.findFirst({
             where: {
                 deletedAt: null,
-                role: {
-                    deletedAt: null,
-                    UserRole: { some: { userId } },
-                },
-                permission: {
-                    deletedAt: null,
-                    permission: permission,
-                },
+                permission: { deletedAt: null, permission },
+                OR: [
+                    { role: { deletedAt: null, UserRole: { some: { userId } } } },
+                    { role: { deletedAt: null, projectMembers: { some: { userId } } } },
+                    { role: { deletedAt: null, BoardMember: { some: { userId } } } },
+                ],
             },
             select: { id: true },
         });
