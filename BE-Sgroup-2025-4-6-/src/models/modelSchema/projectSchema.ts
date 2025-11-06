@@ -2,6 +2,8 @@ import { z } from 'zod';
 import { ProjectStatusEnumSchema } from '../inputTypeSchemas/ProjectStatusEnumSchema'
 import { ProjectMemberWithRelationsSchema, ProjectMemberPartialWithRelationsSchema, ProjectMemberOptionalDefaultsWithRelationsSchema } from './ProjectMemberSchema'
 import type { ProjectMemberWithRelations, ProjectMemberPartialWithRelations, ProjectMemberOptionalDefaultsWithRelations } from './ProjectMemberSchema'
+import { BoardWithRelationsSchema, BoardPartialWithRelationsSchema, BoardOptionalDefaultsWithRelationsSchema } from './BoardSchema'
+import type { BoardWithRelations, BoardPartialWithRelations, BoardOptionalDefaultsWithRelations } from './BoardSchema'
 
 /////////////////////////////////////////
 // PROJECT SCHEMA
@@ -46,12 +48,14 @@ export type projectOptionalDefaults = z.infer<typeof projectOptionalDefaultsSche
 
 export type projectRelations = {
   members: ProjectMemberWithRelations[];
+  Board: BoardWithRelations[];
 };
 
 export type projectWithRelations = z.infer<typeof projectSchema> & projectRelations
 
 export const projectWithRelationsSchema: z.ZodType<projectWithRelations> = projectSchema.merge(z.object({
   members: z.lazy(() => ProjectMemberWithRelationsSchema).array(),
+  Board: z.lazy(() => BoardWithRelationsSchema).array(),
 }))
 
 /////////////////////////////////////////
@@ -60,12 +64,14 @@ export const projectWithRelationsSchema: z.ZodType<projectWithRelations> = proje
 
 export type projectOptionalDefaultsRelations = {
   members: ProjectMemberOptionalDefaultsWithRelations[];
+  Board: BoardOptionalDefaultsWithRelations[];
 };
 
 export type projectOptionalDefaultsWithRelations = z.infer<typeof projectOptionalDefaultsSchema> & projectOptionalDefaultsRelations
 
 export const projectOptionalDefaultsWithRelationsSchema: z.ZodType<projectOptionalDefaultsWithRelations> = projectOptionalDefaultsSchema.merge(z.object({
   members: z.lazy(() => ProjectMemberOptionalDefaultsWithRelationsSchema).array(),
+  Board: z.lazy(() => BoardOptionalDefaultsWithRelationsSchema).array(),
 }))
 
 /////////////////////////////////////////
@@ -74,24 +80,28 @@ export const projectOptionalDefaultsWithRelationsSchema: z.ZodType<projectOption
 
 export type projectPartialRelations = {
   members?: ProjectMemberPartialWithRelations[];
+  Board?: BoardPartialWithRelations[];
 };
 
 export type projectPartialWithRelations = z.infer<typeof projectPartialSchema> & projectPartialRelations
 
 export const projectPartialWithRelationsSchema: z.ZodType<projectPartialWithRelations> = projectPartialSchema.merge(z.object({
   members: z.lazy(() => ProjectMemberPartialWithRelationsSchema).array(),
+  Board: z.lazy(() => BoardPartialWithRelationsSchema).array(),
 })).partial()
 
 export type projectOptionalDefaultsWithPartialRelations = z.infer<typeof projectOptionalDefaultsSchema> & projectPartialRelations
 
 export const projectOptionalDefaultsWithPartialRelationsSchema: z.ZodType<projectOptionalDefaultsWithPartialRelations> = projectOptionalDefaultsSchema.merge(z.object({
   members: z.lazy(() => ProjectMemberPartialWithRelationsSchema).array(),
+  Board: z.lazy(() => BoardPartialWithRelationsSchema).array(),
 }).partial())
 
 export type projectWithPartialRelations = z.infer<typeof projectSchema> & projectPartialRelations
 
 export const projectWithPartialRelationsSchema: z.ZodType<projectWithPartialRelations> = projectSchema.merge(z.object({
   members: z.lazy(() => ProjectMemberPartialWithRelationsSchema).array(),
+  Board: z.lazy(() => BoardPartialWithRelationsSchema).array(),
 }).partial())
 
 export default projectSchema;

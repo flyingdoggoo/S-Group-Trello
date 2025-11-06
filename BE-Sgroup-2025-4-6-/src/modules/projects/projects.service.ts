@@ -1,7 +1,7 @@
 import { ProjectsRepository } from './projects.repository';
 import { CreateProjectRequestDto, UpdateProjectRequestDto, GetProjectsRequestDto } from './dtos';
 import { ProjectResponseDto, GetProjectsResponseDto } from './dtos';
-import { NotFoundException, ConflictException } from '@/common/exceptions';
+import { NotFoundException, ConflictException, ForbiddenException } from '@/common/exceptions';
 import { ServiceResponse, ResponseStatus } from '@/common/dtos';
 import { StatusCodes } from 'http-status-codes';
 import { RolesRepository } from '../roles/roles.repository';
@@ -19,12 +19,23 @@ export class ProjectsService {
             description: dto.description,
         });
         const project_id = project.id;
-        let role_id = await this.rolesRepository.findRoleIdByUserId(userId);
-        if(!role_id){
-            role_id = "USER";
+        // Determine user's global role id
+        let userGlobalRoleId = await this.rolesRepository.findRoleIdByUserId(userId);
+        // If user has no global role, default to USER
+        if (!userGlobalRoleId) {
+            const userRole = await this.rolesRepository.findByName('USER');
+            userGlobalRoleId = userRole?.id as string;
         }
+
+        // Always make the creator a PROJECT_ADMIN within this project (membership role)
+        let roleIdForProjectMember = userGlobalRoleId;
+        const projectAdmin = await this.rolesRepository.findByName('PROJECT_ADMIN');
+        if (projectAdmin?.id) {
+            roleIdForProjectMember = projectAdmin.id;
+        }
+
         await this.projectMemberRepository.assignUserRoleProject(
-            project_id, userId, role_id
+            project_id, userId, roleIdForProjectMember
         );
         return new ServiceResponse(
             ResponseStatus.Success,
@@ -34,12 +45,13 @@ export class ProjectsService {
         );
     }
 
-    async getProjects(dto: GetProjectsRequestDto): Promise<ServiceResponse<GetProjectsResponseDto>> {
+    async getProjects(dto: GetProjectsRequestDto, userId: string): Promise<ServiceResponse<GetProjectsResponseDto>> {
         const page = dto.page ?? 1;
         const limit = dto.limit ?? 10;
         const skip = (page - 1) * limit;
 
         const [projects, total] = await this.projectsRepository.findProjects({
+            userId,
             title: dto.title,
             status: dto.status,
             skip,
@@ -56,11 +68,15 @@ export class ProjectsService {
         );
     }
 
-    async getProjectById(id: string): Promise<ServiceResponse<ProjectResponseDto>> {
+    async getProjectById(id: string, userId: string): Promise<ServiceResponse<ProjectResponseDto>> {
         const project = await this.projectsRepository.findProjectById({ id });
 
         if (!project) {
             throw new NotFoundException('Project not found');
+        }
+        const isMember = await this.projectMemberRepository.isUserMemberOfProject(id, userId);
+        if (!isMember) {
+            throw new ForbiddenException();
         }
 
         return new ServiceResponse(
@@ -71,12 +87,16 @@ export class ProjectsService {
         );
     }
 
-    async updateProject(id: string, dto: UpdateProjectRequestDto): Promise<ServiceResponse<ProjectResponseDto>> {
+    async updateProject(id: string, dto: UpdateProjectRequestDto, userId: string): Promise<ServiceResponse<ProjectResponseDto>> {
         // Kiểm tra project có tồn tại không
         const existingProject = await this.projectsRepository.findProjectById({ id });
 
         if (!existingProject) {
             throw new NotFoundException('Project not found');
+        }
+        const isMember = await this.projectMemberRepository.isUserMemberOfProject(id, userId);
+        if (!isMember) {
+            throw new ForbiddenException();
         }
 
         const project = await this.projectsRepository.updateProject({
@@ -93,12 +113,16 @@ export class ProjectsService {
         );
     }
 
-    async deleteProject(id: string): Promise<ServiceResponse<null>> {
+    async deleteProject(id: string, userId: string): Promise<ServiceResponse<null>> {
         // Kiểm tra project có tồn tại không
         const existingProject = await this.projectsRepository.findProjectById({ id });
 
         if (!existingProject) {
             throw new NotFoundException('Project not found');
+        }
+        const isMember = await this.projectMemberRepository.isUserMemberOfProject(id, userId);
+        if (!isMember) {
+            throw new ForbiddenException();
         }
 
         await this.projectsRepository.deleteProject({ id });
@@ -111,12 +135,16 @@ export class ProjectsService {
         );
     }
 
-    async archiveProject(id: string): Promise<ServiceResponse<ProjectResponseDto>> {
+    async archiveProject(id: string, userId: string): Promise<ServiceResponse<ProjectResponseDto>> {
         // Kiểm tra project có tồn tại không
         const existingProject = await this.projectsRepository.findProjectById({ id });
 
         if (!existingProject) {
             throw new NotFoundException('Project not found');
+        }
+        const isMember = await this.projectMemberRepository.isUserMemberOfProject(id, userId);
+        if (!isMember) {
+            throw new ForbiddenException();
         }
 
         const project = await this.projectsRepository.archiveProject({ id });

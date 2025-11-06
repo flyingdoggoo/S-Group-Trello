@@ -14,7 +14,7 @@ export class ProjectsRepository {
         });
     }
 
-    async findProjects({ title, status, skip, take }: { title?: string, status?: ProjectStatusEnum, skip: number, take: number }): Promise<[project[], number]> {
+    async findProjects({ userId, title, status, skip, take }: { userId?: string, title?: string, status?: ProjectStatusEnum, skip: number, take: number }): Promise<[project[], number]> {
         const where: any = {};
         
         
@@ -26,8 +26,10 @@ export class ProjectsRepository {
             where.status = status;
         }
 
-        // Không lấy các project đã bị xóa
         where.deletedAt = null;
+        if (userId) {
+            where.members = { some: { userId } };
+        }
         
 
         const result = await Promise.all([

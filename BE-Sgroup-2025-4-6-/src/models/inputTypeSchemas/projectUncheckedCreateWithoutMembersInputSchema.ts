@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client';
 
 import { z } from 'zod';
 import { ProjectStatusEnumSchema } from './ProjectStatusEnumSchema';
+import { BoardUncheckedCreateNestedManyWithoutProjectInputSchema } from './BoardUncheckedCreateNestedManyWithoutProjectInputSchema';
 
 export const projectUncheckedCreateWithoutMembersInputSchema: z.ZodType<Prisma.projectUncheckedCreateWithoutMembersInput> = z.strictObject({
   id: z.uuid().optional(),
@@ -11,6 +12,7 @@ export const projectUncheckedCreateWithoutMembersInputSchema: z.ZodType<Prisma.p
   updatedAt: z.coerce.date().optional(),
   deletedAt: z.coerce.date().optional().nullable(),
   status: z.lazy(() => ProjectStatusEnumSchema).optional(),
+  Board: z.lazy(() => BoardUncheckedCreateNestedManyWithoutProjectInputSchema).optional(),
 });
 
 export default projectUncheckedCreateWithoutMembersInputSchema;

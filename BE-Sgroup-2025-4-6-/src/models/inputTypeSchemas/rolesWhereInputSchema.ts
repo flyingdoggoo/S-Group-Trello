@@ -8,6 +8,7 @@ import { DateTimeNullableFilterSchema } from './DateTimeNullableFilterSchema';
 import { ProjectMemberListRelationFilterSchema } from './ProjectMemberListRelationFilterSchema';
 import { RolePermissionListRelationFilterSchema } from './RolePermissionListRelationFilterSchema';
 import { UserRoleListRelationFilterSchema } from './UserRoleListRelationFilterSchema';
+import { BoardMemberListRelationFilterSchema } from './BoardMemberListRelationFilterSchema';
 
 export const rolesWhereInputSchema: z.ZodType<Prisma.rolesWhereInput> = z.strictObject({
   AND: z.union([ z.lazy(() => rolesWhereInputSchema), z.lazy(() => rolesWhereInputSchema).array() ]).optional(),
@@ -22,6 +23,7 @@ export const rolesWhereInputSchema: z.ZodType<Prisma.rolesWhereInput> = z.strict
   projectMembers: z.lazy(() => ProjectMemberListRelationFilterSchema).optional(),
   RolePermission: z.lazy(() => RolePermissionListRelationFilterSchema).optional(),
   UserRole: z.lazy(() => UserRoleListRelationFilterSchema).optional(),
+  BoardMember: z.lazy(() => BoardMemberListRelationFilterSchema).optional(),
 });
 
 export default rolesWhereInputSchema;

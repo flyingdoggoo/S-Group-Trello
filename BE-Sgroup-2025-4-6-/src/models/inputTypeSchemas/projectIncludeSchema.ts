@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
 import { ProjectMemberFindManyArgsSchema } from "../outputTypeSchemas/ProjectMemberFindManyArgsSchema"
+import { BoardFindManyArgsSchema } from "../outputTypeSchemas/BoardFindManyArgsSchema"
 import { ProjectCountOutputTypeArgsSchema } from "../outputTypeSchemas/ProjectCountOutputTypeArgsSchema"
 
 export const projectIncludeSchema: z.ZodType<Prisma.projectInclude> = z.object({
   members: z.union([z.boolean(),z.lazy(() => ProjectMemberFindManyArgsSchema)]).optional(),
+  Board: z.union([z.boolean(),z.lazy(() => BoardFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => ProjectCountOutputTypeArgsSchema)]).optional(),
 }).strict();
 

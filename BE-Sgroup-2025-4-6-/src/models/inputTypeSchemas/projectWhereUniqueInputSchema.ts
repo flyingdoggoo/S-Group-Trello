@@ -9,6 +9,7 @@ import { DateTimeNullableFilterSchema } from './DateTimeNullableFilterSchema';
 import { EnumProjectStatusEnumFilterSchema } from './EnumProjectStatusEnumFilterSchema';
 import { ProjectStatusEnumSchema } from './ProjectStatusEnumSchema';
 import { ProjectMemberListRelationFilterSchema } from './ProjectMemberListRelationFilterSchema';
+import { BoardListRelationFilterSchema } from './BoardListRelationFilterSchema';
 
 export const projectWhereUniqueInputSchema: z.ZodType<Prisma.projectWhereUniqueInput> = z.object({
   id: z.uuid(),
@@ -25,6 +26,7 @@ export const projectWhereUniqueInputSchema: z.ZodType<Prisma.projectWhereUniqueI
   deletedAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
   status: z.union([ z.lazy(() => EnumProjectStatusEnumFilterSchema), z.lazy(() => ProjectStatusEnumSchema) ]).optional(),
   members: z.lazy(() => ProjectMemberListRelationFilterSchema).optional(),
+  Board: z.lazy(() => BoardListRelationFilterSchema).optional(),
 }));
 
 export default projectWhereUniqueInputSchema;

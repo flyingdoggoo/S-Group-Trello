@@ -6,6 +6,7 @@ import { tokensFindManyArgsSchema } from "../outputTypeSchemas/tokensFindManyArg
 import { otpsArgsSchema } from "../outputTypeSchemas/otpsArgsSchema"
 import { ProjectMemberFindManyArgsSchema } from "../outputTypeSchemas/ProjectMemberFindManyArgsSchema"
 import { UserRoleFindManyArgsSchema } from "../outputTypeSchemas/UserRoleFindManyArgsSchema"
+import { BoardMemberFindManyArgsSchema } from "../outputTypeSchemas/BoardMemberFindManyArgsSchema"
 import { UsersCountOutputTypeArgsSchema } from "../outputTypeSchemas/UsersCountOutputTypeArgsSchema"
 
 export const usersSelectSchema: z.ZodType<Prisma.usersSelect> = z.object({
@@ -26,6 +27,7 @@ export const usersSelectSchema: z.ZodType<Prisma.usersSelect> = z.object({
   otps: z.union([z.boolean(),z.lazy(() => otpsArgsSchema)]).optional(),
   projectMembers: z.union([z.boolean(),z.lazy(() => ProjectMemberFindManyArgsSchema)]).optional(),
   UserRole: z.union([z.boolean(),z.lazy(() => UserRoleFindManyArgsSchema)]).optional(),
+  BoardMember: z.union([z.boolean(),z.lazy(() => BoardMemberFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UsersCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 

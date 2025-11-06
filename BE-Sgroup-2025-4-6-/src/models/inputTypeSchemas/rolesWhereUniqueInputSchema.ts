@@ -9,6 +9,7 @@ import { DateTimeNullableFilterSchema } from './DateTimeNullableFilterSchema';
 import { ProjectMemberListRelationFilterSchema } from './ProjectMemberListRelationFilterSchema';
 import { RolePermissionListRelationFilterSchema } from './RolePermissionListRelationFilterSchema';
 import { UserRoleListRelationFilterSchema } from './UserRoleListRelationFilterSchema';
+import { BoardMemberListRelationFilterSchema } from './BoardMemberListRelationFilterSchema';
 
 export const rolesWhereUniqueInputSchema: z.ZodType<Prisma.rolesWhereUniqueInput> = z.object({
   id: z.uuid(),
@@ -26,6 +27,7 @@ export const rolesWhereUniqueInputSchema: z.ZodType<Prisma.rolesWhereUniqueInput
   projectMembers: z.lazy(() => ProjectMemberListRelationFilterSchema).optional(),
   RolePermission: z.lazy(() => RolePermissionListRelationFilterSchema).optional(),
   UserRole: z.lazy(() => UserRoleListRelationFilterSchema).optional(),
+  BoardMember: z.lazy(() => BoardMemberListRelationFilterSchema).optional(),
 }));
 
 export default rolesWhereUniqueInputSchema;

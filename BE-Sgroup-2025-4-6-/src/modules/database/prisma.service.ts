@@ -5,6 +5,8 @@ export class PrismaService extends PrismaClient<
 	'query' | 'beforeExit'
 > {
 	projects: any;
+    Board: any;
+    BoardMember: any;
 	constructor() {
 		super();
 	}
