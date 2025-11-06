@@ -7,6 +7,7 @@ import { DateTimeFieldUpdateOperationsInputSchema } from './DateTimeFieldUpdateO
 import { NullableDateTimeFieldUpdateOperationsInputSchema } from './NullableDateTimeFieldUpdateOperationsInputSchema';
 import { ProjectStatusEnumSchema } from './ProjectStatusEnumSchema';
 import { EnumProjectStatusEnumFieldUpdateOperationsInputSchema } from './EnumProjectStatusEnumFieldUpdateOperationsInputSchema';
+import { BoardUncheckedUpdateManyWithoutProjectNestedInputSchema } from './BoardUncheckedUpdateManyWithoutProjectNestedInputSchema';
 
 export const projectUncheckedUpdateWithoutMembersInputSchema: z.ZodType<Prisma.projectUncheckedUpdateWithoutMembersInput> = z.strictObject({
   id: z.union([ z.uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -16,6 +17,7 @@ export const projectUncheckedUpdateWithoutMembersInputSchema: z.ZodType<Prisma.p
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   deletedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   status: z.union([ z.lazy(() => ProjectStatusEnumSchema), z.lazy(() => EnumProjectStatusEnumFieldUpdateOperationsInputSchema) ]).optional(),
+  Board: z.lazy(() => BoardUncheckedUpdateManyWithoutProjectNestedInputSchema).optional(),
 });
 
 export default projectUncheckedUpdateWithoutMembersInputSchema;

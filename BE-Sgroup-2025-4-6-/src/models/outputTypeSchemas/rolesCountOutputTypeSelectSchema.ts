@@ -5,6 +5,7 @@ export const rolesCountOutputTypeSelectSchema: z.ZodType<Prisma.rolesCountOutput
   projectMembers: z.boolean().optional(),
   RolePermission: z.boolean().optional(),
   UserRole: z.boolean().optional(),
+  BoardMember: z.boolean().optional(),
 }).strict();
 
 export default rolesCountOutputTypeSelectSchema;

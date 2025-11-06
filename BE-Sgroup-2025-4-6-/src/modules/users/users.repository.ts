@@ -1,9 +1,7 @@
 import { PrismaService } from '../database';
 
 import { users } from '../../models/modelSchema/usersSchema';
-import { PaginationUtils } from '@/common/utils/pagination.utils';
 import { UserStatusEnum } from '@prisma/client';
-import { CreateProjectRequestDto } from './dtos/requests/createProject.request';
 export class UsersRepository {
 	constructor(private readonly prismaService = new PrismaService()) { }
 

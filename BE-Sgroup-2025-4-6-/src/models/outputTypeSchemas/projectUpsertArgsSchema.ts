@@ -7,6 +7,7 @@ import { projectUncheckedCreateInputSchema } from '../inputTypeSchemas/projectUn
 import { projectUpdateInputSchema } from '../inputTypeSchemas/projectUpdateInputSchema'
 import { projectUncheckedUpdateInputSchema } from '../inputTypeSchemas/projectUncheckedUpdateInputSchema'
 import { ProjectMemberFindManyArgsSchema } from "../outputTypeSchemas/ProjectMemberFindManyArgsSchema"
+import { BoardFindManyArgsSchema } from "../outputTypeSchemas/BoardFindManyArgsSchema"
 import { ProjectCountOutputTypeArgsSchema } from "../outputTypeSchemas/ProjectCountOutputTypeArgsSchema"
 // Select schema needs to be in file to prevent circular imports
 //------------------------------------------------------
@@ -20,6 +21,7 @@ export const projectSelectSchema: z.ZodType<Prisma.projectSelect> = z.object({
   deletedAt: z.boolean().optional(),
   status: z.boolean().optional(),
   members: z.union([z.boolean(),z.lazy(() => ProjectMemberFindManyArgsSchema)]).optional(),
+  Board: z.union([z.boolean(),z.lazy(() => BoardFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => ProjectCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 

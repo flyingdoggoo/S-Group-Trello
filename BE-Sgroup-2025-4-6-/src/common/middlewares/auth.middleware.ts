@@ -22,11 +22,11 @@ class AuthMiddleware {
         try {
             // Lấy token từ Authorization header
             const authHeader = req.headers.authorization;
-            
+
             console.log('=== AUTH MIDDLEWARE DEBUG ===');
             console.log('Full headers:', req.headers);
             console.log('Authorization header:', authHeader);
-            
+
             if (!authHeader || !authHeader.startsWith('Bearer ')) {
                 console.log('ERROR: No Bearer token found');
                 throw new UnauthorizedException('Access token is required');
@@ -45,7 +45,7 @@ class AuthMiddleware {
                 console.log('Verifying token with secret...');
                 const payload = verify(accessToken, jwtConfig.secretAccessToken) as ITokenPayload;
                 console.log('Token payload:', payload);
-                
+
                 // Lấy thông tin user từ database
                 const user = await this.userRepository.findUser({ email: payload.email });
                 console.log('User found:', user ? 'YES' : 'NO');
@@ -75,20 +75,19 @@ class AuthMiddleware {
         }
     }
     verifyPermission(permission: string) {
-        return async (req: Request, res: Response, next: NextFunction) => {
+        return async (req: Request, _res: Response, next: NextFunction) => {
             try {
-                const user = req.user as UserInformationDto;
-
-                const hasPermission = await this.permissionRepository.hasPermission(user.id, permission);
-                if (!hasPermission) {
-                    throw new ForbiddenException();
-                }
-                next();
+                const user = (req as any).user as UserInformationDto | undefined;
+                if (!user?.id) throw new UnauthorizedException('User not authenticated');
+                const ok = await this.permissionRepository.hasPermission(user.id, permission);
+                if (ok) return next(); 
+                throw new ForbiddenException();
             } catch (error) {
                 next(error);
             }
         };
     }
+
 }
 
 const authMiddleware = new AuthMiddleware();

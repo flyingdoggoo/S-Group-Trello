@@ -3,6 +3,7 @@ import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { RolePermissionCreateNestedManyWithoutRoleInputSchema } from './RolePermissionCreateNestedManyWithoutRoleInputSchema';
 import { UserRoleCreateNestedManyWithoutRoleInputSchema } from './UserRoleCreateNestedManyWithoutRoleInputSchema';
+import { BoardMemberCreateNestedManyWithoutRoleInputSchema } from './BoardMemberCreateNestedManyWithoutRoleInputSchema';
 
 export const rolesCreateWithoutProjectMembersInputSchema: z.ZodType<Prisma.rolesCreateWithoutProjectMembersInput> = z.strictObject({
   id: z.uuid().optional(),
@@ -13,6 +14,7 @@ export const rolesCreateWithoutProjectMembersInputSchema: z.ZodType<Prisma.roles
   deletedAt: z.coerce.date().optional().nullable(),
   RolePermission: z.lazy(() => RolePermissionCreateNestedManyWithoutRoleInputSchema).optional(),
   UserRole: z.lazy(() => UserRoleCreateNestedManyWithoutRoleInputSchema).optional(),
+  BoardMember: z.lazy(() => BoardMemberCreateNestedManyWithoutRoleInputSchema).optional(),
 });
 
 export default rolesCreateWithoutProjectMembersInputSchema;

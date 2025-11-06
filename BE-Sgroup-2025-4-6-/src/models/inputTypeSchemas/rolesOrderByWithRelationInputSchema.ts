@@ -6,6 +6,7 @@ import { SortOrderInputSchema } from './SortOrderInputSchema';
 import { ProjectMemberOrderByRelationAggregateInputSchema } from './ProjectMemberOrderByRelationAggregateInputSchema';
 import { RolePermissionOrderByRelationAggregateInputSchema } from './RolePermissionOrderByRelationAggregateInputSchema';
 import { UserRoleOrderByRelationAggregateInputSchema } from './UserRoleOrderByRelationAggregateInputSchema';
+import { BoardMemberOrderByRelationAggregateInputSchema } from './BoardMemberOrderByRelationAggregateInputSchema';
 
 export const rolesOrderByWithRelationInputSchema: z.ZodType<Prisma.rolesOrderByWithRelationInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
@@ -17,6 +18,7 @@ export const rolesOrderByWithRelationInputSchema: z.ZodType<Prisma.rolesOrderByW
   projectMembers: z.lazy(() => ProjectMemberOrderByRelationAggregateInputSchema).optional(),
   RolePermission: z.lazy(() => RolePermissionOrderByRelationAggregateInputSchema).optional(),
   UserRole: z.lazy(() => UserRoleOrderByRelationAggregateInputSchema).optional(),
+  BoardMember: z.lazy(() => BoardMemberOrderByRelationAggregateInputSchema).optional(),
 });
 
 export default rolesOrderByWithRelationInputSchema;

@@ -7,6 +7,7 @@ import { socialAccountsCreateNestedOneWithoutUserInputSchema } from './socialAcc
 import { tokensCreateNestedManyWithoutUserInputSchema } from './tokensCreateNestedManyWithoutUserInputSchema';
 import { otpsCreateNestedOneWithoutUserInputSchema } from './otpsCreateNestedOneWithoutUserInputSchema';
 import { UserRoleCreateNestedManyWithoutUserInputSchema } from './UserRoleCreateNestedManyWithoutUserInputSchema';
+import { BoardMemberCreateNestedManyWithoutUserInputSchema } from './BoardMemberCreateNestedManyWithoutUserInputSchema';
 
 export const usersCreateWithoutProjectMembersInputSchema: z.ZodType<Prisma.usersCreateWithoutProjectMembersInput> = z.strictObject({
   id: z.uuid().optional(),
@@ -25,6 +26,7 @@ export const usersCreateWithoutProjectMembersInputSchema: z.ZodType<Prisma.users
   tokens: z.lazy(() => tokensCreateNestedManyWithoutUserInputSchema).optional(),
   otps: z.lazy(() => otpsCreateNestedOneWithoutUserInputSchema).optional(),
   UserRole: z.lazy(() => UserRoleCreateNestedManyWithoutUserInputSchema).optional(),
+  BoardMember: z.lazy(() => BoardMemberCreateNestedManyWithoutUserInputSchema).optional(),
 });
 
 export default usersCreateWithoutProjectMembersInputSchema;

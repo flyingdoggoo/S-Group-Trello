@@ -12,14 +12,3 @@ export const LoginRequestValidationSchema: ZodValidationSchema = {
 		password: z.string().min(8),
 	}),
 }
-
-export const LoginRequestSchema = {
-	body: {
-		description: 'Login to your account',
-		content: {
-			'application/json': {
-				schema: LoginRequestValidationSchema.body!,
-			},
-		},
-	},
-};

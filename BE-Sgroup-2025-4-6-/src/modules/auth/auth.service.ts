@@ -5,6 +5,8 @@ import { StatusCodes } from 'http-status-codes';
 
 import { Prisma } from '../database';
 import { UsersRepository } from '../users/users.repository';
+import { RolesRepository } from '../roles/roles.repository';
+import { RolesEnum } from '@/common/enums';
 
 import { AuthRepository } from './auth.repository';
 import {
@@ -23,11 +25,14 @@ import {
 	signJWT,
 } from '@/common';
 import { userConfig } from '@/configs';
+import { UserRoleRepository } from '../role_user/UserRole.repository';
 
 export class AuthService {
 	constructor(
 		private readonly authRepository = new AuthRepository(),
 		private readonly usersRepository = new UsersRepository(),
+		private readonly userRoleRepository = new UserRoleRepository(),
+		private readonly rolesRepository = new RolesRepository(),
 	) {}
 
 	async register(
@@ -57,6 +62,14 @@ export class AuthService {
 		};
 
 		const newAccount = await this.authRepository.createAccount({ accounts: account });
+
+		const desiredRoleName = registerDto.role ?? RolesEnum.USER;
+		const role = await this.rolesRepository.findByName(desiredRoleName);
+		console.log('role', role);
+		if (role && newAccount.user?.id) {
+			await this.userRoleRepository.assignUserRoleProject(newAccount.user.id, role.id);
+			console.log('OK');
+		}
 
 		return {
 			success: true,

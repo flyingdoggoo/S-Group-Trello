@@ -13,7 +13,8 @@ export class ProjectsController {
     async createProject(req: Request, res: Response, next: NextFunction) {
         try {
             const dto = new CreateProjectRequestDto(req.body);
-            const result = await this.projectsService.createProject(dto);
+            const userId = req.user?.id as string; 
+            const result = await this.projectsService.createProject(dto, userId);
             
             res.status(result.code).json({
                 success: result.success,
@@ -31,7 +32,8 @@ export class ProjectsController {
             console.log('Query params:', req.query);
             const dto = new GetProjectsRequestDto(req.query);
             console.log('DTO created:', dto);
-            const result = await this.projectsService.getProjects(dto);
+            const userId = req.user?.id as string;
+            const result = await this.projectsService.getProjects(dto, userId);
             console.log('Service result:', result);
             
             res.status(result.code).json({
@@ -48,7 +50,8 @@ export class ProjectsController {
     async getProjectById(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
-            const result = await this.projectsService.getProjectById(id);
+            const userId = req.user?.id as string;
+            const result = await this.projectsService.getProjectById(id, userId);
             
             res.status(result.code).json({
                 success: result.success,
@@ -64,7 +67,8 @@ export class ProjectsController {
         try {
             const { id } = req.params;
             const dto = new UpdateProjectRequestDto(req.body);
-            const result = await this.projectsService.updateProject(id, dto);
+            const userId = req.user?.id as string;
+            const result = await this.projectsService.updateProject(id, dto, userId);
             
             res.status(result.code).json({
                 success: result.success,
@@ -79,7 +83,8 @@ export class ProjectsController {
     async deleteProject(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
-            const result = await this.projectsService.deleteProject(id);
+            const userId = req.user?.id as string;
+            const result = await this.projectsService.deleteProject(id, userId);
             
             res.status(result.code).json({
                 success: result.success,
@@ -94,7 +99,8 @@ export class ProjectsController {
     async archiveProject(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
-            const result = await this.projectsService.archiveProject(id);
+            const userId = req.user?.id as string;
+            const result = await this.projectsService.archiveProject(id, userId);
             
             res.status(result.code).json({
                 success: result.success,

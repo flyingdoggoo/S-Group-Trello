@@ -20,11 +20,4 @@ export class UsersService {
             pagination: paginationUtils.convertPaginationResponseDtoFromTotalRecords(totalUsers),
         }
     }
-    async createProject(createProjectRequest: CreateProjectRequestDto): Promise<HttpResponseBodySuccessDto<CreateProjectRequestDto>> {
-        const createdProject = await this.usersRepository.createProject(createProjectRequest);
-        return {
-            success: true,
-            data: createdProject
-        };
-    }
 }

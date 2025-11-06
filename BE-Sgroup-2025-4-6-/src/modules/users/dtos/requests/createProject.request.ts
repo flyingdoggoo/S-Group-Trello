@@ -19,7 +19,3 @@ const CreateProjectValidationSchema = z.object({
 export const CreateProjectRequestValidationSchema: ZodValidationSchema = {
     body: CreateProjectValidationSchema
 }
-
-export const CreateProjectRequestSchema = {
-    body: CreateProjectValidationSchema
-}

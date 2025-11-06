@@ -42,6 +42,7 @@ export function Register({ gotoLogin }: { gotoLogin: () => void }) {
             setEmail("")
             setPassword("")
             setConfirmPassword("")
+            gotoLogin();
         } catch (error) {
             toast.error("Error creating account", { autoClose: 5000 })
             console.error("Error creating account:", error)

@@ -14,12 +14,14 @@
     "db:gen-dto": "npx prisma generate",
     "db:gen-migration": "npx prisma migrate dev --create-only --name"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.18.0",
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^8.1.0",
     "@prisma/client": "6.16.3",
     "@tsed/exceptions": "^8.16.2",
     "@types/bcrypt": "^6.0.0",
@@ -30,7 +32,6 @@
     "@types/node": "^24.5.1",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.16",
-    "@types/swagger-ui-express": "^4.1.8",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
@@ -47,7 +48,6 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "reflect-metadata": "^0.2.2",
-    "swagger-ui-express": "^5.0.1",
     "tsyringe": "^4.10.0",
     "zod": "^4.1.9",
     "zod-prisma-types": "^3.2.4"
