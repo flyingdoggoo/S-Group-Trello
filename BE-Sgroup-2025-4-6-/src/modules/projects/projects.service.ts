@@ -14,29 +14,35 @@ export class ProjectsService {
     ) { }
 
     async createProject(dto: CreateProjectRequestDto, userId: string): Promise<ServiceResponse<ProjectResponseDto>> {
+        // Create project
         const project = await this.projectsRepository.createProject({
             title: dto.title,
             description: dto.description,
         });
-        const project_id = project.id;
-        // Determine user's global role id
-        let userGlobalRoleId = await this.rolesRepository.findRoleIdByUserId(userId);
-        // If user has no global role, default to USER
-        if (!userGlobalRoleId) {
+        const projectId = project.id;
+
+        // Fetch PROJECT_ADMIN role; if missing fall back to USER role
+        const projectAdminRole = await this.rolesRepository.findByName('PROJECT_ADMIN');
+        let roleIdForCreator: string | undefined = projectAdminRole?.id;
+        if (!roleIdForCreator) {
             const userRole = await this.rolesRepository.findByName('USER');
-            userGlobalRoleId = userRole?.id as string;
+            roleIdForCreator = userRole?.id;
+        }
+        if (!roleIdForCreator) {
+            // Roles not seeded properly
+            console.error('[CREATE PROJECT] Missing roles: PROJECT_ADMIN and USER');
+            throw new NotFoundException('Roles not seeded');
         }
 
-        // Always make the creator a PROJECT_ADMIN within this project (membership role)
-        let roleIdForProjectMember = userGlobalRoleId;
-        const projectAdmin = await this.rolesRepository.findByName('PROJECT_ADMIN');
-        if (projectAdmin?.id) {
-            roleIdForProjectMember = projectAdmin.id;
+        // Assign membership (creator becomes project admin if available)
+        try {
+            await this.projectMemberRepository.assignUserRoleProject(projectId, userId, roleIdForCreator);
+            console.log('[CREATE PROJECT] Membership inserted', { projectId, userId, roleIdForCreator });
+        } catch (e) {
+            console.error('[CREATE PROJECT] Failed to insert membership', e);
+            throw e;
         }
 
-        await this.projectMemberRepository.assignUserRoleProject(
-            project_id, userId, roleIdForProjectMember
-        );
         return new ServiceResponse(
             ResponseStatus.Success,
             'Project created successfully',

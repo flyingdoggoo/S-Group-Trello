@@ -1,20 +1,12 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
-
+import { apiClient } from "../api/apiClient"
 export default function useProjects() {
     const [projects, setProjects] = useState([])
     const [error, setError] = useState<string | null>(null)
     async function fetchProjects() {
         try {
-            if (!axios.defaults.headers.common["Authorization"]) {
-                const token = localStorage.getItem("accessToken")
-                if (token) {
-                    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
-                }
-            }
-
-            const response = await axios.get("http://localhost:8000/projects")
-
+            const response = await apiClient.get("/projects")
             setProjects(response.data.data.data)
         } catch (err: any) {
             setError(err?.response?.data?.message || err.message)

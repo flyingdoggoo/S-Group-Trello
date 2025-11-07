@@ -24,7 +24,7 @@ export function BoardModalCreate({ projectId, boards, setBoards }: { projectId: 
     try {
       const accessToken = localStorage.getItem("accessToken")
       console.log(accessToken)
-      const response = await axios.post(`http://localhost:8000/projects/${projectId}`, {
+      const response = await axios.post(`http://localhost:8000/projects/${projectId}/boards`, {
         title,
         description
       }, {
