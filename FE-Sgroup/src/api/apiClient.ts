@@ -1,4 +1,4 @@
-import axios, { type AxiosProxyConfig, type AxiosResponse} from "axios";
+import axios, { type AxiosProxyConfig, type AxiosResponse } from "axios";
 
 export const axiosClient = axios.create({
   baseURL: "http://localhost:8000",
@@ -17,13 +17,19 @@ axiosClient.interceptors.request.use((config) => {
 });
 
 export const apiClient = {
-    request: {},
-    get(url: string, config?: AxiosProxyConfig) : Promise<AxiosResponse> {
-        return axiosClient.get(url, config)
-    },
-    post: {},
-    put: {},
-    delete: {},
+  request: {},
+  get(url: string, config?: AxiosProxyConfig): Promise<AxiosResponse> {
+    return axiosClient.get(url, config)
+  },
+  post(url: string, config?: AxiosProxyConfig): Promise<AxiosResponse> {
+    return axiosClient.post(url, config)
+  },
+  put(url: string, config?: AxiosProxyConfig): Promise<AxiosResponse> {
+    return axiosClient.put(url, config)
+  },
+  delete(url: string, config?: AxiosProxyConfig): Promise<AxiosResponse> {
+    return axiosClient.delete(url, config)
+  },
 }
 
 

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { BoardsService } from './boards.service';
+import { BoardsService } from './lists.service';
 import { autoBindUtil } from '@/common/utils';
-import { CreateBoardRequestDto, UpdateBoardRequestDto, GetBoardsRequestDto } from './dtos';
+import { CreateBoardRequestDto, UpdateBoardRequestDto, GetBoardsRequestDto } from '../boards/dtos';
 
 export class BoardsController {
     constructor(

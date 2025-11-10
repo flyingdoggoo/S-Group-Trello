@@ -1,6 +1,6 @@
-import { BoardsRepository } from './boards.repository';
-import { CreateBoardRequestDto, UpdateBoardRequestDto, GetBoardsRequestDto, GetBoardsResponseDto } from './dtos';
-import { BoardResponseDto, BoardResponseDtoSchema } from './dtos';
+import { BoardsRepository } from './lists.repository';
+import { CreateBoardRequestDto, UpdateBoardRequestDto, GetBoardsRequestDto, GetBoardsResponseDto } from '../boards/dtos';
+import { BoardResponseDto, BoardResponseDtoSchema } from '../boards/dtos';
 import { NotFoundException, ConflictException, ForbiddenException } from '@/common/exceptions';
 import { ServiceResponse, ResponseStatus } from '@/common/dtos';
 import { StatusCodes } from 'http-status-codes';
@@ -18,12 +18,10 @@ export class BoardsService {
     ) { }
 
     async createBoard(dto: CreateBoardRequestDto, userId: string, projectId: string): Promise<ServiceResponse<BoardResponseDto>> {
-        // Ensure project exists
         const project = await this.projectsRepository.findProjectById({ id: projectId });
         if (!project) {
             throw new NotFoundException('Project not found');
         }
-        // Ensure user is a member of the project
         const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
         if (!isMember) {
             throw new ForbiddenException();

@@ -1,11 +1,11 @@
 import { autoBindUtil, validateRequestMiddleware } from "@/common";
-import { BoardsController } from "./boards.controller";
+import { BoardsController } from "./lists.controller";
 import express from 'express';
 import {
     CreateBoardRequestValidationSchema,
     UpdateBoardRequestValidationSchema,
     GetBoardsRequestValidationSchema
-} from "./dtos";
+} from "../boards/dtos";
 
 import authMiddleware from '@/common/middlewares/auth.middleware';
 import { BoardPermissionEnum } from "@/common/enums/permissions/boardPermission.enum";

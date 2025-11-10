@@ -267,3 +267,5 @@ model Card {
 
   @@map("cards")
 }
+
+
