@@ -1,54 +1,61 @@
 import { autoBindUtil, validateRequestMiddleware } from "@/common";
-import { BoardsController } from "./lists.controller";
+import { ListsController } from "./lists.controller";
 import express from 'express';
 import {
-    CreateBoardRequestValidationSchema,
-    UpdateBoardRequestValidationSchema,
-    GetBoardsRequestValidationSchema
-} from "../boards/dtos";
+    CreateListRequestValidationSchema,
+    UpdateListRequestValidationSchema,
+    GetListsRequestValidationSchema
+} from "./dtos/requests";
 
 import authMiddleware from '@/common/middlewares/auth.middleware';
-import { BoardPermissionEnum } from "@/common/enums/permissions/boardPermission.enum";
+import { ListPermissionEnum } from "@/common/enums/permissions/listPermission.enum";
+import { CardsRouter } from "../cards/cards.router";
 
-const boardsController = new BoardsController();
+const listsController = new ListsController();
 
 const router = express.Router({ mergeParams: true });
-autoBindUtil(boardsController);
+autoBindUtil(listsController);
 
-// This router is mounted at /projects/:id/boards
-// So base path '/' refers to boards within the given project (req.params.id)
+///boards/:boardId/lists
 router.get(
     '/',
     authMiddleware.verifyToken,
-    validateRequestMiddleware(GetBoardsRequestValidationSchema),
-    authMiddleware.verifyPermission(BoardPermissionEnum.GET_BOARD),
-    boardsController.getBoards
+    validateRequestMiddleware(GetListsRequestValidationSchema),
+    authMiddleware.verifyPermission(ListPermissionEnum.GET_LIST),
+    listsController.getLists
 );
+
 router.post(
     '/',
     authMiddleware.verifyToken,
-    validateRequestMiddleware(CreateBoardRequestValidationSchema),
-    authMiddleware.verifyPermission(BoardPermissionEnum.CREATE_BOARD),
-    boardsController.createBoard
-);
-router.get(
-    '/:boardId',
-    authMiddleware.verifyToken,
-    authMiddleware.verifyPermission(BoardPermissionEnum.GET_BOARD),
-    boardsController.getBoardById
-);
-router.put(
-    '/:boardId',
-    authMiddleware.verifyToken,
-    validateRequestMiddleware(UpdateBoardRequestValidationSchema),
-    authMiddleware.verifyPermission(BoardPermissionEnum.UPDATE_BOARD),
-    boardsController.updateBoard
-);
-router.delete(
-    '/:boardId',
-    authMiddleware.verifyToken,
-    authMiddleware.verifyPermission(BoardPermissionEnum.DELETE_BOARD),
-    boardsController.deleteBoard
+    validateRequestMiddleware(CreateListRequestValidationSchema),
+    authMiddleware.verifyPermission(ListPermissionEnum.CREATE_LIST),
+    listsController.createList
 );
 
-export const boardsRouter = router;
+router.get(
+    '/:listId',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyPermission(ListPermissionEnum.GET_LIST),
+    listsController.getListById
+);
+
+router.put(
+    '/:listId',
+    authMiddleware.verifyToken,
+    validateRequestMiddleware(UpdateListRequestValidationSchema),
+    authMiddleware.verifyPermission(ListPermissionEnum.UPDATE_LIST),
+    listsController.updateList
+);
+
+router.delete(
+    '/:listId',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyPermission(ListPermissionEnum.DELETE_LIST),
+    listsController.deleteList
+);
+
+export const ListsRouter = router;
+
+// Nested route for cards under a list
+router.use('/:listId/cards', CardsRouter);

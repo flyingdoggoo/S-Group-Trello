@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import axios from "axios"
 import { apiClient } from "../api/apiClient"
 export default function useProjects() {
     const [projects, setProjects] = useState([])

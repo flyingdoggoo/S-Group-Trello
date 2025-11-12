@@ -14,6 +14,7 @@ export const CardSelectSchema: z.ZodType<Prisma.CardSelect> = z.object({
   title: z.boolean().optional(),
   description: z.boolean().optional(),
   position: z.boolean().optional(),
+  status: z.boolean().optional(),
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
   deletedAt: z.boolean().optional(),

@@ -1,102 +1,129 @@
-'use client';
-import { faker } from '@faker-js/faker';
 import {
     KanbanBoard,
-    KanbanCard,
     KanbanCards,
     KanbanHeader,
     KanbanProvider,
+    KanbanCard,
 } from '@/components/ui/shadcn-io/kanban';
-import { useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-const columns = [
-    { id: faker.string.uuid(), name: 'Planned', color: '#6B7280' },
-    { id: faker.string.uuid(), name: 'In Progress', color: '#F59E0B' },
-    { id: faker.string.uuid(), name: 'Done', color: '#10B981' },
-    { id: faker.string.uuid(), name: 'Archived', color: '#374151' },
-];
-const users = Array.from({ length: 4 })
-    .fill(null)
-    .map(() => ({
-        id: faker.string.uuid(),
-        name: faker.person.fullName(),
-        image: faker.image.avatar(),
-    }));
-const exampleFeatures = Array.from({ length: 20 })
-    .fill(null)
-    .map(() => ({
-        id: faker.string.uuid(),
-        name: capitalize(faker.company.buzzPhrase()),
-        startAt: faker.date.past({ years: 0.5, refDate: new Date() }),
-        endAt: faker.date.future({ years: 0.5, refDate: new Date() }),
-        column: faker.helpers.arrayElement(columns).id,
-        owner: faker.helpers.arrayElement(users),
-    }));
-const dateFormatter = new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-});
-const shortDateFormatter = new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-});
-const Example = () => {
-    const [features, setFeatures] = useState(exampleFeatures);
-    return (
-        <div className="p-8 d">
-            <KanbanProvider
-                columns={columns}
-                data={features}
-                onDataChange={setFeatures}
-            >
-                {(column) => (
-                    <KanbanBoard id={column.id} key={column.id}>
-                        <KanbanHeader>
-                            <div className="flex items-center gap-2">
-                                <div
-                                    className="h-2 w-2 rounded-full"
-                                    style={{ backgroundColor: column.color }}
-                                />
-                                <span>{column.name}</span>
-                            </div>
-                        </KanbanHeader>
-                        <KanbanCards id={column.id}>
-                            {(feature: (typeof features)[number]) => (
-                                <KanbanCard
-                                    column={column.id}
-                                    id={feature.id}
-                                    key={feature.id}
-                                    name={feature.name}
-                                >
-                                    <div className="flex items-start justify-between gap-2">
-                                        <div className="flex flex-col gap-1">
-                                            <p className="m-0 flex-1 font-medium text-sm">
-                                                {feature.name}
-                                            </p>
-                                        </div>
-                                        {feature.owner && (
-                                            <Avatar className="h-4 w-4 shrink-0">
-                                                <AvatarImage src={feature.owner.image} />
-                                                <AvatarFallback>
-                                                    {feature.owner.name?.slice(0, 2)}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        )}
-                                    </div>
-                                    <p className="m-0 text-muted-foreground text-xs">
-                                        {shortDateFormatter.format(feature.startAt)} -{' '}
-                                        {dateFormatter.format(feature.endAt)}
-                                    </p>
-                                </KanbanCard>
-                            )}
-                        </KanbanCards>
-                    </KanbanBoard>
-                )}
-            </KanbanProvider>
-        </div>
+import { faker } from '@faker-js/faker';
+import { useParams } from 'react-router';
+import useLists from '@/hooks/useLists';
+import type { ListItem } from '@/hooks/useLists';
+import { useMemo, useState, useEffect } from 'react';
+import { ListModalCreate } from '@/components/ui/list.modal.create';
+import { apiClient } from '@/api/apiClient';
+import { SidebarProvider } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/layouts/Sidebar"
+type FeatureItem = { id: string; name: string; description?: string | null; column: string };
 
+export default function BoardDetail() {
+    const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+    const boardId = useParams().boardId as string;
+    const projectId = useParams().id as string;
+    const { lists, setLists } = useLists({ projectId, boardId });
+    const columns = useMemo(() => lists.map((list: ListItem) => ({
+        id: list.id,
+        name: capitalize(list.title),
+        color: faker.color.rgb({ format: 'hex' }),
+    })), [lists]);
+
+    const [features, setFeatures] = useState<FeatureItem[]>([]);
+    const [inputs, setInputs] = useState<Record<string, string>>({});
+    // inputs = {
+    //     "listA": "b",
+    //     "listB": "a"
+    // }
+
+    // Load cards for all lists when lists change
+    useEffect(() => {
+        if (!lists.length) { setFeatures([]); return; }
+        let mounted = true;
+        (async () => {
+            try {
+                const resultArrays = await Promise.all(lists.map(async l => {
+                    const res = await apiClient.get(`projects/${projectId}/boards/${boardId}/lists/${l.id}/cards`);
+                    const raw = res.data?.data?.data || [];
+                    return raw.map((c: any) => ({ id: c.id, name: c.title, description: c.description ?? null, column: l.id } as FeatureItem));
+                }));
+                if (mounted) setFeatures(resultArrays.flat());
+            } catch (err) {
+                console.error(err);
+                if (mounted) setFeatures([]);
+            }
+        })();
+        return () => { mounted = false; };
+    }, [lists, projectId, boardId]);
+
+    async function handleCreate(listId: string) {
+        const title = (inputs[listId] || '').trim();
+        if (!title) return;
+        try {
+            const res = await apiClient.post(`projects/${projectId}/boards/${boardId}/lists/${listId}/cards`, { title });
+            const c = res.data?.data;
+            if (c) {
+                setFeatures(prev => [...prev, { id: c.id, name: c.title, description: c.description ?? null, column: listId }]);
+                setInputs(prev => ({ ...prev, [listId]: '' }));
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    return (
+        <div>
+            <SidebarProvider>
+                <AppSidebar />
+                <div className="p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-semibold mr-4">Board</h2>
+                        <ListModalCreate projectId={projectId} boardId={boardId} lists={lists} setLists={setLists} />
+                    </div>
+                    <div className="overflow-x-auto">
+                        <div className="gap-4 min-w-max">
+                            <KanbanProvider columns={columns} data={features} onDataChange={setFeatures}>
+                                {(column) => (
+                                    <KanbanBoard id={column.id} key={column.id} className="w-48 flex-shrink-0">
+                                        <KanbanHeader>
+                                            <div className="flex items-center gap-2">
+                                                <div
+                                                    className="h-2 w-2 rounded-full"
+                                                    style={{ backgroundColor: column.color }}
+                                                />
+                                                <span>{column.name}</span>
+                                            </div>
+                                        </KanbanHeader>
+                                        <KanbanCards id={column.id}>
+                                            {(feature: FeatureItem) => (
+                                                <KanbanCard column={column.id} id={feature.id} key={feature.id} name={feature.name}>
+                                                    {feature.description && (
+                                                        <p className="m-0 text-xs text-muted-foreground line-clamp-3">{feature.description}</p>
+                                                    )}
+                                                </KanbanCard>
+                                            )}
+                                        </KanbanCards>
+                                        <div className="m-2 flex items-center gap-2">
+                                            <input
+                                                value={inputs[column.id] || ''}
+                                                onChange={(e) =>
+                                                    setInputs((prev) => ({ ...prev, [column.id]: e.target.value }))
+                                                }
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        handleCreate(column.id);
+                                                    }
+                                                }}
+                                                placeholder="Add a card..."
+                                                className="flex-1 rounded border px-2 py-1 text-sm"
+                                            />
+                                        </div>
+                                    </KanbanBoard>
+                                )}
+                            </KanbanProvider>
+                        </div>
+                    </div>
+                </div>
+            </SidebarProvider>
+        </div>
     );
-};
-export default Example;
+}

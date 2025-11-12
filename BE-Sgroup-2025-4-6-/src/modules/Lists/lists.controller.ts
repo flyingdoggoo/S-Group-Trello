@@ -1,98 +1,69 @@
 import { Request, Response, NextFunction } from 'express';
-import { BoardsService } from './lists.service';
+import { ListsService } from './lists.service';
 import { autoBindUtil } from '@/common/utils';
-import { CreateBoardRequestDto, UpdateBoardRequestDto, GetBoardsRequestDto } from '../boards/dtos';
+import { CreateListRequestDto, UpdateListRequestDto, GetListsRequestDto } from './dtos/requests';
 
-export class BoardsController {
-    constructor(
-        private readonly boardsService = new BoardsService()
-    ) {
+export class ListsController {
+    constructor(private readonly listsService = new ListsService()) {
         autoBindUtil(this);
     }
 
-    async createBoard(req: Request, res: Response, next: NextFunction) {
+    // Assumes nested under /projects/:id/boards/:boardId/lists
+        async createList(req: Request, res: Response, next: NextFunction) {
         try {
-            const dto = new CreateBoardRequestDto(req.body);
-            const userId = req.user?.id as string; 
+            const dto = new CreateListRequestDto(req.body);
+            const userId = req.user?.id as string;
+                const projectId = req.params.id as string; // project scope
+                const boardId = req.params.boardId as string;
+                const result = await this.listsService.createList(dto, userId, projectId, boardId);
+            res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+        async getLists(req: Request, res: Response, next: NextFunction) {
+        try {
+            const dto = new GetListsRequestDto(req.query);
             const projectId = req.params.id as string;
-            const result = await this.boardsService.createBoard(dto, userId, projectId);
-            console.log('=== CREATE BOARD CONTROLLER ===');
-            console.log('Request Body:', req.body);
-            console.log('DTO:', dto);
-            console.log('User ID:', userId);
-            console.log('Project ID:', projectId);
-            console.log('Service Result:', result);
-            res.status(result.code).json({
-                success: result.success,
-                message: result.message,
-                data: result.data
-            });
+            const boardId = req.params.boardId as string;
+            const userId = req.user?.id as string;
+                const result = await this.listsService.getLists(dto, projectId, boardId, userId);
+            res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
         }
     }
 
-    async getBoards(req: Request, res: Response, next: NextFunction) {
+        async getListById(req: Request, res: Response, next: NextFunction) {
         try {
-            const dto = new GetBoardsRequestDto(req.query);
-            const projectId = req.params.id as string; // parent param
+                const { id, boardId, listId } = req.params;
             const userId = req.user?.id as string;
-            const result = await this.boardsService.getBoards(dto, projectId, userId);
-            
-            res.status(result.code).json({
-                success: result.success,
-                message: result.message,
-                data: result.data
-            });
+                const result = await this.listsService.getListById(listId, id, boardId, userId);
+            res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
         }
     }
 
-    async getBoardById(req: Request, res: Response, next: NextFunction) {
+        async updateList(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId } = req.params;
+                const { id, boardId, listId } = req.params;
+            const dto = new UpdateListRequestDto(req.body);
             const userId = req.user?.id as string;
-            const result = await this.boardsService.getBoardById(boardId, id, userId);
-
-            res.status(result.code).json({
-                success: result.success,
-                message: result.message,
-                data: result.data
-            });
+                const result = await this.listsService.updateList(listId, id, boardId, userId, dto);
+            res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
         }
     }
 
-    async updateBoard(req: Request, res: Response, next: NextFunction) {
+        async deleteList(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId } = req.params;
-            const dto = new UpdateBoardRequestDto(req.body);
+                const { id, boardId, listId } = req.params;
             const userId = req.user?.id as string;
-            const result = await this.boardsService.updateBoard(boardId, id, userId, dto);
-
-            res.status(result.code).json({
-                success: result.success,
-                message: result.message,
-                data: result.data
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    async deleteBoard(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { id, boardId } = req.params;
-            const userId = req.user?.id as string;
-            const result = await this.boardsService.deleteBoard(boardId, id, userId);
-
-            res.status(result.code).json({
-                success: result.success,
-                message: result.message,
-                data: result.data
-            });
+                const result = await this.listsService.deleteList(listId, id, boardId, userId);
+            res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
         }

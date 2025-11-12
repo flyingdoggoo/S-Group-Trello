@@ -13,8 +13,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
-import axios from "axios"
 import { toast } from "react-toastify"
+import { apiClient } from "@/api/apiClient"
 export function ProjectModalCreate({ projects, setProjects }: { projects: any; setProjects: any }) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -22,17 +22,10 @@ export function ProjectModalCreate({ projects, setProjects }: { projects: any; s
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     try {
-      const accessToken = localStorage.getItem("accessToken")
-      console.log(accessToken)
-      const response = await axios.post("http://localhost:8000/projects", {
+      const response = await apiClient.post("projects", {
         title,
         description
-      }, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
       })
-      console.log("Project created:", response)
       if (response.data && response.data.data) {
         setTitle("")
         setDescription("")
@@ -78,7 +71,7 @@ export function ProjectModalCreate({ projects, setProjects }: { projects: any; s
                   onChange={(e) => setTitle(e.target.value)}
                 />
               </div>
-              <div className="grid gap-3">
+              <div className="grid gap-3 mb-4">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"

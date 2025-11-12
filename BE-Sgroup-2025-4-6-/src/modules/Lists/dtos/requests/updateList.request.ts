@@ -1,21 +1,18 @@
 import z from "zod";
 import { ZodValidationSchema } from "@/common";
 
-export class UpdateBoardRequestDto {
+export class UpdateListRequestDto {
     title?: string;
-    description?: string;
 
-    constructor(data?: Partial<UpdateBoardRequestDto>) {
+    constructor(data?: Partial<UpdateListRequestDto>) {
         this.title = data?.title;
-        this.description = data?.description;
     }
 }
 
-const updateBoardRequestSchema = z.object({
+const updateListRequestSchema = z.object({
     title: z.string().min(1).optional(),
-    description: z.string().optional()
 }).strict();
 
-export const UpdateBoardRequestValidationSchema: ZodValidationSchema = {
-    body: updateBoardRequestSchema
+export const UpdateListRequestValidationSchema: ZodValidationSchema = {
+    body: updateListRequestSchema
 }

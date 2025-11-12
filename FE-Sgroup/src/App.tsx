@@ -12,7 +12,7 @@ export default function App() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/projects" element={<Dashboard />} />
       <Route path="/projects/:id/boards" element={<ProjectDetail />} />
-      <Route path="/testKanban" element={<BoardDetail />} />
+      <Route path="/projects/:id/boards/:boardId/lists" element={<BoardDetail />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

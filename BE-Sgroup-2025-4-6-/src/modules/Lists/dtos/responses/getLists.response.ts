@@ -1,7 +1,7 @@
 import z from "zod";
-import { BoardResponseDtoSchema } from "./list.response";
+import { ListResponseDtoSchema } from "./list.response";
 
-export class GetBoardsResponseDto {
+export class GetListsResponseDto {
     data: Array<any>;
     total: number;
     page: number;
@@ -15,8 +15,8 @@ export class GetBoardsResponseDto {
     }
 }
 
-export const GetBoardsResponseDtoSchema = z.object({
-    data: z.array(BoardResponseDtoSchema),
+export const GetListsResponseDtoSchema = z.object({
+    data: z.array(ListResponseDtoSchema),
     total: z.number(),
     page: z.number(),
     limit: z.number(),
