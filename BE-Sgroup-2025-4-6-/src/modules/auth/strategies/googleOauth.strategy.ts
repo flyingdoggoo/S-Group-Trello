@@ -97,9 +97,13 @@ export class GoogleOauthStrategy {
 				}
 			}
 
+			// Attach minimal user identity plus the social account payload
 			done(null, {
-				socialAccountInformation: socialAccount,
-			});
+				id: (socialAccount?.userId || existingUser?.id || '').toString(),
+				email: user.email,
+				name: user.name,
+				socialAccountInformation: socialAccount!,
+			} as Express.User);
 		} catch {
 			throw new InternalServerException();
 		}

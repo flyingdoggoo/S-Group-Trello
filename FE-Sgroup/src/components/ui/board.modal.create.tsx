@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
-import axios from "axios"
 import { toast } from "react-toastify"
 import { apiClient } from "@/api/apiClient"
 export function BoardModalCreate({ projectId, boards, setBoards }: { projectId: string; boards: any; setBoards: any }) {

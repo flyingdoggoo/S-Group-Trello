@@ -11,18 +11,8 @@ services:
             POSTGRES_DB: trip
         ports:
             - '5434:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
 
-    trip-backend:
-        working_dir: /app
-        container_name: trip-backend
-        build:
-            context: .
-            dockerfile: Dockerfile
-        restart: on-failure
-        ports:
-            - '8000:8000'
-        depends_on:
-            - trip-database
-        env_file:
-            - .env.docker
-        command: ['npx', 'tsx', 'src/app.ts']
+volumes:
+    postgres_data:
