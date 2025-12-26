@@ -13,8 +13,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
-import axios from "axios"
 import { toast } from "react-toastify"
+import { apiClient } from "@/api/apiClient"
 export function BoardModalCreate({ projectId, boards, setBoards }: { projectId: string; boards: any; setBoards: any }) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -22,15 +22,9 @@ export function BoardModalCreate({ projectId, boards, setBoards }: { projectId: 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     try {
-      const accessToken = localStorage.getItem("accessToken")
-      console.log(accessToken)
-      const response = await axios.post(`http://localhost:8000/projects/${projectId}`, {
+      const response = await apiClient.post(`projects/${projectId}/boards`, {
         title,
         description
-      }, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
       })
       if (response.data && response.data.data) {
         setTitle("")
@@ -75,7 +69,7 @@ export function BoardModalCreate({ projectId, boards, setBoards }: { projectId: 
                   onChange={(e) => setTitle(e.target.value)}
                 />
               </div>
-              <div className="grid gap-3">
+              <div className="grid gap-3 mb-4">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"

@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "format": "prettier --write \"src/**/*.ts\" && pnpm lint",
+    "format": "prettier --write \"src/**/*.ts\" && npm run lint",
     "lint": "eslint \"src/**/*.ts\" --fix",
-    "build": "pnpm install & pnpm db:push & npx rimraf dist & npx tsup",
+    "build": "npm install & npm run db:push & npx rimraf dist & npx tsup",
     "start": "node dist/app.js",
     "dev": "tsx watch --clear-screen=false src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -20,7 +20,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.18.0",
   "dependencies": {
     "@prisma/client": "6.16.3",
     "@tsed/exceptions": "^8.16.2",
@@ -48,9 +47,12 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "reflect-metadata": "^0.2.2",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "tsyringe": "^4.10.0",
     "zod": "^4.1.9",
-    "zod-prisma-types": "^3.2.4"
+    "zod-prisma-types": "^3.2.4",
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

@@ -9,6 +9,7 @@ import {
 
 import authMiddleware from '@/common/middlewares/auth.middleware';
 import { BoardPermissionEnum } from "@/common/enums/permissions/boardPermission.enum";
+import { ListsRouter } from "../lists/lists.router";
 
 const boardsController = new BoardsController();
 
@@ -50,5 +51,7 @@ router.delete(
     authMiddleware.verifyPermission(BoardPermissionEnum.DELETE_BOARD),
     boardsController.deleteBoard
 );
+
+router.use('/:boardId/lists', ListsRouter);
 
 export const boardsRouter = router;

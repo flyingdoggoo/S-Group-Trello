@@ -14,7 +14,7 @@ export function Dashboard() {
       <SidebarProvider>
         <AppSidebar />
         <main className="flex-1 p-8">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <h1 className="text-3xl font-bold">Projects Manager</h1>
           <p className="text-gray-500 mb-4">Manage your boards and projects</p>
           {error && <div className="text-red-500 mb-2">{error}</div>}
 

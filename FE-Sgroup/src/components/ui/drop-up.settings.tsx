@@ -18,6 +18,7 @@ export function DropUpSettings(collapsed: any) {
     function Logout() {
         localStorage.removeItem("accessToken")
         window.location.reload()
+        window.location.href = "/"
     }
     return (
 

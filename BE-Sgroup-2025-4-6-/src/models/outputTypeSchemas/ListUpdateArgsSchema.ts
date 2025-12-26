@@ -15,6 +15,7 @@ export const ListSelectSchema: z.ZodType<Prisma.ListSelect> = z.object({
   boardId: z.boolean().optional(),
   title: z.boolean().optional(),
   position: z.boolean().optional(),
+  status: z.boolean().optional(),
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
   deletedAt: z.boolean().optional(),

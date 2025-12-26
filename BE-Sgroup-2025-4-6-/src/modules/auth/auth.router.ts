@@ -27,6 +27,6 @@ router.post(
 );
 router.get('/google/login', authController.googleAuth);
 router.get('/google/check-login', authController.googleCallback);
-router.get('/google/login/failure', authController.googleCallback);
+router.get('/google/login/failure', authController.authFailure);
 
 export const authRouter = router;

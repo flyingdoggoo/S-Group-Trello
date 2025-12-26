@@ -18,12 +18,10 @@ export class BoardsService {
     ) { }
 
     async createBoard(dto: CreateBoardRequestDto, userId: string, projectId: string): Promise<ServiceResponse<BoardResponseDto>> {
-        // Ensure project exists
         const project = await this.projectsRepository.findProjectById({ id: projectId });
         if (!project) {
             throw new NotFoundException('Project not found');
         }
-        // Ensure user is a member of the project
         const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
         if (!isMember) {
             throw new ForbiddenException();
@@ -34,21 +32,10 @@ export class BoardsService {
             title: dto.title,
             description: dto.description,
         });
-        const board_id = board.id;
-        let userGlobalRoleId = await this.rolesRepository.findRoleIdByUserId(userId);
-        if (!userGlobalRoleId) {
-            const userRole = await this.rolesRepository.findByName('USER');
-            userGlobalRoleId = userRole?.id as string;
-        }
-        // If creator is PROJECT_ADMIN, elevate to BOARD_ADMIN for this board
-        let roleIdForBoardMember = userGlobalRoleId;
-        const projectAdmin = await this.rolesRepository.findByName('PROJECT_ADMIN');
+        const boardId = board.id;
         const boardAdmin = await this.rolesRepository.findByName('BOARD_ADMIN');
-        if (projectAdmin?.id && boardAdmin?.id && userGlobalRoleId === projectAdmin.id) {
-            roleIdForBoardMember = boardAdmin.id;
-        }
         await this.boardMemberRepository.assignUserRoleBoard(
-            board_id, userId, roleIdForBoardMember
+            boardId, userId, boardAdmin.id
         );
         return new ServiceResponse(
             ResponseStatus.Success,

@@ -3,6 +3,7 @@ import { RolesEnum } from "../src/common/enums/roles.enum";
 import { UserPermissionEnum } from "../src/common/enums/permissions/userPermission.enum";
 import { ProjectPermissionEnum } from "../src/common/enums/permissions/projectPermission.enum";
 import { BoardPermissionEnum } from "../src/common/enums/permissions/boardPermission.enum";
+import { ListPermissionEnum } from "../src/common/enums/permissions/listPermission.enum";
 
 const prisma = new PrismaClient();
 
@@ -28,6 +29,7 @@ async function seedPermissions() {
     enumValues(UserPermissionEnum).forEach((p) => permissions.add(p));
     enumValues(ProjectPermissionEnum).forEach((p) => permissions.add(p));
     enumValues(BoardPermissionEnum).forEach((p) => permissions.add(p));
+    enumValues(ListPermissionEnum).forEach((p) => permissions.add(p));
 
     const desired = Array.from(permissions);
     const existing = await prisma.permission.findMany({
@@ -42,16 +44,42 @@ async function seedPermissions() {
 }
 
 async function seedRolePermissions() {
+    const allow = (perms: string[]) => perms.filter(p => p.startsWith('GET_') || p.startsWith('CREATE_') || p.startsWith('UPDATE_'));
+
     const rolePermissions: Record<RolesEnum, string[]> = {
-            [RolesEnum.USER]: [
-                ProjectPermissionEnum.CREATE_PROJECT,
-                ProjectPermissionEnum.GET_PROJECT,
-            ],
-            [RolesEnum.PROJECT_ADMIN]: [
-                ...enumValues(ProjectPermissionEnum),
-                ...enumValues(BoardPermissionEnum), // Project admin can manage boards within their projects
-            ],
-            [RolesEnum.BOARD_ADMIN]: enumValues(BoardPermissionEnum),
+        [RolesEnum.USER]: [
+            ProjectPermissionEnum.CREATE_PROJECT,
+            ProjectPermissionEnum.GET_PROJECT,
+        ],
+        [RolesEnum.PROJECT_ADMIN]: [
+            ...enumValues(ProjectPermissionEnum),
+            ...enumValues(BoardPermissionEnum),
+            ...enumValues(ListPermissionEnum),
+        ],
+        [RolesEnum.BOARD_ADMIN]: [
+            ...enumValues(BoardPermissionEnum),
+            ...enumValues(ListPermissionEnum),
+        ],
+        // Normal project members: can GET/CREATE/UPDATE across project resources, but no DELETE or INVITE
+        [RolesEnum.PROJECT_MEMBER]: [
+            ...allow(enumValues(ProjectPermissionEnum)),
+            ...allow(enumValues(BoardPermissionEnum)),
+            ...allow(enumValues(ListPermissionEnum)),
+        ],
+        // Normal board members: board-scoped GET/UPDATE for board, and GET/CREATE/UPDATE for lists/cards
+        [RolesEnum.BOARD_MEMBER]: [
+            // Board
+            BoardPermissionEnum.GET_BOARD,
+            BoardPermissionEnum.UPDATE_BOARD,
+            // Cards (no delete)
+            BoardPermissionEnum.GET_CARD,
+            BoardPermissionEnum.CREATE_CARD,
+            BoardPermissionEnum.UPDATE_CARD,
+            // Lists (no delete)
+            ListPermissionEnum.GET_LIST,
+            ListPermissionEnum.CREATE_LIST,
+            ListPermissionEnum.UPDATE_LIST,
+        ],
     };
 
     for (const [roleName, perms] of Object.entries(rolePermissions) as [RolesEnum, string[]][]) {

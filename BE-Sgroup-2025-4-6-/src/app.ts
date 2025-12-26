@@ -14,6 +14,9 @@ import {
 	setCookieMiddleware,
 } from './common';
 
+import { NotificationGateway } from './modules/notifications/notification.gateway';
+import { createSecretKey } from 'crypto';
+import { createServer } from 'http';
 const app: Express = express();
 
 app.use(express.json());
@@ -37,10 +40,15 @@ app.use('/health-check', Modules.healthCheckRouter);
 app.use('/auth', Modules.authRouter);
 app.use('/users', Modules.usersRouter);
 app.use('/projects', Modules.projectsRouter);
-
+app.use('/notifications', Modules.notificationRouter);
 app.use(errorHandlerMiddleware);
 
-app.listen(appEnv.PORT, () => {
+const server = createServer(app);
+
+const notificationGateway = new NotificationGateway();
+notificationGateway.initialize(server);
+
+server.listen(appEnv.PORT, () => {
 	const { NODE_ENV, HOST, PORT } = appEnv;
 	console.log(`Server (${NODE_ENV}) running at http://${HOST}:${PORT}`);
 });

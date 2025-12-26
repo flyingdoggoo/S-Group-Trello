@@ -3,6 +3,8 @@ import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { StringFilterSchema } from './StringFilterSchema';
 import { IntFilterSchema } from './IntFilterSchema';
+import { EnumListStatusEnumFilterSchema } from './EnumListStatusEnumFilterSchema';
+import { ListStatusEnumSchema } from './ListStatusEnumSchema';
 import { DateTimeFilterSchema } from './DateTimeFilterSchema';
 import { DateTimeNullableFilterSchema } from './DateTimeNullableFilterSchema';
 
@@ -14,6 +16,7 @@ export const ListScalarWhereInputSchema: z.ZodType<Prisma.ListScalarWhereInput> 
   boardId: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   title: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   position: z.union([ z.lazy(() => IntFilterSchema), z.number() ]).optional(),
+  status: z.union([ z.lazy(() => EnumListStatusEnumFilterSchema), z.lazy(() => ListStatusEnumSchema) ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   deletedAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),

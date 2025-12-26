@@ -20,7 +20,6 @@ class AuthMiddleware {
 
     async verifyToken(req: Request, res: Response, next: NextFunction) {
         try {
-            // Lấy token từ Authorization header
             const authHeader = req.headers.authorization;
 
             console.log('=== AUTH MIDDLEWARE DEBUG ===');

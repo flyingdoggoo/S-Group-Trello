@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ListStatusEnumSchema } from '../inputTypeSchemas/ListStatusEnumSchema'
 import { BoardWithRelationsSchema, BoardPartialWithRelationsSchema, BoardOptionalDefaultsWithRelationsSchema } from './BoardSchema'
 import type { BoardWithRelations, BoardPartialWithRelations, BoardOptionalDefaultsWithRelations } from './BoardSchema'
 import { CardWithRelationsSchema, CardPartialWithRelationsSchema, CardOptionalDefaultsWithRelationsSchema } from './CardSchema'
@@ -9,6 +10,7 @@ import type { CardWithRelations, CardPartialWithRelations, CardOptionalDefaultsW
 /////////////////////////////////////////
 
 export const ListSchema = z.object({
+  status: ListStatusEnumSchema,
   id: z.uuid(),
   boardId: z.string(),
   title: z.string(),
@@ -33,6 +35,7 @@ export type ListPartial = z.infer<typeof ListPartialSchema>
 /////////////////////////////////////////
 
 export const ListOptionalDefaultsSchema = ListSchema.merge(z.object({
+  status: ListStatusEnumSchema.optional(),
   id: z.uuid().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
