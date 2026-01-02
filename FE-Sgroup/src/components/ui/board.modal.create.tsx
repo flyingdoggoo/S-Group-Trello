@@ -15,12 +15,20 @@ import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
 import { toast } from "react-toastify"
 import { apiClient } from "@/api/apiClient"
-export function BoardModalCreate({ projectId, boards, setBoards }: { projectId: string; boards: any; setBoards: any }) {
+import { useBoardsStore } from "@/stores/boards.store"
+import { useProjectsStore } from "@/stores/projects.store"
+
+export function BoardModalCreate({ projectId }: { projectId: string }) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [loading, setLoading] = useState(false)
+  const addBoard = useBoardsStore((state) => state.addBoard)
+  const updateProjectBoardCount = useProjectsStore((state) => state.updateProjectBoardCount)
+  const projects = useProjectsStore((state) => state.projects)
+  
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setLoading(true)
     try {
       const response = await apiClient.post(`projects/${projectId}/boards`, {
         title,
@@ -29,8 +37,17 @@ export function BoardModalCreate({ projectId, boards, setBoards }: { projectId: 
       if (response.data && response.data.data) {
         setTitle("")
         setDescription("")
-        let newBoard = response.data.data
-        setBoards([...boards, newBoard])
+        const newBoard = response.data.data
+        
+        // Add board to store
+        addBoard(projectId, newBoard)
+        
+        // Update board count in projects store
+        const project = projects.find(p => p.id === projectId)
+        if (project) {
+          updateProjectBoardCount(projectId, (project.boardCount || 0) + 1)
+        }
+        
         toast.success("Board created successfully!")
       }
     } catch (error : any) {

@@ -15,12 +15,19 @@ import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
 import { toast } from "react-toastify"
 import { apiClient } from "@/api/apiClient"
-export function ProjectModalCreate({ projects, setProjects }: { projects: any; setProjects: any }) {
+import { useProjectsStore } from "@/stores/projects.store"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+
+export function ProjectModalCreate({ projects }: { projects: any }) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [loading, setLoading] = useState(false)
+  const addProject = useProjectsStore((state) => state.addProject)
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setLoading(true)
     try {
       const response = await apiClient.post("projects", {
         title,
@@ -31,12 +38,11 @@ export function ProjectModalCreate({ projects, setProjects }: { projects: any; s
         setDescription("")
         let newProject = response.data.data
         console.log("New project:", newProject)
-        console.log("Current projects:", projects)
-        setProjects([...projects, newProject])
+        addProject(newProject) // Sử dụng store action thay vì setProjects
         toast.success("Project created successfully!")
       }
-    } catch (error : any) {
-      if(error.response?.status === 403){
+    } catch (error: any) {
+      if (error.response?.status === 403) {
         toast.error("You do not have permission to create a project.")
       }
       else {
@@ -50,10 +56,13 @@ export function ProjectModalCreate({ projects, setProjects }: { projects: any; s
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-5 hover:bg-gray-50 cursor-pointer transition">
-            <span className="text-3xl text-gray-400 mb-2">+</span>
-            <button className="text-gray-600 font-medium">Create a new project</button>
-          </div>
+          <Button
+            variant="outline"
+            className="text-white border-gray-600 bg-gray-900"
+          >
+            <FontAwesomeIcon icon={faPlus} /> New Workspace
+          </Button>
+
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <form className="dialog-form" onSubmit={handleSubmit}>

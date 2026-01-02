@@ -39,6 +39,18 @@ export class ProjectsRepository {
                 take,
                 orderBy: {
                     createdAt: 'desc'
+                },
+                include: {
+                    Board: {
+                        where: {
+                            deletedAt: null
+                        },
+                        select: {
+                            id: true,
+                            title: true,
+                            description: true
+                        }
+                    }
                 }
             }),
             this.prismaService.project.count({
