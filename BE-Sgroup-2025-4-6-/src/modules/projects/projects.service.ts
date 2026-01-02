@@ -64,7 +64,19 @@ export class ProjectsService {
             take: limit,
         });
 
-        const projectsResponse = projects.map(project => new ProjectResponseDto(project));
+        const projectsResponse = projects.map(project => {
+            const boards = (project as any).Board || [];
+            const boardCount = boards.length;
+            return new ProjectResponseDto({ 
+                ...project, 
+                boardCount,
+                boards: boards.map((b: any) => ({
+                    id: b.id,
+                    title: b.title,
+                    description: b.description
+                }))
+            });
+        });
 
         return new ServiceResponse(
             ResponseStatus.Success,

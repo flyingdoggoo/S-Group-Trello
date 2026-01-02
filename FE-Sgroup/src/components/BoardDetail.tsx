@@ -29,10 +29,6 @@ export default function BoardDetail() {
 
     const [features, setFeatures] = useState<FeatureItem[]>([]);
     const [inputs, setInputs] = useState<Record<string, string>>({});
-    // inputs = {
-    //     "listA": "b",
-    //     "listB": "a"
-    // }
 
     // Load cards for all lists when lists change
     useEffect(() => {
