@@ -21,7 +21,7 @@ export function Dashboard() {
               <h1 className="text-3xl font-bold">Dashboard</h1>
               <p className="text-gray-500 mb-4">Manage your workspaces and boards</p>
             </div>
-            <ProjectModalCreate projects={projects} />
+            <ProjectModalCreate />
           </div>
           {error && <div className="text-red-500 mb-2">{error}</div>}
 

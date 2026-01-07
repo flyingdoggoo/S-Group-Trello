@@ -19,7 +19,7 @@ import { useProjectsStore } from "@/stores/projects.store"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
-export function ProjectModalCreate({ projects }: { projects: any }) {
+export function ProjectModalCreate() {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [loading, setLoading] = useState(false)
