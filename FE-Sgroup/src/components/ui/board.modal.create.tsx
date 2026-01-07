@@ -23,8 +23,7 @@ export function BoardModalCreate({ projectId }: { projectId: string }) {
   const [description, setDescription] = useState("")
   const [loading, setLoading] = useState(false)
   const addBoard = useBoardsStore((state) => state.addBoard)
-  const updateProjectBoardCount = useProjectsStore((state) => state.updateProjectBoardCount)
-  const projects = useProjectsStore((state) => state.projects)
+  const addBoardToProject = useProjectsStore((state) => state.addBoardToProject)
   
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -39,14 +38,9 @@ export function BoardModalCreate({ projectId }: { projectId: string }) {
         setDescription("")
         const newBoard = response.data.data
         
-        // Add board to store
+        // Add board to both stores
         addBoard(projectId, newBoard)
-        
-        // Update board count in projects store
-        const project = projects.find(p => p.id === projectId)
-        if (project) {
-          updateProjectBoardCount(projectId, (project.boardCount || 0) + 1)
-        }
+        addBoardToProject(projectId, newBoard)
         
         toast.success("Board created successfully!")
       }
