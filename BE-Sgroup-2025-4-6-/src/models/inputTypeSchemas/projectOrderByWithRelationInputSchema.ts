@@ -5,6 +5,7 @@ import { SortOrderSchema } from './SortOrderSchema';
 import { SortOrderInputSchema } from './SortOrderInputSchema';
 import { ProjectMemberOrderByRelationAggregateInputSchema } from './ProjectMemberOrderByRelationAggregateInputSchema';
 import { BoardOrderByRelationAggregateInputSchema } from './BoardOrderByRelationAggregateInputSchema';
+import { InvitationsOrderByRelationAggregateInputSchema } from './InvitationsOrderByRelationAggregateInputSchema';
 
 export const projectOrderByWithRelationInputSchema: z.ZodType<Prisma.projectOrderByWithRelationInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
@@ -16,6 +17,7 @@ export const projectOrderByWithRelationInputSchema: z.ZodType<Prisma.projectOrde
   status: z.lazy(() => SortOrderSchema).optional(),
   members: z.lazy(() => ProjectMemberOrderByRelationAggregateInputSchema).optional(),
   Board: z.lazy(() => BoardOrderByRelationAggregateInputSchema).optional(),
+  invitation: z.lazy(() => InvitationsOrderByRelationAggregateInputSchema).optional(),
 });
 
 export default projectOrderByWithRelationInputSchema;

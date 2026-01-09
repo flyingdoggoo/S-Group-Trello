@@ -14,6 +14,8 @@ import { UserRoleWithRelationsSchema, UserRolePartialWithRelationsSchema, UserRo
 import type { UserRoleWithRelations, UserRolePartialWithRelations, UserRoleOptionalDefaultsWithRelations } from './UserRoleSchema'
 import { BoardMemberWithRelationsSchema, BoardMemberPartialWithRelationsSchema, BoardMemberOptionalDefaultsWithRelationsSchema } from './BoardMemberSchema'
 import type { BoardMemberWithRelations, BoardMemberPartialWithRelations, BoardMemberOptionalDefaultsWithRelations } from './BoardMemberSchema'
+import { InvitationsWithRelationsSchema, InvitationsPartialWithRelationsSchema, InvitationsOptionalDefaultsWithRelationsSchema } from './InvitationsSchema'
+import type { InvitationsWithRelations, InvitationsPartialWithRelations, InvitationsOptionalDefaultsWithRelations } from './InvitationsSchema'
 
 /////////////////////////////////////////
 // USERS SCHEMA
@@ -69,6 +71,7 @@ export type usersRelations = {
   projectMembers: ProjectMemberWithRelations[];
   UserRole: UserRoleWithRelations[];
   BoardMember: BoardMemberWithRelations[];
+  Invitations: InvitationsWithRelations[];
 };
 
 export type usersWithRelations = z.infer<typeof usersSchema> & usersRelations
@@ -81,6 +84,7 @@ export const usersWithRelationsSchema: z.ZodType<usersWithRelations> = usersSche
   projectMembers: z.lazy(() => ProjectMemberWithRelationsSchema).array(),
   UserRole: z.lazy(() => UserRoleWithRelationsSchema).array(),
   BoardMember: z.lazy(() => BoardMemberWithRelationsSchema).array(),
+  Invitations: z.lazy(() => InvitationsWithRelationsSchema).array(),
 }))
 
 /////////////////////////////////////////
@@ -95,6 +99,7 @@ export type usersOptionalDefaultsRelations = {
   projectMembers: ProjectMemberOptionalDefaultsWithRelations[];
   UserRole: UserRoleOptionalDefaultsWithRelations[];
   BoardMember: BoardMemberOptionalDefaultsWithRelations[];
+  Invitations: InvitationsOptionalDefaultsWithRelations[];
 };
 
 export type usersOptionalDefaultsWithRelations = z.infer<typeof usersOptionalDefaultsSchema> & usersOptionalDefaultsRelations
@@ -107,6 +112,7 @@ export const usersOptionalDefaultsWithRelationsSchema: z.ZodType<usersOptionalDe
   projectMembers: z.lazy(() => ProjectMemberOptionalDefaultsWithRelationsSchema).array(),
   UserRole: z.lazy(() => UserRoleOptionalDefaultsWithRelationsSchema).array(),
   BoardMember: z.lazy(() => BoardMemberOptionalDefaultsWithRelationsSchema).array(),
+  Invitations: z.lazy(() => InvitationsOptionalDefaultsWithRelationsSchema).array(),
 }))
 
 /////////////////////////////////////////
@@ -121,6 +127,7 @@ export type usersPartialRelations = {
   projectMembers?: ProjectMemberPartialWithRelations[];
   UserRole?: UserRolePartialWithRelations[];
   BoardMember?: BoardMemberPartialWithRelations[];
+  Invitations?: InvitationsPartialWithRelations[];
 };
 
 export type usersPartialWithRelations = z.infer<typeof usersPartialSchema> & usersPartialRelations
@@ -133,6 +140,7 @@ export const usersPartialWithRelationsSchema: z.ZodType<usersPartialWithRelation
   projectMembers: z.lazy(() => ProjectMemberPartialWithRelationsSchema).array(),
   UserRole: z.lazy(() => UserRolePartialWithRelationsSchema).array(),
   BoardMember: z.lazy(() => BoardMemberPartialWithRelationsSchema).array(),
+  Invitations: z.lazy(() => InvitationsPartialWithRelationsSchema).array(),
 })).partial()
 
 export type usersOptionalDefaultsWithPartialRelations = z.infer<typeof usersOptionalDefaultsSchema> & usersPartialRelations
@@ -145,6 +153,7 @@ export const usersOptionalDefaultsWithPartialRelationsSchema: z.ZodType<usersOpt
   projectMembers: z.lazy(() => ProjectMemberPartialWithRelationsSchema).array(),
   UserRole: z.lazy(() => UserRolePartialWithRelationsSchema).array(),
   BoardMember: z.lazy(() => BoardMemberPartialWithRelationsSchema).array(),
+  Invitations: z.lazy(() => InvitationsPartialWithRelationsSchema).array(),
 }).partial())
 
 export type usersWithPartialRelations = z.infer<typeof usersSchema> & usersPartialRelations
@@ -157,6 +166,7 @@ export const usersWithPartialRelationsSchema: z.ZodType<usersWithPartialRelation
   projectMembers: z.lazy(() => ProjectMemberPartialWithRelationsSchema).array(),
   UserRole: z.lazy(() => UserRolePartialWithRelationsSchema).array(),
   BoardMember: z.lazy(() => BoardMemberPartialWithRelationsSchema).array(),
+  Invitations: z.lazy(() => InvitationsPartialWithRelationsSchema).array(),
 }).partial())
 
 export default usersSchema;

@@ -9,6 +9,7 @@ import { DateTimeFieldUpdateOperationsInputSchema } from './DateTimeFieldUpdateO
 import { NullableDateTimeFieldUpdateOperationsInputSchema } from './NullableDateTimeFieldUpdateOperationsInputSchema';
 import { projectUpdateOneRequiredWithoutBoardNestedInputSchema } from './projectUpdateOneRequiredWithoutBoardNestedInputSchema';
 import { ListUpdateManyWithoutBoardNestedInputSchema } from './ListUpdateManyWithoutBoardNestedInputSchema';
+import { InvitationsUpdateManyWithoutBoardNestedInputSchema } from './InvitationsUpdateManyWithoutBoardNestedInputSchema';
 
 export const BoardUpdateWithoutBoardMemberInputSchema: z.ZodType<Prisma.BoardUpdateWithoutBoardMemberInput> = z.strictObject({
   id: z.union([ z.uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -21,6 +22,7 @@ export const BoardUpdateWithoutBoardMemberInputSchema: z.ZodType<Prisma.BoardUpd
   deletedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   project: z.lazy(() => projectUpdateOneRequiredWithoutBoardNestedInputSchema).optional(),
   List: z.lazy(() => ListUpdateManyWithoutBoardNestedInputSchema).optional(),
+  invitation: z.lazy(() => InvitationsUpdateManyWithoutBoardNestedInputSchema).optional(),
 });
 
 export default BoardUpdateWithoutBoardMemberInputSchema;

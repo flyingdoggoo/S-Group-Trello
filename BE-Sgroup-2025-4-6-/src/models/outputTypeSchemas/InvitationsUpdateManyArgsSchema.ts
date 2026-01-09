@@ -1,0 +1,13 @@
+import { z } from 'zod';
+import type { Prisma } from '@prisma/client';
+import { InvitationsUpdateManyMutationInputSchema } from '../inputTypeSchemas/InvitationsUpdateManyMutationInputSchema'
+import { InvitationsUncheckedUpdateManyInputSchema } from '../inputTypeSchemas/InvitationsUncheckedUpdateManyInputSchema'
+import { InvitationsWhereInputSchema } from '../inputTypeSchemas/InvitationsWhereInputSchema'
+
+export const InvitationsUpdateManyArgsSchema: z.ZodType<Prisma.InvitationsUpdateManyArgs> = z.object({
+  data: z.union([ InvitationsUpdateManyMutationInputSchema, InvitationsUncheckedUpdateManyInputSchema ]),
+  where: InvitationsWhereInputSchema.optional(), 
+  limit: z.number().optional(),
+}).strict();
+
+export default InvitationsUpdateManyArgsSchema;
