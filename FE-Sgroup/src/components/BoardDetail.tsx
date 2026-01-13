@@ -182,11 +182,79 @@ export default function BoardDetail() {
                         className="flex-1 rounded border px-2 py-1 text-sm"
                       />
                     </div>
+                    <div className="overflow-x-auto">
+                      <div className="gap-4 min-w-max">
+                        <KanbanProvider
+                          columns={columns}
+                          data={features}
+                          onDataChange={setFeatures}
+                        >
+                          {(column) => (
+                            <KanbanBoard
+                              id={column.id}
+                              key={column.id}
+                              className="w-70 flex-shrink-0 bg-white rounded-lg"
+                            >
+                              <KanbanHeader className="bg-gray-50 mb-5 p-4">
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="h-2 w-2 rounded-full"
+                                    style={{ backgroundColor: column.color }}
+                                  />
+                                  <span>{column.name}</span>
+                                </div>
+                              </KanbanHeader>
+                              <KanbanCards
+                                id={column.id}
+                                className="bg-gray-50"
+                              >
+                                {(feature: FeatureItem) => (
+                                  <KanbanCard
+                                    column={column.id}
+                                    id={feature.id}
+                                    key={feature.id}
+                                    name={feature.name}
+                                    className="ml-5 mr-5 min-h-[150px]"
+                                  >
+                                    {feature.description && (
+                                      <p className="m-0 text-xs text-muted-foreground line-clamp-3">
+                                        {feature.description}
+                                      </p>
+                                    )}
+                                  </KanbanCard>
+                                )}
+                              </KanbanCards>
+                              <div className="m-2 flex items-center gap-2">
+                                <input
+                                  value={inputs[column.id] || ""}
+                                  onChange={(e) =>
+                                    setInputs((prev) => ({
+                                      ...prev,
+                                      [column.id]: e.target.value,
+                                    }))
+                                  }
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      e.preventDefault();
+                                      handleCreate(column.id);
+                                    }
+                                  }}
+                                  placeholder="Add a card..."
+                                  className="flex-1 rounded px-2 py-1 text-sm"
+                                />
+                              </div>
+                            </KanbanBoard>
+                          )}
+                        </KanbanProvider>
+                      </div>
+                    </div>
                   </KanbanBoard>
                 )}
               </KanbanProvider>
             </div>
           </div>
+
+          {/* </SidebarProvider> */}
         </div>
       </SidebarProvider>
     </div>

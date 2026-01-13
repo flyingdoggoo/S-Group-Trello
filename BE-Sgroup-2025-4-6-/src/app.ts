@@ -32,12 +32,20 @@ app.use(setCookieMiddleware);
 app.use(passport.initialize());
 
 // Middlewares
-const allowedOrigins = appEnv.CORS_ORIGIN.split(',');
+const allowedOrigins = [
+	appEnv.CORS_ORIGIN,
+	'http://localhost:5173',
+	'https://flyingdoggoo.github.io',
+];
+
 app.use(
 	cors({
 		origin: (origin, callback) => {
-			if (!origin || allowedOrigins.includes(origin)) callback(null, true);
-			else callback(new Error('Not allowed by CORS'));
+			if (!origin || allowedOrigins.includes(origin)) {
+				callback(null, true);
+			} else {
+				callback(new Error('Not allowed by CORS'));
+			}
 		},
 		credentials: true,
 	}),

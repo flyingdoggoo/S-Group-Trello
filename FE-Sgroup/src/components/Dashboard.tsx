@@ -23,7 +23,7 @@ export function Dashboard() {
                 Manage your workspaces and boards
               </p>
             </div>
-            <ProjectModalCreate projects={projects} />
+            <ProjectModalCreate />
           </div>
           {error && <div className="text-red-500 mb-2">{error} hehe</div>}
 

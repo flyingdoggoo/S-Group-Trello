@@ -49,7 +49,7 @@ export function AppSidebar() {
   return (
     <div
       className={`flex flex-col bg-white border-r h-screen transition-all duration-300 ${
-        collapsed ? "w-16" : "w-56"
+        collapsed ? "w-16" : "w-64"
       }`}
     >
       {/* Header */}

@@ -1,11 +1,20 @@
 import { create } from "zustand";
 
+interface Board {
+  id: string;
+  title: string;
+  description: string | null;
+}
+
 interface Project {
   id: string;
   title: string;
   description: string;
   boardCount?: number;
+
   memberCount?: number;
+
+  boards?: Board[];
 }
 
 interface ProjectsStore {
@@ -16,6 +25,7 @@ interface ProjectsStore {
 
   setProjects: (projects: Project[]) => void;
   addProject: (project: Project) => void;
+  addBoardToProject: (projectId: string, board: Board) => void;
   updateProjectBoardCount: (projectId: string, count: number) => void;
   updateProjectMemberCount: (projectId: string, count: number) => void;
   setLoading: (isLoading: boolean) => void;
@@ -29,6 +39,7 @@ export const useProjectsStore = create<ProjectsStore>((set) => ({
   error: null,
 
   setProjects: (projects) => set({ projects, error: null }),
+
   addProject: (project) =>
     set((state) => ({
       projects: [...state.projects, project],
@@ -45,6 +56,20 @@ export const useProjectsStore = create<ProjectsStore>((set) => ({
         p.id === projectId ? { ...p, memberCount: count } : p
       ),
     })),
+
+  addBoardToProject: (projectId, board) =>
+    set((state) => ({
+      projects: state.projects.map((p) =>
+        p.id === projectId
+          ? {
+              ...p,
+              boards: [...(p.boards || []), board],
+              boardCount: (p.boardCount || 0) + 1,
+            }
+          : p
+      ),
+    })),
+
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
 }));
