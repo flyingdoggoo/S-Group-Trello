@@ -16,4 +16,4 @@ export const RegisterRequestValidationSchema: ZodValidationSchema = {
 		name: z.string().min(2).max(100),
 		role: z.nativeEnum(RolesEnum).optional().describe('Optional role; default USER'),
 	}),
-}
+};

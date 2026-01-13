@@ -13,3 +13,4 @@ export * from './BoardSchema';
 export * from './BoardMemberSchema';
 export * from './ListSchema';
 export * from './CardSchema';
+export * from './InvitationsSchema';

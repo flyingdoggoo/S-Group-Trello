@@ -10,6 +10,7 @@ import { EnumProjectStatusEnumFilterSchema } from './EnumProjectStatusEnumFilter
 import { ProjectStatusEnumSchema } from './ProjectStatusEnumSchema';
 import { ProjectMemberListRelationFilterSchema } from './ProjectMemberListRelationFilterSchema';
 import { BoardListRelationFilterSchema } from './BoardListRelationFilterSchema';
+import { InvitationsListRelationFilterSchema } from './InvitationsListRelationFilterSchema';
 
 export const projectWhereUniqueInputSchema: z.ZodType<Prisma.projectWhereUniqueInput> = z.object({
   id: z.uuid(),
@@ -27,6 +28,7 @@ export const projectWhereUniqueInputSchema: z.ZodType<Prisma.projectWhereUniqueI
   status: z.union([ z.lazy(() => EnumProjectStatusEnumFilterSchema), z.lazy(() => ProjectStatusEnumSchema) ]).optional(),
   members: z.lazy(() => ProjectMemberListRelationFilterSchema).optional(),
   Board: z.lazy(() => BoardListRelationFilterSchema).optional(),
+  invitation: z.lazy(() => InvitationsListRelationFilterSchema).optional(),
 }));
 
 export default projectWhereUniqueInputSchema;

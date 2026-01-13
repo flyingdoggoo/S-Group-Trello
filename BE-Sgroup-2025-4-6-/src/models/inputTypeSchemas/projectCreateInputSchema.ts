@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { ProjectStatusEnumSchema } from './ProjectStatusEnumSchema';
 import { ProjectMemberCreateNestedManyWithoutProjectInputSchema } from './ProjectMemberCreateNestedManyWithoutProjectInputSchema';
 import { BoardCreateNestedManyWithoutProjectInputSchema } from './BoardCreateNestedManyWithoutProjectInputSchema';
+import { InvitationsCreateNestedManyWithoutProjectInputSchema } from './InvitationsCreateNestedManyWithoutProjectInputSchema';
 
 export const projectCreateInputSchema: z.ZodType<Prisma.projectCreateInput> = z.strictObject({
   id: z.uuid().optional(),
@@ -15,6 +16,7 @@ export const projectCreateInputSchema: z.ZodType<Prisma.projectCreateInput> = z.
   status: z.lazy(() => ProjectStatusEnumSchema).optional(),
   members: z.lazy(() => ProjectMemberCreateNestedManyWithoutProjectInputSchema).optional(),
   Board: z.lazy(() => BoardCreateNestedManyWithoutProjectInputSchema).optional(),
+  invitation: z.lazy(() => InvitationsCreateNestedManyWithoutProjectInputSchema).optional(),
 });
 
 export default projectCreateInputSchema;

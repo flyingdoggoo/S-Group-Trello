@@ -9,6 +9,6 @@ export const appEnv = cleanEnv(process.env, {
 		choices: ['development', 'production', 'test'],
 	}),
 	HOST: host({ devDefault: testOnly('localhost') }),
-	PORT: port({ devDefault: testOnly(3000) }),
-	CORS_ORIGIN: str({ devDefault: testOnly('http://localhost:3000') }),
+	PORT: port({ devDefault: testOnly(8000) }),
+	CORS_ORIGIN: str({ devDefault: testOnly('http://localhost:8000') }),
 });

@@ -3,6 +3,7 @@ import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { BoardStatusEnumSchema } from './BoardStatusEnumSchema';
 import { ListUncheckedCreateNestedManyWithoutBoardInputSchema } from './ListUncheckedCreateNestedManyWithoutBoardInputSchema';
+import { InvitationsUncheckedCreateNestedManyWithoutBoardInputSchema } from './InvitationsUncheckedCreateNestedManyWithoutBoardInputSchema';
 import { BoardMemberUncheckedCreateNestedManyWithoutBoardInputSchema } from './BoardMemberUncheckedCreateNestedManyWithoutBoardInputSchema';
 
 export const BoardUncheckedCreateWithoutProjectInputSchema: z.ZodType<Prisma.BoardUncheckedCreateWithoutProjectInput> = z.strictObject({
@@ -15,6 +16,7 @@ export const BoardUncheckedCreateWithoutProjectInputSchema: z.ZodType<Prisma.Boa
   updatedAt: z.coerce.date().optional(),
   deletedAt: z.coerce.date().optional().nullable(),
   List: z.lazy(() => ListUncheckedCreateNestedManyWithoutBoardInputSchema).optional(),
+  invitation: z.lazy(() => InvitationsUncheckedCreateNestedManyWithoutBoardInputSchema).optional(),
   BoardMember: z.lazy(() => BoardMemberUncheckedCreateNestedManyWithoutBoardInputSchema).optional(),
 });
 

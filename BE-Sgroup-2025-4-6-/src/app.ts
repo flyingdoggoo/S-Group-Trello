@@ -35,19 +35,21 @@ app.use(passport.initialize());
 const allowedOrigins = [
 	appEnv.CORS_ORIGIN,
 	'http://localhost:5173',
-	'https://flyingdoggoo.github.io'
+	'https://flyingdoggoo.github.io',
 ];
 
-app.use(cors({ 
-	origin: (origin, callback) => {
-		if (!origin || allowedOrigins.includes(origin)) {
-			callback(null, true);
-		} else {
-			callback(new Error('Not allowed by CORS'));
-		}
-	},
-	credentials: true 
-}));
+app.use(
+	cors({
+		origin: (origin, callback) => {
+			if (!origin || allowedOrigins.includes(origin)) {
+				callback(null, true);
+			} else {
+				callback(new Error('Not allowed by CORS'));
+			}
+		},
+		credentials: true,
+	}),
+);
 app.use(helmet());
 app.use(morgan('combined'));
 
@@ -55,6 +57,8 @@ app.use('/health-check', Modules.healthCheckRouter);
 app.use('/auth', Modules.authRouter);
 app.use('/users', Modules.usersRouter);
 app.use('/projects', Modules.projectsRouter);
+app.use('/invites', Modules.invitationRouter);
+app.use('/roles', Modules.roleRouter);
 app.use('/notifications', Modules.notificationRouter);
 app.use(errorHandlerMiddleware);
 

@@ -9,6 +9,7 @@ import { EnumProjectStatusEnumFilterSchema } from './EnumProjectStatusEnumFilter
 import { ProjectStatusEnumSchema } from './ProjectStatusEnumSchema';
 import { ProjectMemberListRelationFilterSchema } from './ProjectMemberListRelationFilterSchema';
 import { BoardListRelationFilterSchema } from './BoardListRelationFilterSchema';
+import { InvitationsListRelationFilterSchema } from './InvitationsListRelationFilterSchema';
 
 export const projectWhereInputSchema: z.ZodType<Prisma.projectWhereInput> = z.strictObject({
   AND: z.union([ z.lazy(() => projectWhereInputSchema), z.lazy(() => projectWhereInputSchema).array() ]).optional(),
@@ -23,6 +24,7 @@ export const projectWhereInputSchema: z.ZodType<Prisma.projectWhereInput> = z.st
   status: z.union([ z.lazy(() => EnumProjectStatusEnumFilterSchema), z.lazy(() => ProjectStatusEnumSchema) ]).optional(),
   members: z.lazy(() => ProjectMemberListRelationFilterSchema).optional(),
   Board: z.lazy(() => BoardListRelationFilterSchema).optional(),
+  invitation: z.lazy(() => InvitationsListRelationFilterSchema).optional(),
 });
 
 export default projectWhereInputSchema;

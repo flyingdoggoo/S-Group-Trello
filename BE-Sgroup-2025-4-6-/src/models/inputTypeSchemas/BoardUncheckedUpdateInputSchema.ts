@@ -8,6 +8,7 @@ import { EnumBoardStatusEnumFieldUpdateOperationsInputSchema } from './EnumBoard
 import { DateTimeFieldUpdateOperationsInputSchema } from './DateTimeFieldUpdateOperationsInputSchema';
 import { NullableDateTimeFieldUpdateOperationsInputSchema } from './NullableDateTimeFieldUpdateOperationsInputSchema';
 import { ListUncheckedUpdateManyWithoutBoardNestedInputSchema } from './ListUncheckedUpdateManyWithoutBoardNestedInputSchema';
+import { InvitationsUncheckedUpdateManyWithoutBoardNestedInputSchema } from './InvitationsUncheckedUpdateManyWithoutBoardNestedInputSchema';
 import { BoardMemberUncheckedUpdateManyWithoutBoardNestedInputSchema } from './BoardMemberUncheckedUpdateManyWithoutBoardNestedInputSchema';
 
 export const BoardUncheckedUpdateInputSchema: z.ZodType<Prisma.BoardUncheckedUpdateInput> = z.strictObject({
@@ -21,6 +22,7 @@ export const BoardUncheckedUpdateInputSchema: z.ZodType<Prisma.BoardUncheckedUpd
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   deletedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   List: z.lazy(() => ListUncheckedUpdateManyWithoutBoardNestedInputSchema).optional(),
+  invitation: z.lazy(() => InvitationsUncheckedUpdateManyWithoutBoardNestedInputSchema).optional(),
   BoardMember: z.lazy(() => BoardMemberUncheckedUpdateManyWithoutBoardNestedInputSchema).optional(),
 });
 

@@ -10,6 +10,7 @@ import { DateTimeNullableFilterSchema } from './DateTimeNullableFilterSchema';
 import { ProjectScalarRelationFilterSchema } from './ProjectScalarRelationFilterSchema';
 import { projectWhereInputSchema } from './projectWhereInputSchema';
 import { ListListRelationFilterSchema } from './ListListRelationFilterSchema';
+import { InvitationsListRelationFilterSchema } from './InvitationsListRelationFilterSchema';
 import { BoardMemberListRelationFilterSchema } from './BoardMemberListRelationFilterSchema';
 
 export const BoardWhereInputSchema: z.ZodType<Prisma.BoardWhereInput> = z.strictObject({
@@ -27,6 +28,7 @@ export const BoardWhereInputSchema: z.ZodType<Prisma.BoardWhereInput> = z.strict
   deletedAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
   project: z.union([ z.lazy(() => ProjectScalarRelationFilterSchema), z.lazy(() => projectWhereInputSchema) ]).optional(),
   List: z.lazy(() => ListListRelationFilterSchema).optional(),
+  invitation: z.lazy(() => InvitationsListRelationFilterSchema).optional(),
   BoardMember: z.lazy(() => BoardMemberListRelationFilterSchema).optional(),
 });
 

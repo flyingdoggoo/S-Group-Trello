@@ -6,6 +6,7 @@ export const usersCountOutputTypeSelectSchema: z.ZodType<Prisma.usersCountOutput
   projectMembers: z.boolean().optional(),
   UserRole: z.boolean().optional(),
   BoardMember: z.boolean().optional(),
+  Invitations: z.boolean().optional(),
 }).strict();
 
 export default usersCountOutputTypeSelectSchema;

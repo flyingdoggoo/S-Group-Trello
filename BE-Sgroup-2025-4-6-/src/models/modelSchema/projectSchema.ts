@@ -4,6 +4,8 @@ import { ProjectMemberWithRelationsSchema, ProjectMemberPartialWithRelationsSche
 import type { ProjectMemberWithRelations, ProjectMemberPartialWithRelations, ProjectMemberOptionalDefaultsWithRelations } from './ProjectMemberSchema'
 import { BoardWithRelationsSchema, BoardPartialWithRelationsSchema, BoardOptionalDefaultsWithRelationsSchema } from './BoardSchema'
 import type { BoardWithRelations, BoardPartialWithRelations, BoardOptionalDefaultsWithRelations } from './BoardSchema'
+import { InvitationsWithRelationsSchema, InvitationsPartialWithRelationsSchema, InvitationsOptionalDefaultsWithRelationsSchema } from './InvitationsSchema'
+import type { InvitationsWithRelations, InvitationsPartialWithRelations, InvitationsOptionalDefaultsWithRelations } from './InvitationsSchema'
 
 /////////////////////////////////////////
 // PROJECT SCHEMA
@@ -49,6 +51,7 @@ export type projectOptionalDefaults = z.infer<typeof projectOptionalDefaultsSche
 export type projectRelations = {
   members: ProjectMemberWithRelations[];
   Board: BoardWithRelations[];
+  invitation: InvitationsWithRelations[];
 };
 
 export type projectWithRelations = z.infer<typeof projectSchema> & projectRelations
@@ -56,6 +59,7 @@ export type projectWithRelations = z.infer<typeof projectSchema> & projectRelati
 export const projectWithRelationsSchema: z.ZodType<projectWithRelations> = projectSchema.merge(z.object({
   members: z.lazy(() => ProjectMemberWithRelationsSchema).array(),
   Board: z.lazy(() => BoardWithRelationsSchema).array(),
+  invitation: z.lazy(() => InvitationsWithRelationsSchema).array(),
 }))
 
 /////////////////////////////////////////
@@ -65,6 +69,7 @@ export const projectWithRelationsSchema: z.ZodType<projectWithRelations> = proje
 export type projectOptionalDefaultsRelations = {
   members: ProjectMemberOptionalDefaultsWithRelations[];
   Board: BoardOptionalDefaultsWithRelations[];
+  invitation: InvitationsOptionalDefaultsWithRelations[];
 };
 
 export type projectOptionalDefaultsWithRelations = z.infer<typeof projectOptionalDefaultsSchema> & projectOptionalDefaultsRelations
@@ -72,6 +77,7 @@ export type projectOptionalDefaultsWithRelations = z.infer<typeof projectOptiona
 export const projectOptionalDefaultsWithRelationsSchema: z.ZodType<projectOptionalDefaultsWithRelations> = projectOptionalDefaultsSchema.merge(z.object({
   members: z.lazy(() => ProjectMemberOptionalDefaultsWithRelationsSchema).array(),
   Board: z.lazy(() => BoardOptionalDefaultsWithRelationsSchema).array(),
+  invitation: z.lazy(() => InvitationsOptionalDefaultsWithRelationsSchema).array(),
 }))
 
 /////////////////////////////////////////
@@ -81,6 +87,7 @@ export const projectOptionalDefaultsWithRelationsSchema: z.ZodType<projectOption
 export type projectPartialRelations = {
   members?: ProjectMemberPartialWithRelations[];
   Board?: BoardPartialWithRelations[];
+  invitation?: InvitationsPartialWithRelations[];
 };
 
 export type projectPartialWithRelations = z.infer<typeof projectPartialSchema> & projectPartialRelations
@@ -88,6 +95,7 @@ export type projectPartialWithRelations = z.infer<typeof projectPartialSchema> &
 export const projectPartialWithRelationsSchema: z.ZodType<projectPartialWithRelations> = projectPartialSchema.merge(z.object({
   members: z.lazy(() => ProjectMemberPartialWithRelationsSchema).array(),
   Board: z.lazy(() => BoardPartialWithRelationsSchema).array(),
+  invitation: z.lazy(() => InvitationsPartialWithRelationsSchema).array(),
 })).partial()
 
 export type projectOptionalDefaultsWithPartialRelations = z.infer<typeof projectOptionalDefaultsSchema> & projectPartialRelations
@@ -95,6 +103,7 @@ export type projectOptionalDefaultsWithPartialRelations = z.infer<typeof project
 export const projectOptionalDefaultsWithPartialRelationsSchema: z.ZodType<projectOptionalDefaultsWithPartialRelations> = projectOptionalDefaultsSchema.merge(z.object({
   members: z.lazy(() => ProjectMemberPartialWithRelationsSchema).array(),
   Board: z.lazy(() => BoardPartialWithRelationsSchema).array(),
+  invitation: z.lazy(() => InvitationsPartialWithRelationsSchema).array(),
 }).partial())
 
 export type projectWithPartialRelations = z.infer<typeof projectSchema> & projectPartialRelations
@@ -102,6 +111,7 @@ export type projectWithPartialRelations = z.infer<typeof projectSchema> & projec
 export const projectWithPartialRelationsSchema: z.ZodType<projectWithPartialRelations> = projectSchema.merge(z.object({
   members: z.lazy(() => ProjectMemberPartialWithRelationsSchema).array(),
   Board: z.lazy(() => BoardPartialWithRelationsSchema).array(),
+  invitation: z.lazy(() => InvitationsPartialWithRelationsSchema).array(),
 }).partial())
 
 export default projectSchema;

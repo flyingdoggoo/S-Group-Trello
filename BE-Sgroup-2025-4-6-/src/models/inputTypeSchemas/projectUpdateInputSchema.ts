@@ -9,6 +9,7 @@ import { ProjectStatusEnumSchema } from './ProjectStatusEnumSchema';
 import { EnumProjectStatusEnumFieldUpdateOperationsInputSchema } from './EnumProjectStatusEnumFieldUpdateOperationsInputSchema';
 import { ProjectMemberUpdateManyWithoutProjectNestedInputSchema } from './ProjectMemberUpdateManyWithoutProjectNestedInputSchema';
 import { BoardUpdateManyWithoutProjectNestedInputSchema } from './BoardUpdateManyWithoutProjectNestedInputSchema';
+import { InvitationsUpdateManyWithoutProjectNestedInputSchema } from './InvitationsUpdateManyWithoutProjectNestedInputSchema';
 
 export const projectUpdateInputSchema: z.ZodType<Prisma.projectUpdateInput> = z.strictObject({
   id: z.union([ z.uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -20,6 +21,7 @@ export const projectUpdateInputSchema: z.ZodType<Prisma.projectUpdateInput> = z.
   status: z.union([ z.lazy(() => ProjectStatusEnumSchema), z.lazy(() => EnumProjectStatusEnumFieldUpdateOperationsInputSchema) ]).optional(),
   members: z.lazy(() => ProjectMemberUpdateManyWithoutProjectNestedInputSchema).optional(),
   Board: z.lazy(() => BoardUpdateManyWithoutProjectNestedInputSchema).optional(),
+  invitation: z.lazy(() => InvitationsUpdateManyWithoutProjectNestedInputSchema).optional(),
 });
 
 export default projectUpdateInputSchema;

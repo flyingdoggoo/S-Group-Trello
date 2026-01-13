@@ -62,6 +62,13 @@ enum CardStatusEnum {
   deleted
 }
 
+enum InvitationStatusEnum {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
 model users {
   id        String         @id @default(uuid())
   email     String         @unique
@@ -87,9 +94,10 @@ model users {
   otps           otps?
   projectMembers ProjectMember[]
   UserRole       UserRole[]
+  BoardMember    BoardMember[]
+  Invitations    Invitations[]
 
   @@map("users")
-  BoardMember BoardMember[]
 }
 
 model accounts {
@@ -143,6 +151,8 @@ model project {
   members     ProjectMember[]
   Board       Board[]
 
+  invitation Invitations[] @relation("ProjectInvitation")
+
   @@map("projects")
 }
 
@@ -157,9 +167,9 @@ model roles {
   projectMembers ProjectMember[]
   RolePermission RolePermission[]
   UserRole       UserRole[]
+  BoardMember    BoardMember[]
 
   @@map("roles")
-  BoardMember BoardMember[]
 }
 
 model permission {
@@ -223,51 +233,71 @@ model Board {
   project     project         @relation(fields: [projectId], references: [id])
   List        List[]
 
-  @@map("boards")
+  invitation  Invitations[]  @relation("BoardInvitation")
   BoardMember BoardMember[]
+
+  @@map("boards")
 }
 
-model BoardMember{
-  id        String   @id @default(uuid())
-  boardId   String   @map("board_id")
-  userId    String   @map("user_id")
-  roleId    String   @map("role_id")
-  joinedAt  DateTime @default(now()) @map("joined_at")
-  board     Board    @relation(fields: [boardId], references: [id])
-  user      users    @relation(fields: [userId], references: [id])
-  role      roles    @relation(fields: [roleId], references: [id])
+model BoardMember {
+  id       String   @id @default(uuid())
+  boardId  String   @map("board_id")
+  userId   String   @map("user_id")
+  roleId   String   @map("role_id")
+  joinedAt DateTime @default(now()) @map("joined_at")
+  board    Board    @relation(fields: [boardId], references: [id])
+  user     users    @relation(fields: [userId], references: [id])
+  role     roles    @relation(fields: [roleId], references: [id])
 
   @@map("board_members")
 }
 
 model List {
-  id        String    @id @default(uuid())
-  boardId   String    @map("board_id")
+  id        String         @id @default(uuid())
+  boardId   String         @map("board_id")
   title     String
   position  Int
-  status   ListStatusEnum @default(active)
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-  board     Board     @relation(fields: [boardId], references: [id])
+  status    ListStatusEnum @default(active)
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  deletedAt DateTime?      @map("deleted_at")
+  board     Board          @relation(fields: [boardId], references: [id])
   Card      Card[]
 
   @@map("lists")
 }
 
 model Card {
-  id          String    @id @default(uuid())
-  listId      String    @map("list_id")
+  id          String         @id @default(uuid())
+  listId      String         @map("list_id")
   title       String
   description String?
   position    Int
   status      CardStatusEnum @default(active)
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
-  list        List      @relation(fields: [listId], references: [id])
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  deletedAt   DateTime?      @map("deleted_at")
+  list        List           @relation(fields: [listId], references: [id])
 
   @@map("cards")
 }
 
+model Invitations {
+  id        String               @id @default(uuid())
+  projectId String?              @map("project_id")
+  boardId   String?              @map("board_id")
+  email     String
+  roleId    String               @map("role_id")
+  token     String               @unique
+  status    InvitationStatusEnum @default(PENDING)
+  createdBy String               @map("created_by")
+  owner     users                @relation(fields: [createdBy], references: [id])
+  createdAt DateTime             @default(now())
+  expiresAt DateTime             @map("expires_at")
+  acceptedAt DateTime?           @map("accepted_at")
+  project   project?             @relation("ProjectInvitation", fields: [projectId], references: [id])
+  board     Board?               @relation("BoardInvitation", fields: [boardId], references: [id])
 
+  @@index([email, status])
+  @@map("Invitations")
+}

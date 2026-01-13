@@ -18,6 +18,7 @@ import { otpsWhereInputSchema } from './otpsWhereInputSchema';
 import { ProjectMemberListRelationFilterSchema } from './ProjectMemberListRelationFilterSchema';
 import { UserRoleListRelationFilterSchema } from './UserRoleListRelationFilterSchema';
 import { BoardMemberListRelationFilterSchema } from './BoardMemberListRelationFilterSchema';
+import { InvitationsListRelationFilterSchema } from './InvitationsListRelationFilterSchema';
 
 export const usersWhereInputSchema: z.ZodType<Prisma.usersWhereInput> = z.strictObject({
   AND: z.union([ z.lazy(() => usersWhereInputSchema), z.lazy(() => usersWhereInputSchema).array() ]).optional(),
@@ -41,6 +42,7 @@ export const usersWhereInputSchema: z.ZodType<Prisma.usersWhereInput> = z.strict
   projectMembers: z.lazy(() => ProjectMemberListRelationFilterSchema).optional(),
   UserRole: z.lazy(() => UserRoleListRelationFilterSchema).optional(),
   BoardMember: z.lazy(() => BoardMemberListRelationFilterSchema).optional(),
+  Invitations: z.lazy(() => InvitationsListRelationFilterSchema).optional(),
 });
 
 export default usersWhereInputSchema;
