@@ -31,12 +31,7 @@ export function InviteDialogEntity({
   projectId,
   onMemberAdded,
 }: InviteDialogEntityProps) {
-  console.log("InviteDialogEntity rendered with:", {
-    entityType,
-    entityId,
-    projectId,
-    onMemberAdded,
-  });
+
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -64,15 +59,6 @@ export function InviteDialogEntity({
   }, [isOpen, fetchMembers]);
 
   // Debug: Log roles khi thay đổi
-  useEffect(() => {
-    console.log(
-      "Current roles in dialog:",
-      roles,
-      "for entityType:",
-      entityType
-    );
-  }, [roles, entityType]);
-
   const getInitials = (name: string): string => {
     if (!name) return "";
     return name

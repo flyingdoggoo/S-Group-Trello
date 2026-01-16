@@ -47,6 +47,8 @@ export default function BoardDetail() {
     const [showForm, setShowForm] = useState<Record<string, boolean>>({});
     const [showMenu, setShowMenu] = useState<Record<string, boolean>>({});
     const [selectedCard, setSelectedCard] = useState<{ id: string; listId: string } | null>(null);
+    // Track listId thực tế trong DB (có thể khác với UI state sau khi drag)
+    const [cardToListMapping, setCardToListMapping] = useState<Record<string, string>>({});
 
     // Load cards for all lists when lists change
     useEffect(() => {
@@ -74,7 +76,16 @@ export default function BoardDetail() {
                         );
                     })
                 );
-                if (mounted) setFeatures(resultArrays.flat());
+                if (mounted) {
+                    const allCards = resultArrays.flat();
+                    setFeatures(allCards);
+                    // Update mapping
+                    const mapping: Record<string, string> = {};
+                    allCards.forEach(card => {
+                        mapping[card.id] = card.column;
+                    });
+                    setCardToListMapping(mapping);
+                }
             } catch (err) {
                 console.error(err);
                 if (mounted) setFeatures([]);
@@ -104,12 +115,59 @@ export default function BoardDetail() {
                         column: listId,
                     },
                 ]);
+                setCardToListMapping(prev => ({
+                    ...prev,
+                    [c.id]: listId
+                }));
                 setInputs((prev) => ({ ...prev, [listId]: "" }));
                 setShowForm((prev) => ({ ...prev, [listId]: false }));
             }
         } catch (err) {
             console.error(err);
         }
+    }
+
+    async function handleDragEnd(event: any) {
+        const { active, over } = event;
+        
+        if (!over) return;
+
+        const activeCard = features.find(f => f.id === active.id);
+        if (!activeCard) return;
+
+        // Xác định target column
+        const overCard = features.find(f => f.id === over.id);
+        const targetColumn = overCard?.column || over.id;
+
+        // Tính position mới dựa trên vị trí trong features array
+        // Phải đợi React state update xong nên dùng setTimeout
+        setTimeout(async () => {
+            const currentFeatures = features;
+            const cardsInTargetColumn = currentFeatures.filter(f => f.column === targetColumn);
+            const newPosition = cardsInTargetColumn.findIndex(f => f.id === active.id);
+
+            const oldListId = cardToListMapping[active.id] || activeCard.column;
+
+            try {
+                const url = `projects/${projectId}/boards/${boardId}/lists/${oldListId}/cards/${active.id}`;
+                const payload = { 
+                    listId: targetColumn,
+                    position: newPosition
+                };
+                
+                await apiClient.put(url, payload);
+                
+                // Update mapping sau khi API success
+                setCardToListMapping(prev => ({
+                    ...prev,
+                    [active.id]: targetColumn
+                }));
+            } catch (err: any) {
+                console.error('Error updating card:', err);
+                console.error('Error response:', err.response?.data);
+                window.location.reload();
+            }
+        }, 100);
     }
 
     return (
@@ -133,6 +191,7 @@ export default function BoardDetail() {
                                 columns={columns}
                                 data={features}
                                 onDataChange={setFeatures}
+                                onDragEnd={handleDragEnd}
                             >
                                 {(column) => (
                                     <KanbanBoard
@@ -214,7 +273,9 @@ export default function BoardDetail() {
                                                     name={feature.name}
                                                     className="ml-5 mr-5 min-h-[150px] rounded-lg"
                                                     onCardClick={(id, listId) => {
-                                                        setSelectedCard({ id, listId });
+                                                        // Dùng listId thực tế từ mapping (DB) thay vì từ UI state
+                                                        const realListId = cardToListMapping[id] || listId;
+                                                        setSelectedCard({ id, listId: realListId });
                                                     }}
                                                 >
                                                     <div className="flex flex-col justify-center text-left h-full">

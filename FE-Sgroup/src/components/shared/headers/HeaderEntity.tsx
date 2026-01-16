@@ -37,12 +37,6 @@ export function HeaderEntity({
     fetchMembers();
   }, [projectId, countMembers]);
 
-  console.log("rendering header with params:", {
-    title,
-    entityType,
-    entityId,
-    projectId,
-  });
 
   const handleMemberAdded = () => {
     fetchMembers();

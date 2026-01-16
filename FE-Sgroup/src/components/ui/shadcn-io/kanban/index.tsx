@@ -115,37 +115,18 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
     id,
   });
   const { activeCardId } = useContext(KanbanContext) as KanbanContextProps;
-  const [isLongPress, setIsLongPress] = useState(false);
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
   };
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    setIsLongPress(false);
-    // Bắt đầu đếm thời gian - sau 200ms mới được drag
-    longPressTimer.current = setTimeout(() => {
-      setIsLongPress(true);
-    }, 200);
-  };
-
-  const handlePointerUp = () => {
-    // Clear timer khi thả chuột
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  };
-
   const handleClick = (e: React.MouseEvent) => {
-    // Chỉ trigger click nếu không phải long press (drag)
-    if (!isLongPress && onCardClick) {
+    // Click sẽ hoạt động vì drag chỉ bắt đầu khi move > 10px
+    if (onCardClick && !isDragging) {
       e.stopPropagation();
       onCardClick(id, column);
     }
-    setIsLongPress(false);
   };
 
   return (
@@ -153,7 +134,8 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
       <div 
         style={style} 
         ref={setNodeRef}
-        className="relative"
+        {...listeners}
+        {...attributes}
       >
         <Card
           className={cn(
@@ -165,14 +147,6 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
         >
           {children ?? <p className="m-0 font-medium text-sm">{name}</p>}
         </Card>
-        <div 
-          {...listeners}
-          {...attributes}
-          onPointerDown={handlePointerDown}
-          onPointerUp={handlePointerUp}
-          className="absolute inset-0 cursor-grab"
-          style={{ pointerEvents: isLongPress ? 'auto' : 'none' }}
-        />
       </div>
       {activeCardId === id && (
         <t.In>
@@ -258,8 +232,16 @@ export const KanbanProvider = <
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
 
   const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 10, // Drag chỉ bắt đầu sau khi di chuyển 10px
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
     useSensor(KeyboardSensor)
   );
 

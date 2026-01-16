@@ -20,7 +20,6 @@ export function AppSidebar() {
         try {
           const response = await apiClient.get("/projects");
           const projectsData = response.data.data.data;
-          console.log("Projects from API:", projectsData);
           setProjects(projectsData);
         } catch (err) {
           console.error("Failed to fetch projects in sidebar:", err);

@@ -41,7 +41,6 @@ export const useRoleStore = create<RoleStore>((set, get) => ({
 
     try {
       const response = await apiClient.get("/roles");
-      console.log("✓ API response roles:", response.data.data);
 
       // Transform data: bỏ USER role, chuyển id/roleName -> value/label
       const allRoles = response.data.data.filter(
