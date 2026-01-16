@@ -19,7 +19,6 @@ export const useEntityMembers = (
           : `/projects/${entityId}/members`;
 
       const response = await axiosClient.get(endpoint);
-      console.log("Fetched members:", response.data.data);
 
       const sortedMembers = [...response.data.data].sort((a, b) => {
         if (a.role.roleName === "PROJECT_ADMIN") return -1;
