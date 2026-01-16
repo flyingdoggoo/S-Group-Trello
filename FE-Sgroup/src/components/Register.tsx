@@ -25,6 +25,7 @@ export function Register() {
       });
       console.log(response);
       toast.success("Created account success");
+      navigate("/login", { replace: true });
     } catch (error) {
       console.log(error);
       toast.error("Created account failed");

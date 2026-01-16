@@ -7,6 +7,11 @@ import { CardUncheckedCreateInputSchema } from '../inputTypeSchemas/CardUnchecke
 import { CardUpdateInputSchema } from '../inputTypeSchemas/CardUpdateInputSchema'
 import { CardUncheckedUpdateInputSchema } from '../inputTypeSchemas/CardUncheckedUpdateInputSchema'
 import { ListArgsSchema } from "../outputTypeSchemas/ListArgsSchema"
+import { CardTagFindManyArgsSchema } from "../outputTypeSchemas/CardTagFindManyArgsSchema"
+import { CardTodoFindManyArgsSchema } from "../outputTypeSchemas/CardTodoFindManyArgsSchema"
+import { CardMemberFindManyArgsSchema } from "../outputTypeSchemas/CardMemberFindManyArgsSchema"
+import { CardCommentFindManyArgsSchema } from "../outputTypeSchemas/CardCommentFindManyArgsSchema"
+import { CardCountOutputTypeArgsSchema } from "../outputTypeSchemas/CardCountOutputTypeArgsSchema"
 // Select schema needs to be in file to prevent circular imports
 //------------------------------------------------------
 
@@ -21,6 +26,11 @@ export const CardSelectSchema: z.ZodType<Prisma.CardSelect> = z.object({
   updatedAt: z.boolean().optional(),
   deletedAt: z.boolean().optional(),
   list: z.union([z.boolean(),z.lazy(() => ListArgsSchema)]).optional(),
+  tags: z.union([z.boolean(),z.lazy(() => CardTagFindManyArgsSchema)]).optional(),
+  todos: z.union([z.boolean(),z.lazy(() => CardTodoFindManyArgsSchema)]).optional(),
+  members: z.union([z.boolean(),z.lazy(() => CardMemberFindManyArgsSchema)]).optional(),
+  comments: z.union([z.boolean(),z.lazy(() => CardCommentFindManyArgsSchema)]).optional(),
+  _count: z.union([z.boolean(),z.lazy(() => CardCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
 export const CardUpsertArgsSchema: z.ZodType<Prisma.CardUpsertArgs> = z.object({

@@ -96,6 +96,8 @@ model users {
   UserRole       UserRole[]
   BoardMember    BoardMember[]
   Invitations    Invitations[]
+  CardMember     CardMember[]
+  CardComment    CardComment[]
 
   @@map("users")
 }
@@ -278,8 +280,61 @@ model Card {
   updatedAt   DateTime       @updatedAt @map("updated_at")
   deletedAt   DateTime?      @map("deleted_at")
   list        List           @relation(fields: [listId], references: [id])
+  
+  tags        CardTag[]
+  todos       CardTodo[]
+  members     CardMember[]
+  comments    CardComment[]
 
   @@map("cards")
+}
+
+model CardTag {
+  id        String   @id @default(uuid())
+  cardId    String   @map("card_id")
+  name      String
+  color     String
+  createdAt DateTime @default(now()) @map("created_at")
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@map("card_tags")
+}
+
+model CardTodo {
+  id        String   @id @default(uuid())
+  cardId    String   @map("card_id")
+  title     String
+  completed Boolean  @default(false)
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@map("card_todos")
+}
+
+model CardMember {
+  id       String   @id @default(uuid())
+  cardId   String   @map("card_id")
+  userId   String   @map("user_id")
+  joinedAt DateTime @default(now()) @map("joined_at")
+  card     Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user     users    @relation(fields: [userId], references: [id])
+
+  @@map("card_members")
+}
+
+model CardComment {
+  id        String   @id @default(uuid())
+  cardId    String   @map("card_id")
+  userId    String   @map("user_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user      users    @relation(fields: [userId], references: [id])
+
+  @@map("card_comments")
 }
 
 model Invitations {

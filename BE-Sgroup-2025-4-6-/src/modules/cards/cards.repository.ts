@@ -53,6 +53,25 @@ export class CardsRepository {
                 listId,
                 deletedAt: null
             },
+            include: {
+                tags: true,
+                todos: { orderBy: { position: 'asc' } },
+                members: {
+                    include: {
+                        user: {
+                            select: { id: true, name: true, avatar: true }
+                        }
+                    }
+                },
+                comments: {
+                    include: {
+                        user: {
+                            select: { id: true, name: true, avatar: true }
+                        }
+                    },
+                    orderBy: { createdAt: 'desc' }
+                }
+            }
         });
     }
 
@@ -75,5 +94,75 @@ export class CardsRepository {
                 status: CardStatusEnum.deleted,
             },
         });
+    }
+
+    // Tags
+    async createTag({ cardId, name, color }: { cardId: string, name: string, color: string }) {
+        return this.prismaService.cardTag.create({
+            data: { cardId, name, color }
+        });
+    }
+
+    async deleteTag({ id }: { id: string }) {
+        return this.prismaService.cardTag.delete({ where: { id } });
+    }
+
+    // Todos
+    async getNextTodoPosition(cardId: string): Promise<number> {
+        const last = await this.prismaService.cardTodo.findFirst({
+            where: { cardId },
+            orderBy: { position: 'desc' },
+            select: { position: true }
+        });
+        return last ? last.position + 1 : 0;
+    }
+
+    async createTodo({ cardId, title, position }: { cardId: string, title: string, position: number }) {
+        return this.prismaService.cardTodo.create({
+            data: { cardId, title, position }
+        });
+    }
+
+    async updateTodo({ id, completed }: { id: string, completed: boolean }) {
+        return this.prismaService.cardTodo.update({
+            where: { id },
+            data: { completed }
+        });
+    }
+
+    async deleteTodo({ id }: { id: string }) {
+        return this.prismaService.cardTodo.delete({ where: { id } });
+    }
+
+    // Members
+    async addMember({ cardId, userId }: { cardId: string, userId: string }) {
+        return this.prismaService.cardMember.create({
+            data: { cardId, userId },
+            include: {
+                user: {
+                    select: { id: true, name: true, avatar: true }
+                }
+            }
+        });
+    }
+
+    async removeMember({ id }: { id: string }) {
+        return this.prismaService.cardMember.delete({ where: { id } });
+    }
+
+    // Comments
+    async createComment({ cardId, userId, content }: { cardId: string, userId: string, content: string }) {
+        return this.prismaService.cardComment.create({
+            data: { cardId, userId, content },
+            include: {
+                user: {
+                    select: { id: true, name: true, avatar: true }
+                }
+            }
+        });
+    }
+
+    async deleteComment({ id }: { id: string }) {
+        return this.prismaService.cardComment.delete({ where: { id } });
     }
 }

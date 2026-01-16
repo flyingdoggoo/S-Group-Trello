@@ -15,6 +15,8 @@ import { otpsUpdateOneWithoutUserNestedInputSchema } from './otpsUpdateOneWithou
 import { ProjectMemberUpdateManyWithoutUserNestedInputSchema } from './ProjectMemberUpdateManyWithoutUserNestedInputSchema';
 import { BoardMemberUpdateManyWithoutUserNestedInputSchema } from './BoardMemberUpdateManyWithoutUserNestedInputSchema';
 import { InvitationsUpdateManyWithoutOwnerNestedInputSchema } from './InvitationsUpdateManyWithoutOwnerNestedInputSchema';
+import { CardMemberUpdateManyWithoutUserNestedInputSchema } from './CardMemberUpdateManyWithoutUserNestedInputSchema';
+import { CardCommentUpdateManyWithoutUserNestedInputSchema } from './CardCommentUpdateManyWithoutUserNestedInputSchema';
 
 export const usersUpdateWithoutUserRoleInputSchema: z.ZodType<Prisma.usersUpdateWithoutUserRoleInput> = z.strictObject({
   id: z.union([ z.uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -35,6 +37,8 @@ export const usersUpdateWithoutUserRoleInputSchema: z.ZodType<Prisma.usersUpdate
   projectMembers: z.lazy(() => ProjectMemberUpdateManyWithoutUserNestedInputSchema).optional(),
   BoardMember: z.lazy(() => BoardMemberUpdateManyWithoutUserNestedInputSchema).optional(),
   Invitations: z.lazy(() => InvitationsUpdateManyWithoutOwnerNestedInputSchema).optional(),
+  CardMember: z.lazy(() => CardMemberUpdateManyWithoutUserNestedInputSchema).optional(),
+  CardComment: z.lazy(() => CardCommentUpdateManyWithoutUserNestedInputSchema).optional(),
 });
 
 export default usersUpdateWithoutUserRoleInputSchema;

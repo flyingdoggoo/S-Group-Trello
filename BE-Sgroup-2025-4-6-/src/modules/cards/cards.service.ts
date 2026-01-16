@@ -161,4 +161,91 @@ export class CardsService {
             StatusCodes.OK
         );
     }
-}
+    // Tags
+    async addTag(cardId: string, projectId: string, boardId: string, listId: string, userId: string, name: string, color: string): Promise<ServiceResponse<any>> {
+        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
+        if (!isMember) throw new ForbiddenException();
+
+        const card = await this.cardsRepository.findCardById({ id: cardId, listId });
+        if (!card) throw new NotFoundException('Card not found');
+
+        const tag = await this.cardsRepository.createTag({ cardId, name, color });
+        return new ServiceResponse(ResponseStatus.Success, 'Tag added', tag, StatusCodes.CREATED);
+    }
+
+    async deleteTag(cardId: string, tagId: string, projectId: string, boardId: string, listId: string, userId: string): Promise<ServiceResponse<null>> {
+        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
+        if (!isMember) throw new ForbiddenException();
+
+        await this.cardsRepository.deleteTag({ id: tagId });
+        return new ServiceResponse(ResponseStatus.Success, 'Tag deleted', null, StatusCodes.OK);
+    }
+
+    // Todos
+    async addTodo(cardId: string, projectId: string, boardId: string, listId: string, userId: string, title: string): Promise<ServiceResponse<any>> {
+        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
+        if (!isMember) throw new ForbiddenException();
+
+        const card = await this.cardsRepository.findCardById({ id: cardId, listId });
+        if (!card) throw new NotFoundException('Card not found');
+
+        const position = await this.cardsRepository.getNextTodoPosition(cardId);
+        const todo = await this.cardsRepository.createTodo({ cardId, title, position });
+        return new ServiceResponse(ResponseStatus.Success, 'Todo added', todo, StatusCodes.CREATED);
+    }
+
+    async updateTodo(cardId: string, todoId: string, projectId: string, boardId: string, listId: string, userId: string, completed: boolean): Promise<ServiceResponse<any>> {
+        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
+        if (!isMember) throw new ForbiddenException();
+
+        const todo = await this.cardsRepository.updateTodo({ id: todoId, completed });
+        return new ServiceResponse(ResponseStatus.Success, 'Todo updated', todo, StatusCodes.OK);
+    }
+
+    async deleteTodo(cardId: string, todoId: string, projectId: string, boardId: string, listId: string, userId: string): Promise<ServiceResponse<null>> {
+        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
+        if (!isMember) throw new ForbiddenException();
+
+        await this.cardsRepository.deleteTodo({ id: todoId });
+        return new ServiceResponse(ResponseStatus.Success, 'Todo deleted', null, StatusCodes.OK);
+    }
+
+    // Members
+    async addMember(cardId: string, projectId: string, boardId: string, listId: string, userId: string, memberUserId: string): Promise<ServiceResponse<any>> {
+        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
+        if (!isMember) throw new ForbiddenException();
+
+        const card = await this.cardsRepository.findCardById({ id: cardId, listId });
+        if (!card) throw new NotFoundException('Card not found');
+
+        const member = await this.cardsRepository.addMember({ cardId, userId: memberUserId });
+        return new ServiceResponse(ResponseStatus.Success, 'Member added', member, StatusCodes.CREATED);
+    }
+
+    async removeMember(cardId: string, memberId: string, projectId: string, boardId: string, listId: string, userId: string): Promise<ServiceResponse<null>> {
+        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
+        if (!isMember) throw new ForbiddenException();
+
+        await this.cardsRepository.removeMember({ id: memberId });
+        return new ServiceResponse(ResponseStatus.Success, 'Member removed', null, StatusCodes.OK);
+    }
+
+    // Comments
+    async addComment(cardId: string, projectId: string, boardId: string, listId: string, userId: string, content: string): Promise<ServiceResponse<any>> {
+        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
+        if (!isMember) throw new ForbiddenException();
+
+        const card = await this.cardsRepository.findCardById({ id: cardId, listId });
+        if (!card) throw new NotFoundException('Card not found');
+
+        const comment = await this.cardsRepository.createComment({ cardId, userId, content });
+        return new ServiceResponse(ResponseStatus.Success, 'Comment added', comment, StatusCodes.CREATED);
+    }
+
+    async deleteComment(cardId: string, commentId: string, projectId: string, boardId: string, listId: string, userId: string): Promise<ServiceResponse<null>> {
+        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
+        if (!isMember) throw new ForbiddenException();
+
+        await this.cardsRepository.deleteComment({ id: commentId });
+        return new ServiceResponse(ResponseStatus.Success, 'Comment deleted', null, StatusCodes.OK);
+    }}
