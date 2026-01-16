@@ -26,6 +26,7 @@ import {
   type ReactNode,
   useContext,
   useState,
+  useRef,
 } from 'react';
 import { createPortal } from 'react-dom';
 import tunnel from 'tunnel-rat';
@@ -91,13 +92,17 @@ export const KanbanBoard = ({ id, children, className }: KanbanBoardProps) => {
 export type KanbanCardProps<T extends KanbanItemProps = KanbanItemProps> = T & {
   children?: ReactNode;
   className?: string;
+  onCardClick?: (id: string, column: string) => void;
 };
 
 export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
   id,
   name,
+  column,
   children,
   className,
+  onCardClick,
+  ...rest
 }: KanbanCardProps<T>) => {
   const {
     attributes,
@@ -110,24 +115,64 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
     id,
   });
   const { activeCardId } = useContext(KanbanContext) as KanbanContextProps;
+  const [isLongPress, setIsLongPress] = useState(false);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
   };
 
+  const handlePointerDown = (e: React.PointerEvent) => {
+    setIsLongPress(false);
+    // Bắt đầu đếm thời gian - sau 200ms mới được drag
+    longPressTimer.current = setTimeout(() => {
+      setIsLongPress(true);
+    }, 200);
+  };
+
+  const handlePointerUp = () => {
+    // Clear timer khi thả chuột
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    // Chỉ trigger click nếu không phải long press (drag)
+    if (!isLongPress && onCardClick) {
+      e.stopPropagation();
+      onCardClick(id, column);
+    }
+    setIsLongPress(false);
+  };
+
   return (
     <>
-      <div style={style} {...listeners} {...attributes} ref={setNodeRef}>
+      <div 
+        style={style} 
+        ref={setNodeRef}
+        className="relative"
+      >
         <Card
           className={cn(
             'cursor-grab gap-4 rounded-md p-3 shadow-sm',
             isDragging && 'pointer-events-none cursor-grabbing opacity-30',
             className
           )}
+          onClick={handleClick}
         >
           {children ?? <p className="m-0 font-medium text-sm">{name}</p>}
         </Card>
+        <div 
+          {...listeners}
+          {...attributes}
+          onPointerDown={handlePointerDown}
+          onPointerUp={handlePointerUp}
+          className="absolute inset-0 cursor-grab"
+          style={{ pointerEvents: isLongPress ? 'auto' : 'none' }}
+        />
       </div>
       {activeCardId === id && (
         <t.In>

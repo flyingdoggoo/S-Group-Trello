@@ -9,8 +9,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const accessToken = localStorage.getItem("accessToken");
 
   if (!accessToken) {
-    // Nếu chưa đăng nhập, chuyển hướng về trang home (login)
-    return <Navigate to="/" replace />;
+    // Nếu chưa đăng nhập, chuyển hướng về trang login
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;

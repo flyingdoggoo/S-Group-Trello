@@ -54,4 +54,71 @@ router.delete(
     cardsController.deleteCard
 );
 
+// Card Tags
+router.post(
+    '/:cardId/tags',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyPermission(ListPermissionEnum.UPDATE_CARD),
+    cardsController.addTag
+);
+
+router.delete(
+    '/:cardId/tags/:tagId',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyPermission(ListPermissionEnum.UPDATE_CARD),
+    cardsController.deleteTag
+);
+
+// Card Todos
+router.post(
+    '/:cardId/todos',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyPermission(ListPermissionEnum.UPDATE_CARD),
+    cardsController.addTodo
+);
+
+router.patch(
+    '/:cardId/todos/:todoId',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyPermission(ListPermissionEnum.UPDATE_CARD),
+    cardsController.updateTodo
+);
+
+router.delete(
+    '/:cardId/todos/:todoId',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyPermission(ListPermissionEnum.UPDATE_CARD),
+    cardsController.deleteTodo
+);
+
+// Card Members
+router.post(
+    '/:cardId/members',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyPermission(ListPermissionEnum.UPDATE_CARD),
+    cardsController.addMember
+);
+
+router.delete(
+    '/:cardId/members/:memberId',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyPermission(ListPermissionEnum.UPDATE_CARD),
+    cardsController.removeMember
+);
+
+// Card Comments
+router.post(
+    '/:cardId/comments',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyPermission(ListPermissionEnum.UPDATE_CARD),
+    cardsController.addComment
+);
+
+router.delete(
+    '/:cardId/comments/:commentId',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyPermission(ListPermissionEnum.UPDATE_CARD),
+    cardsController.deleteComment
+);
+
 export const CardsRouter = router;

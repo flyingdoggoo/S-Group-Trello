@@ -16,6 +16,10 @@ import { BoardMemberWithRelationsSchema, BoardMemberPartialWithRelationsSchema, 
 import type { BoardMemberWithRelations, BoardMemberPartialWithRelations, BoardMemberOptionalDefaultsWithRelations } from './BoardMemberSchema'
 import { InvitationsWithRelationsSchema, InvitationsPartialWithRelationsSchema, InvitationsOptionalDefaultsWithRelationsSchema } from './InvitationsSchema'
 import type { InvitationsWithRelations, InvitationsPartialWithRelations, InvitationsOptionalDefaultsWithRelations } from './InvitationsSchema'
+import { CardMemberWithRelationsSchema, CardMemberPartialWithRelationsSchema, CardMemberOptionalDefaultsWithRelationsSchema } from './CardMemberSchema'
+import type { CardMemberWithRelations, CardMemberPartialWithRelations, CardMemberOptionalDefaultsWithRelations } from './CardMemberSchema'
+import { CardCommentWithRelationsSchema, CardCommentPartialWithRelationsSchema, CardCommentOptionalDefaultsWithRelationsSchema } from './CardCommentSchema'
+import type { CardCommentWithRelations, CardCommentPartialWithRelations, CardCommentOptionalDefaultsWithRelations } from './CardCommentSchema'
 
 /////////////////////////////////////////
 // USERS SCHEMA
@@ -72,6 +76,8 @@ export type usersRelations = {
   UserRole: UserRoleWithRelations[];
   BoardMember: BoardMemberWithRelations[];
   Invitations: InvitationsWithRelations[];
+  CardMember: CardMemberWithRelations[];
+  CardComment: CardCommentWithRelations[];
 };
 
 export type usersWithRelations = z.infer<typeof usersSchema> & usersRelations
@@ -85,6 +91,8 @@ export const usersWithRelationsSchema: z.ZodType<usersWithRelations> = usersSche
   UserRole: z.lazy(() => UserRoleWithRelationsSchema).array(),
   BoardMember: z.lazy(() => BoardMemberWithRelationsSchema).array(),
   Invitations: z.lazy(() => InvitationsWithRelationsSchema).array(),
+  CardMember: z.lazy(() => CardMemberWithRelationsSchema).array(),
+  CardComment: z.lazy(() => CardCommentWithRelationsSchema).array(),
 }))
 
 /////////////////////////////////////////
@@ -100,6 +108,8 @@ export type usersOptionalDefaultsRelations = {
   UserRole: UserRoleOptionalDefaultsWithRelations[];
   BoardMember: BoardMemberOptionalDefaultsWithRelations[];
   Invitations: InvitationsOptionalDefaultsWithRelations[];
+  CardMember: CardMemberOptionalDefaultsWithRelations[];
+  CardComment: CardCommentOptionalDefaultsWithRelations[];
 };
 
 export type usersOptionalDefaultsWithRelations = z.infer<typeof usersOptionalDefaultsSchema> & usersOptionalDefaultsRelations
@@ -113,6 +123,8 @@ export const usersOptionalDefaultsWithRelationsSchema: z.ZodType<usersOptionalDe
   UserRole: z.lazy(() => UserRoleOptionalDefaultsWithRelationsSchema).array(),
   BoardMember: z.lazy(() => BoardMemberOptionalDefaultsWithRelationsSchema).array(),
   Invitations: z.lazy(() => InvitationsOptionalDefaultsWithRelationsSchema).array(),
+  CardMember: z.lazy(() => CardMemberOptionalDefaultsWithRelationsSchema).array(),
+  CardComment: z.lazy(() => CardCommentOptionalDefaultsWithRelationsSchema).array(),
 }))
 
 /////////////////////////////////////////
@@ -128,6 +140,8 @@ export type usersPartialRelations = {
   UserRole?: UserRolePartialWithRelations[];
   BoardMember?: BoardMemberPartialWithRelations[];
   Invitations?: InvitationsPartialWithRelations[];
+  CardMember?: CardMemberPartialWithRelations[];
+  CardComment?: CardCommentPartialWithRelations[];
 };
 
 export type usersPartialWithRelations = z.infer<typeof usersPartialSchema> & usersPartialRelations
@@ -141,6 +155,8 @@ export const usersPartialWithRelationsSchema: z.ZodType<usersPartialWithRelation
   UserRole: z.lazy(() => UserRolePartialWithRelationsSchema).array(),
   BoardMember: z.lazy(() => BoardMemberPartialWithRelationsSchema).array(),
   Invitations: z.lazy(() => InvitationsPartialWithRelationsSchema).array(),
+  CardMember: z.lazy(() => CardMemberPartialWithRelationsSchema).array(),
+  CardComment: z.lazy(() => CardCommentPartialWithRelationsSchema).array(),
 })).partial()
 
 export type usersOptionalDefaultsWithPartialRelations = z.infer<typeof usersOptionalDefaultsSchema> & usersPartialRelations
@@ -154,6 +170,8 @@ export const usersOptionalDefaultsWithPartialRelationsSchema: z.ZodType<usersOpt
   UserRole: z.lazy(() => UserRolePartialWithRelationsSchema).array(),
   BoardMember: z.lazy(() => BoardMemberPartialWithRelationsSchema).array(),
   Invitations: z.lazy(() => InvitationsPartialWithRelationsSchema).array(),
+  CardMember: z.lazy(() => CardMemberPartialWithRelationsSchema).array(),
+  CardComment: z.lazy(() => CardCommentPartialWithRelationsSchema).array(),
 }).partial())
 
 export type usersWithPartialRelations = z.infer<typeof usersSchema> & usersPartialRelations
@@ -167,6 +185,8 @@ export const usersWithPartialRelationsSchema: z.ZodType<usersWithPartialRelation
   UserRole: z.lazy(() => UserRolePartialWithRelationsSchema).array(),
   BoardMember: z.lazy(() => BoardMemberPartialWithRelationsSchema).array(),
   Invitations: z.lazy(() => InvitationsPartialWithRelationsSchema).array(),
+  CardMember: z.lazy(() => CardMemberPartialWithRelationsSchema).array(),
+  CardComment: z.lazy(() => CardCommentPartialWithRelationsSchema).array(),
 }).partial())
 
 export default usersSchema;

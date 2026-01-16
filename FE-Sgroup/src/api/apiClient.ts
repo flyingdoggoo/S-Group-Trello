@@ -35,6 +35,13 @@ export const apiClient = {
   ): Promise<AxiosResponse> {
     return axiosClient.put(url, data, config);
   },
+  patch(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<AxiosResponse> {
+    return axiosClient.patch(url, data, config);
+  },
   delete(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse> {
     return axiosClient.delete(url, config);
   },

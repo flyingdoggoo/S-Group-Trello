@@ -11,8 +11,12 @@ export class CardResponseDto {
     status: CardStatusEnum;
     createdAt: Date;
     updatedAt: Date;
+    tags?: any[];
+    todos?: any[];
+    members?: any[];
+    comments?: any[];
 
-    constructor(data: Card) {
+    constructor(data: Card & { tags?: any[], todos?: any[], members?: any[], comments?: any[] }) {
         this.id = data.id;
         this.listId = data.listId;
         this.title = data.title;
@@ -21,6 +25,10 @@ export class CardResponseDto {
         this.status = data.status;
         this.createdAt = data.createdAt;
         this.updatedAt = data.updatedAt;
+        this.tags = data.tags || [];
+        this.todos = data.todos || [];
+        this.members = data.members || [];
+        this.comments = data.comments || [];
     }
 }
 
