@@ -8,16 +8,39 @@ import { Toaster } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "./ui/input-otp";
+
 export function Register() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [openOTPDialog, setOpenOTPDialog] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!name || !email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Password and Confirm Password do not match");
+      return;
+    }
     try {
+      setOpenOTPDialog(true);
       const response = await axios.post("http://localhost:8000/auth/register", {
         name: name,
         email: email,
@@ -29,6 +52,31 @@ export function Register() {
     } catch (error) {
       console.log(error);
       toast.error("Created account failed");
+    }
+  }
+
+  async function handleVerify() {
+    console.log("Verifying OTP:", otp);
+    try {
+      const response = await axios.post("http://localhost:8000/auth/verify", {
+        email: email,
+        otp: otp,
+      });
+      console.log("data verify", response);
+      toast.success("OTP verified successfully");
+
+      setOpenOTPDialog(false);
+      setEmail("");
+      setName("");
+      setPassword("");
+      setConfirmPassword("");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (error) {
+      console.log(error);
+      toast.error("OTP verification failed");
     }
   }
 
@@ -101,9 +149,33 @@ export function Register() {
               </button>
             </p>
 
-            <Button type="submit" className="mt-4" onClick={handleSubmit}>
-              Create Account
-            </Button>
+            <Dialog open={openOTPDialog} onOpenChange={setOpenOTPDialog}>
+              <DialogTrigger asChild>
+                <Button type="submit" className="mt-4" onClick={handleSubmit}>
+                  Create Account
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] flex flex-col gap-4 items-center">
+                <div className="text-lg font-medium">Verify Email</div>
+                <div>Please enter the OTP sent to your email</div>
+                <InputOTP maxLength={6} onChange={(value) => setOtp(value)}>
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                  </InputOTPGroup>
+                  <InputOTPSeparator />
+                  <InputOTPGroup>
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
+                <Button className="w-[300px]" onClick={handleVerify}>
+                  Verify
+                </Button>
+              </DialogContent>
+            </Dialog>
           </form>
         </div>
         <Toaster richColors position="bottom-center" />

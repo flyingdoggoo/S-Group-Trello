@@ -1,3 +1,4 @@
+import { verify } from 'jsonwebtoken';
 import { Exception } from '@tsed/exceptions';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -11,7 +12,11 @@ import {
 	RegisterResponseDto,
 } from './dtos';
 
-import type { CheckLoginWithGoogleOauthRequestDto } from './dtos';
+import type {
+	AccountResponseDto,
+	CheckLoginWithGoogleOauthRequestDto,
+	VerifyRequestDto,
+} from './dtos';
 import type { HttpResponseBodySuccessDto } from '@/common';
 import { appEnv } from '@/configs';
 
@@ -44,11 +49,7 @@ export class AuthController {
 	}
 
 	// Redirect to Google OAuth (must return middleware invocation)
-	googleAuth = (
-		req: Request,
-		res: Response,
-		next: NextFunction,
-	): void => {
+	googleAuth = (req: Request, res: Response, next: NextFunction): void => {
 		return passport.authenticate('google', {
 			scope: ['profile', 'email'],
 			accessType: 'offline',
@@ -111,4 +112,13 @@ export class AuthController {
 	authFailure = (_req: Request, _res: Response): Exception => {
 		throw new OptionalException(StatusCodes.UNAUTHORIZED, 'Authentication Failed');
 	};
+
+	async verify(req: Request): Promise<Response> {
+		const verifyRequestDto = req.body as VerifyRequestDto;
+		const result = await this.authService.verify(verifyRequestDto);
+		if (result instanceof Exception) {
+			return new HttpResponseDto().exception(result);
+		}
+		return new HttpResponseDto().success<AccountResponseDto>(result);
+	}
 }

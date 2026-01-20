@@ -1,3 +1,4 @@
+import { MailsService } from '../mails/mail.service';
 import { BoardMembersRepository } from './../boardMembers/boardMembers.repository';
 import { roles } from './../../models/modelSchema/rolesSchema';
 import { Exception } from '@tsed/exceptions';
@@ -20,7 +21,7 @@ import { ProjectMembersRepository } from '../projectMembers/projectMembers.repos
 import { RolesRepository } from '../roles/roles.repository';
 import { StatusCodes } from 'http-status-codes/build/cjs/status-codes';
 import { randomBytes } from 'crypto';
-import { InvitationStatusEnum } from '@prisma/client';
+import { InvitationStatusEnum, project } from '@prisma/client';
 
 export class InvitationService {
 	constructor(
@@ -31,6 +32,7 @@ export class InvitationService {
 		private readonly rolesRepository = new RolesRepository(),
 		private readonly projectRepository = new ProjectsRepository(),
 		private readonly boardsRepository = new BoardsRepository(),
+		private readonly mailsService = new MailsService(),
 	) {}
 
 	async inviteUserToProject(
@@ -40,6 +42,10 @@ export class InvitationService {
 		roleId: string,
 	): Promise<ServiceResponse<InvitationResponseDto> | Exception> {
 		const existingUser = await this.usersRepository.findUser({ email });
+		const project = await this.projectRepository.findProjectById({ id: projectId });
+		if (!project) {
+			throw new NotFoundException('Project not found');
+		}
 		if (existingUser) {
 			const existingMember =
 				await this.projectMembersRepository.isUserMemberOfProject(
@@ -47,9 +53,7 @@ export class InvitationService {
 					existingUser.id,
 				);
 			if (existingMember) {
-				throw new ConflictException(
-					'User is already a member of the project hihi',
-				);
+				throw new ConflictException('User is already a member of the project ');
 			}
 
 			const newMember = await this.projectMembersRepository.assignUserRoleProject(
@@ -58,6 +62,16 @@ export class InvitationService {
 				roleId,
 			);
 
+			await this.mailsService.sendEmail({
+				recipients: [
+					{
+						address: email,
+						name: 'User',
+					},
+				],
+				subject: 'You have been added to a project',
+				html: `You have been added to a project ${project.title}. Please log in to your account to access the project.`,
+			});
 			// notification logic can be added here
 
 			return new ServiceResponse(
@@ -97,7 +111,16 @@ export class InvitationService {
 				expiresAt,
 			});
 			// email sending logic can be added here
-
+			await this.mailsService.sendEmail({
+				recipients: [
+					{
+						address: email,
+						name: 'User',
+					},
+				],
+				subject: 'You are invited to join a project',
+				html: `You have been invited to join a project. Please use the following token to accept the invitation: <a href="http://localhost:5173/S-Group-Trello/register">Accept Invitation</a>. This invitation is valid until ${expiresAt.toDateString()}.`,
+			});
 			return new ServiceResponse(
 				ResponseStatus.Success,
 				'Invitation sent successfully',
@@ -118,6 +141,7 @@ export class InvitationService {
 		roleId: string,
 	): Promise<ServiceResponse<InvitationResponseDto> | Exception> {
 		const existingUser = await this.usersRepository.findUser({ email });
+
 		if (existingUser) {
 			const existingMember = await this.boardMembersRepository.isUserMemberOfBoard(
 				boardId,
@@ -134,7 +158,16 @@ export class InvitationService {
 			);
 
 			// notification logic can be added here
-
+			await this.mailsService.sendEmail({
+				recipients: [
+					{
+						address: email,
+						name: 'User',
+					},
+				],
+				subject: 'You have been added to a board',
+				html: `You have been added to a board. Please log in to your account to access the board.`,
+			});
 			return new ServiceResponse(
 				ResponseStatus.Success,
 				'User invited successfully',
@@ -167,7 +200,16 @@ export class InvitationService {
 				expiresAt,
 			});
 			// email sending logic can be added here
-
+			await this.mailsService.sendEmail({
+				recipients: [
+					{
+						address: email,
+						name: 'User',
+					},
+				],
+				subject: 'You are invited to join a board',
+				html: `You have been invited to join a board. Please use the following token to accept the invitation: <a href="http://localhost:5173/S-Group-Trello/register">Accept Invitation</a>. This invitation is valid until ${expiresAt.toDateString()}.`,
+			});
 			return new ServiceResponse(
 				ResponseStatus.Success,
 				'Invitation sent successfully',
