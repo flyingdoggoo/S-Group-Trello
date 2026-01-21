@@ -8,7 +8,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ProjectsRepository } from '../projects/projects.repository';
 import { ProjectMembersRepository } from '../projectMembers/projectMembers.repository';
 import { BoardsRepository } from '../boards/boards.repository';
-import { ListsRepository } from '../lists/lists.repository';
+import { ListsRepository } from '../Lists/lists.repository';
 import { CardStatusEnum } from '@prisma/client';
 
 export class CardsService {
