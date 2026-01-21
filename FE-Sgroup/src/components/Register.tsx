@@ -40,7 +40,6 @@ export function Register() {
       return;
     }
     try {
-      setOpenOTPDialog(true);
       const response = await axios.post("http://localhost:8000/auth/register", {
         name: name,
         email: email,
@@ -48,7 +47,8 @@ export function Register() {
       });
       console.log(response);
       toast.success("Created account success");
-      navigate("/login", { replace: true });
+      setOpenOTPDialog(true);
+      // navigate("/login", { replace: true });
     } catch (error) {
       console.log(error);
       toast.error("Created account failed");
@@ -65,12 +65,12 @@ export function Register() {
       console.log("data verify", response);
       toast.success("OTP verified successfully");
 
-      setOpenOTPDialog(false);
       setEmail("");
       setName("");
       setPassword("");
       setConfirmPassword("");
 
+      setOpenOTPDialog(false);
       setTimeout(() => {
         navigate("/login");
       }, 2000);
@@ -151,7 +151,7 @@ export function Register() {
 
             <Dialog open={openOTPDialog} onOpenChange={setOpenOTPDialog}>
               <DialogTrigger asChild>
-                <Button type="submit" className="mt-4" onClick={handleSubmit}>
+                <Button className="mt-4" onClick={handleSubmit}>
                   Create Account
                 </Button>
               </DialogTrigger>
