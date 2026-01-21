@@ -7,7 +7,8 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   outDir: './dist',
-  skipNodeModulesBundle: true,
+  skipNodeModulesBundle: false,
+  noExternal: [/(.*)/],
   external: [
     'bcrypt',
     '@prisma/client',
