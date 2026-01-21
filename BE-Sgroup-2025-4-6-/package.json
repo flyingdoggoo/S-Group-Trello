@@ -8,7 +8,7 @@
     "lint": "eslint \"src/**/*.ts\" --fix",
     "build": "npx rimraf dist && npx tsup",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && prisma db push && npm run build",
+    "vercel-build": "prisma generate",
     "start": "node dist/app.js",
     "dev": "tsx watch --clear-screen=false src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
