@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
-import axios from "axios";
+import { apiClient } from "@/api/apiClient";
 import { Link, useNavigate } from "react-router-dom";
 
 export function Login() {
@@ -15,7 +15,7 @@ export function Login() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8000/auth/login", {
+      const response = await apiClient.post("/auth/login", {
         email: email,
         password: password,
       });

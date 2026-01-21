@@ -5,7 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import { Toaster } from "sonner";
-import axios from "axios";
+import { apiClient } from "@/api/apiClient";
 import { useNavigate } from "react-router-dom";
 
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
@@ -40,7 +40,7 @@ export function Register() {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:8000/auth/register", {
+      const response = await apiClient.post("/auth/register", {
         name: name,
         email: email,
         password: password,
@@ -58,7 +58,7 @@ export function Register() {
   async function handleVerify() {
     console.log("Verifying OTP:", otp);
     try {
-      const response = await axios.post("http://localhost:8000/auth/verify", {
+      const response = await apiClient.post("/auth/verify", {
         email: email,
         otp: otp,
       });
