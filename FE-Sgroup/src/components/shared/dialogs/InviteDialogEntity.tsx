@@ -37,11 +37,25 @@ export function InviteDialogEntity({
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  type Member = {
+    id: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      avatarUrl?: string;
+    };
+    role: {
+      id: string;
+      roleName: string;
+    };
+  };
+
   const { members, fetchMembers } = useEntityMembers(
     entityType,
     entityId,
     projectId
-  );
+  ) as { members: Member[]; fetchMembers: () => void };
   const { fetchRoles, roles } = useRoleStore();
 
   // QUAN TRỌNG: Fetch roles ngay khi entityType thay đổi
@@ -68,7 +82,7 @@ export function InviteDialogEntity({
       .join("");
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedRole) {
       toast.error("Please select a role for the invited member.");

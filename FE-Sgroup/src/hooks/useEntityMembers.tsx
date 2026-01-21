@@ -6,7 +6,13 @@ export const useEntityMembers = (
   entityId: string,
   projectId?: string
 ) => {
-  const [members, setMembers] = useState([]);
+  type Member = {
+    role: { roleName: string };
+    user: { name: string };
+    // add other fields if needed
+  };
+
+  const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
