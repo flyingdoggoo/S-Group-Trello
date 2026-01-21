@@ -14,9 +14,6 @@ import {
 	setCookieMiddleware,
 } from './common';
 
-import { NotificationGateway } from './modules/notifications/notification.gateway';
-import { createSecretKey } from 'crypto';
-import { createServer } from 'http';
 const app: Express = express();
 
 app.use(express.json());
@@ -199,19 +196,6 @@ app.use('/invites', Modules.invitationRouter);
 app.use('/roles', Modules.roleRouter);
 app.use('/notifications', Modules.notificationRouter);
 app.use(errorHandlerMiddleware);
-
-const server = createServer(app);
-
-const notificationGateway = new NotificationGateway();
-notificationGateway.initialize(server);
-
-// Only start server in non-serverless environment
-if (process.env.VERCEL !== '1') {
-	server.listen(appEnv.PORT, () => {
-		const { NODE_ENV, HOST, PORT } = appEnv;
-		console.log(`Server (${NODE_ENV}) running at http://${HOST}:${PORT}`);
-	});
-}
 
 // Export for Vercel serverless
 export default app;
