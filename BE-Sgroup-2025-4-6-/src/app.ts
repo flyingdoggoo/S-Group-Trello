@@ -197,5 +197,5 @@ app.use('/roles', Modules.roleRouter);
 app.use('/notifications', Modules.notificationRouter);
 app.use(errorHandlerMiddleware);
 
-// Export for Vercel serverless
-export default app;
+// Export for Vercel serverless (CommonJS)
+module.exports = app;
