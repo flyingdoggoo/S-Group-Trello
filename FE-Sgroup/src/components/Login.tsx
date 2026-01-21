@@ -12,7 +12,7 @@ export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost:8000/auth/login", {
@@ -21,7 +21,7 @@ export function Login() {
       });
       console.log("Login response data:", response.data);
       localStorage.setItem("accessToken", response.data.data.accessToken);
-      cookieStore.set("accessToken", response.data.data.accessToken);
+      document.cookie = `accessToken=${response.data.data.accessToken}; path=/`;
 
       toast.success("Login success");
       navigate("/dashboard", { replace: true });

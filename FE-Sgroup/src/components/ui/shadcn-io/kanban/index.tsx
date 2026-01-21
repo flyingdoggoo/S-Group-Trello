@@ -26,7 +26,6 @@ import {
   type ReactNode,
   useContext,
   useState,
-  useRef,
 } from 'react';
 import { createPortal } from 'react-dom';
 import tunnel from 'tunnel-rat';
@@ -102,7 +101,6 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
   children,
   className,
   onCardClick,
-  ...rest
 }: KanbanCardProps<T>) => {
   const {
     attributes,

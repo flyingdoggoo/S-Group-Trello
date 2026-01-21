@@ -15,7 +15,7 @@ import { ComboboxRoleMember } from "@/components/projects/ComboboxRoleMember";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { apiClient } from "@/api/apiClient";
-import { useEntityMembers, type Member } from "@/hooks/useEntityMembers";
+import { useEntityMembers } from "@/hooks/useEntityMembers";
 import { useRoleStore } from "@/stores/roles.store";
 
 interface InviteDialogEntityProps {
@@ -37,13 +37,13 @@ export function InviteDialogEntity({
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { members, fetchMembers, loading, error } = useEntityMembers(
+  const { members, fetchMembers } = useEntityMembers(
     entityType,
     entityId,
     projectId
   );
 
-  const { fetchRoles, roles } = useRoleStore();
+  const { fetchRoles } = useRoleStore();
 
   // QUAN TRỌNG: Fetch roles ngay khi entityType thay đổi
   useEffect(() => {
