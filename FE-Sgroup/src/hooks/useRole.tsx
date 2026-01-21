@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { apiClient } from "@/api/apiClient";
-import { ro } from "@faker-js/faker";
+
 export default function useRole() {
   const [roles, setRoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);

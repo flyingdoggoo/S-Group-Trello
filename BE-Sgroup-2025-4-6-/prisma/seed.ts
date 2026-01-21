@@ -77,6 +77,9 @@ async function seedRolePermissions() {
 
 			...allow(enumValues(BoardPermissionEnum)),
 			...allow(enumValues(ListPermissionEnum)),
+			// BoardPermissionEnum.GET_BOARD,
+			// ListPermissionEnum.GET_LIST,
+			// BoardPermissionEnum.GET_CARD,
 		],
 
 		[RolesEnum.PROJECT_VIEWER]: [

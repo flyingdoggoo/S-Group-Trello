@@ -42,7 +42,7 @@ export function InviteDialogEntity({
     entityId,
     projectId
   );
-  const { fetchRoles, roles } = useRoleStore();
+  const { fetchRoles } = useRoleStore();
 
   // QUAN TRỌNG: Fetch roles ngay khi entityType thay đổi
   useEffect(() => {
@@ -68,7 +68,7 @@ export function InviteDialogEntity({
       .join("");
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRole) {
       toast.error("Please select a role for the invited member.");

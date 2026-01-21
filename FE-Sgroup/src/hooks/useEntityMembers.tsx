@@ -6,7 +6,7 @@ export const useEntityMembers = (
   entityId: string,
   projectId?: string
 ) => {
-  const [members, setMembers] = useState([]);
+  const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
