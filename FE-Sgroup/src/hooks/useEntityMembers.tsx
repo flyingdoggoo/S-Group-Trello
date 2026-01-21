@@ -1,12 +1,26 @@
 import { axiosClient } from "@/api/apiClient";
 import { useState, useEffect, useCallback } from "react";
 
+export type Member = {
+  id: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    avatarUrl?: string;
+  };
+  role: {
+    id: string;
+    roleName: string;
+  };
+};
+
 export const useEntityMembers = (
   entityType: "project" | "board",
   entityId: string,
   projectId?: string
 ) => {
-  const [members, setMembers] = useState([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

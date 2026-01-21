@@ -25,7 +25,7 @@ export function Register() {
   const [otp, setOtp] = useState("");
   const [openOTPDialog, setOpenOTPDialog] = useState(false);
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!name || !email || !password) {
       toast.error("Please fill in all fields");
@@ -151,7 +151,7 @@ export function Register() {
 
             <Dialog open={openOTPDialog} onOpenChange={setOpenOTPDialog}>
               <DialogTrigger asChild>
-                <Button className="mt-4" onClick={handleSubmit}>
+                <Button type="submit" className="mt-4">
                   Create Account
                 </Button>
               </DialogTrigger>
