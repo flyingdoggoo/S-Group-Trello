@@ -7,11 +7,16 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   outDir: './dist',
-  skipNodeModulesBundle: true,
+  bundle: true,
+  skipNodeModulesBundle: false,
+  noExternal: [/.*/],
   external: [
     'bcrypt',
     '@prisma/client',
   ],
+  esbuildOptions(options) {
+    options.mainFields = ['module', 'main'];
+  },
 });
 
 
