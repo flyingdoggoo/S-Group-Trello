@@ -9,10 +9,17 @@ export default defineConfig({
   outDir: './dist',
   bundle: true,
   skipNodeModulesBundle: false,
-  noExternal: [/.*/],
   external: [
     'bcrypt',
     '@prisma/client',
+    'express',
+    'cors',
+    'helmet',
+    'morgan',
+    'passport',
+    'passport-google-oauth20',
+    'cookie-parser',
+    'nodemailer',
   ],
   esbuildOptions(options) {
     options.mainFields = ['module', 'main'];
