@@ -205,7 +205,13 @@ const server = createServer(app);
 const notificationGateway = new NotificationGateway();
 notificationGateway.initialize(server);
 
-server.listen(appEnv.PORT, () => {
-	const { NODE_ENV, HOST, PORT } = appEnv;
-	console.log(`Server (${NODE_ENV}) running at http://${HOST}:${PORT}`);
-});
+// Only start server in non-serverless environment
+if (process.env.VERCEL !== '1') {
+	server.listen(appEnv.PORT, () => {
+		const { NODE_ENV, HOST, PORT } = appEnv;
+		console.log(`Server (${NODE_ENV}) running at http://${HOST}:${PORT}`);
+	});
+}
+
+// Export for Vercel serverless
+export default app;
