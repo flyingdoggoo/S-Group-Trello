@@ -33,6 +33,7 @@ app.use(passport.initialize());
 
 // Middlewares
 const allowedOrigins = [
+	"https://s-group-trello-r74buwl6h-nguyn-thanh-hius-projects.vercel.app",
 	appEnv.CORS_ORIGIN,
 	'http://localhost:5173',
 	'https://flyingdoggoo.github.io',
