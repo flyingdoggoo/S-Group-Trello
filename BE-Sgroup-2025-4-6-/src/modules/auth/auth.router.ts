@@ -3,6 +3,7 @@ import { AuthController } from './auth.controller';
 import {
 	LoginRequestValidationSchema,
 	RegisterRequestValidationSchema,
+	verifyRequestValidationSchema,
 } from './dtos';
 import { GoogleOauthStrategy } from './strategies/googleOauth.strategy';
 import { autoBindUtil, validateRequestMiddleware } from '@/common';
@@ -28,5 +29,10 @@ router.post(
 router.get('/google/login', authController.googleAuth);
 router.get('/google/check-login', authController.googleCallback);
 router.get('/google/login/failure', authController.authFailure);
+router.post(
+	'/verify',
+	validateRequestMiddleware(verifyRequestValidationSchema),
+	authController.verify,
+);
 
 export const authRouter = router;
