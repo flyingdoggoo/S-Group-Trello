@@ -51,6 +51,9 @@ export class BoardsService {
 		});
 		const boardId = board.id;
 		const boardAdmin = await this.rolesRepository.findByName('BOARD_ADMIN');
+		if (!boardAdmin) {
+			throw new Error('BOARD_ADMIN role not found');
+		}
 		await this.boardMemberRepository.assignUserRoleBoard(
 			boardId,
 			userId,

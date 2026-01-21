@@ -2,6 +2,7 @@
   "name": "BE-base",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\" && npm run lint",

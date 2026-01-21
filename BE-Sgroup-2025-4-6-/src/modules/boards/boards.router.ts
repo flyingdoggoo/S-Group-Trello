@@ -9,7 +9,7 @@ import {
 
 import authMiddleware from '@/common/middlewares/auth.middleware';
 import { BoardPermissionEnum } from '@/common/enums/permissions/boardPermission.enum';
-import { ListsRouter } from '../lists/lists.router';
+import { ListsRouter } from '../Lists/lists.router';
 
 const boardsController = new BoardsController();
 
