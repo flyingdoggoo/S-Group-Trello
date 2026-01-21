@@ -49,9 +49,14 @@ app.use(
 			}
 		},
 		credentials: true,
+		methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+		allowedHeaders: ['Content-Type', 'Authorization'],
 	}),
 );
-app.use(helmet());
+app.use(helmet({
+	crossOriginResourcePolicy: { policy: "cross-origin" },
+	crossOriginEmbedderPolicy: false,
+}));
 app.use(morgan('combined'));
 
 app.use('/health-check', Modules.healthCheckRouter);
