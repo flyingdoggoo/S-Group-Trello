@@ -1,5 +1,5 @@
 import { otps } from '@prisma/client';
-import { Exception } from '@tsed/exceptions';
+import { Exception } from '@/common/exceptions/base.exception';
 import { StatusCodes } from 'http-status-codes';
 
 import { UsersRepository } from '../users/users.repository';

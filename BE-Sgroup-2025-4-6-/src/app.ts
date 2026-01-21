@@ -197,5 +197,13 @@ app.use('/roles', Modules.roleRouter);
 app.use('/notifications', Modules.notificationRouter);
 app.use(errorHandlerMiddleware);
 
+// Start server for local development
+if (process.env.VERCEL !== '1') {
+	app.listen(appEnv.PORT, () => {
+		const { NODE_ENV, HOST, PORT } = appEnv;
+		console.log(`Server (${NODE_ENV}) running at http://${HOST}:${PORT}`);
+	});
+}
+
 // Export for Vercel serverless (CommonJS)
 module.exports = app;

@@ -1,4 +1,4 @@
-import { Exception } from '@tsed/exceptions';
+import { Exception } from '../exceptions/base.exception';
 import { Request, Response, NextFunction } from 'express';
 
 import { HttpResponseDto } from '../dtos';

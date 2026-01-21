@@ -1,5 +1,5 @@
 import { UserStatusEnum } from '@prisma/client';
-import { Exception } from '@tsed/exceptions';
+import { Exception } from '@/common/exceptions/base.exception';
 import { genSalt, hash } from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
 

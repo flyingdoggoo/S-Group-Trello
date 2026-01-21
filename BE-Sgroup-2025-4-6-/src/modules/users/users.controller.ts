@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { HttpResponseDto, PaginationDto } from "@/common";
 import { UsersService } from "./users.service";
-import { Exception } from '@tsed/exceptions';
+import { Exception } from '@/common/exceptions/base.exception';
 import { RegisterResponseDto } from '../auth/dtos';
 import { GetUsersRequestDto, GetUsersResponseDto } from './dtos';
 import { CreateProjectRequestDto } from './dtos/requests/createProject.request';

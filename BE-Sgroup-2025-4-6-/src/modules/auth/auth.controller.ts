@@ -1,5 +1,5 @@
 import { verify } from 'jsonwebtoken';
-import { Exception } from '@tsed/exceptions';
+import { Exception } from '@/common/exceptions/base.exception';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import passport from 'passport';
