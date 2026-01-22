@@ -5,11 +5,11 @@ import z from 'zod';
 
 export class PaginationDto {
 	page: number = 1;
-	limit: number = 10;
+	limit: number = 30;
 
 	constructor(data: Partial<PaginationDto>) {
 		this.page = Number(data.page ?? 1);
-		this.limit = Number(data.limit ?? 10);
+		this.limit = Number(data.limit ?? 30);
 	}
 }
 

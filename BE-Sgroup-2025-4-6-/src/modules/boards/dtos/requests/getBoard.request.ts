@@ -12,7 +12,7 @@ export class GetBoardsRequestDto {
         this.title = data?.title;
         this.status = data?.status;
         this.page = data?.page ? parseInt(data.page as string, 10) : 1;
-        this.limit = data?.limit ? parseInt(data.limit as string, 10) : 10;
+        this.limit = data?.limit ? parseInt(data.limit as string, 10) : 30;
     }
 }
 
@@ -20,7 +20,7 @@ const getBoardsRequestQuery = z.object({
     title: z.string().optional(),
     status: z.nativeEnum(BoardStatusEnum).optional(),
     page: z.coerce.number().int().positive().optional().default(1),
-    limit: z.coerce.number().int().positive().optional().default(10),
+    limit: z.coerce.number().int().positive().optional().default(30),
 }).strict();
 
 export const GetBoardsRequestValidationSchema: ZodValidationSchema = {

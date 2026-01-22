@@ -54,7 +54,7 @@ export class ListsService {
         if (!isMember) throw new ForbiddenException();
 
         const page = dto.page ?? 1;
-        const limit = dto.limit ?? 10;
+        const limit = dto.limit ?? 30;
         const skip = (page - 1) * limit;
 
         const [lists, total] = await this.listsRepository.findLists({

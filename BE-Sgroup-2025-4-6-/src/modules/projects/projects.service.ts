@@ -77,7 +77,7 @@ export class ProjectsService {
 		userId: string,
 	): Promise<ServiceResponse<GetProjectsResponseDto>> {
 		const page = dto.page ?? 1;
-		const limit = dto.limit ?? 10;
+		const limit = dto.limit ?? 30;
 		const skip = (page - 1) * limit;
 
 		const [projects, total] = await this.projectsRepository.findProjects({

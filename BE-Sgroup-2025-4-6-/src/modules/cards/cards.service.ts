@@ -64,7 +64,7 @@ export class CardsService {
         if (!isMember) throw new ForbiddenException();
 
         const page = dto.page ?? 1;
-        const limit = dto.limit ?? 10;
+        const limit = dto.limit ?? 30;
         const skip = (page - 1) * limit;
 
         const [cards, total] = await this.cardsRepository.findCards({
