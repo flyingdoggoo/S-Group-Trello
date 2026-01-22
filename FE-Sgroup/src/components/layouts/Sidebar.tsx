@@ -18,7 +18,7 @@ export function AppSidebar() {
     const fetchProjects = async () => {
       if (projects.length === 0) {
         try {
-          const response = await apiClient.get("/projects");
+          const response = await apiClient.get("/projects?limit=100");
           const projectsData = response.data.data.data;
           setProjects(projectsData);
         } catch (err) {

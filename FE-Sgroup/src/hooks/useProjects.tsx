@@ -16,7 +16,7 @@ export default function useProjects() {
   async function fetchProjects() {
     setLoading(true);
     try {
-      const response = await apiClient.get("/projects");
+      const response = await apiClient.get("/projects?limit=100");
       console.log("Fetched projects:", response.data.data.data);
       setProjects(response.data.data.data);
     } catch (err: any) {
