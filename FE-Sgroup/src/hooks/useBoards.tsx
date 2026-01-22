@@ -11,7 +11,7 @@ export default function useBoards({ projectId }: { projectId: string }) {
     async function fetchBoards() {
         setIsLoading(true)
         try {
-            const response = await apiClient.get(`/projects/${projectId}/boards`)
+            const response = await apiClient.get(`/projects/${projectId}/boards?limit=100`)
             const boardsData = response.data.data.data
             setBoards(projectId, boardsData)
         } catch (err: any) {
