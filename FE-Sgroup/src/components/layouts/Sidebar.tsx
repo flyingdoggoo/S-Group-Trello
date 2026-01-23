@@ -8,9 +8,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrello } from "@fortawesome/free-brands-svg-icons";
 import { useProjectsStore } from "@/stores/projects.store";
 import { apiClient } from "@/api/apiClient";
+import { toast } from "react-toastify";
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    projectId: string;
+  } | null>(null);
   const location = useLocation();
   const { projects, setProjects } = useProjectsStore();
 
@@ -28,6 +35,36 @@ export function AppSidebar() {
     };
     fetchProjects();
   }, [projects.length, setProjects]);
+
+  // Close context menu on click outside
+  useEffect(() => {
+    const handleClick = () => setContextMenu(null);
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, []);
+
+  const handleContextMenu = (e: React.MouseEvent, projectId: string) => {
+    e.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      projectId,
+    });
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    try {
+      await apiClient.delete(`/projects/${projectId}`);
+      toast.success("Project deleted successfully");
+      // Remove from local state
+      setProjects(projects.filter((p: any) => p.id !== projectId));
+      setContextMenu(null);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to delete project");
+      console.error(err);
+    }
+  };
 
   const navigationItems = [
     {
@@ -47,7 +84,7 @@ export function AppSidebar() {
 
   return (
     <div
-      className={`flex flex-col bg-white border-r h-screen transition-all duration-300 ${
+      className={`sticky top-0 self-start flex flex-col bg-white border-r h-screen transition-all duration-300 z-40 ${
         collapsed ? "w-16" : "w-64"
       }`}
     >
@@ -113,6 +150,7 @@ export function AppSidebar() {
             <Link
               key={`${item.to}-${index}`}
               to={item.to}
+              onContextMenu={(e) => handleContextMenu(e, projects[index].id)}
               className={`flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors ${
                 collapsed ? "justify-center" : ""
               } ${
@@ -132,6 +170,28 @@ export function AppSidebar() {
       </div>
 
       {/* Footer */}
+
+      {/* Context Menu */}
+      {contextMenu?.visible && (
+        <div
+          className="fixed bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50"
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={() => handleDeleteProject(contextMenu.projectId)}
+            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors"
+          >
+            Delete
+          </button>
+          <button
+            onClick={() => setContextMenu(null)}
+            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
       <DropUpSettings collapsed={collapsed} />
     </div>
   );
