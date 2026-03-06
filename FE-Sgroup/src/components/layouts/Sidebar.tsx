@@ -84,18 +84,18 @@ export function AppSidebar() {
 
   return (
     <div
-      className={`sticky top-0 self-start flex flex-col bg-white border-r border-neutral-200 h-screen transition-all duration-300 z-40 ${
+      className={`sticky top-0 self-start flex flex-col bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 h-screen transition-all duration-300 z-40 ${
         collapsed ? "w-16" : "w-64"
       }`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700/50">
         {!collapsed && (
           <Link to="/dashboard">  
-            <h2 className="text-lg font-semibold flex items-center gap-2 text-black hover:opacity-70 transition-opacity">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-slate-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-300 transition-colors">
               <FontAwesomeIcon
                 icon={faTrello}
-                className="text-3xl text-black"
+                className="text-3xl text-blue-400"
               />
               Trello
             </h2>
@@ -103,11 +103,11 @@ export function AppSidebar() {
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className={`p-1.5 rounded-md hover:bg-neutral-100 active:bg-neutral-200 transition-colors ${
+          className={`p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 active:bg-slate-200 dark:active:bg-slate-600 transition-colors ${
             collapsed ? "mx-auto" : ""
           }`}
         >
-          <Menu className="h-5 w-5 text-neutral-600" />
+          <Menu className="h-5 w-5 text-slate-500 dark:text-slate-400" />
         </button>
       </div>
 
@@ -116,7 +116,7 @@ export function AppSidebar() {
         {/* Navigation Section */}
         {!collapsed && (
           <div className="px-4 mb-2">
-            <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+            <h3 className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
               Navigation
             </h3>
           </div>
@@ -130,8 +130,8 @@ export function AppSidebar() {
                 collapsed ? "justify-center" : ""
               } ${
                 location.pathname === item.to
-                  ? "bg-neutral-100 text-black font-medium border-r-2 border-black"
-                  : "text-neutral-600 hover:bg-neutral-50 hover:text-black"
+                  ? "bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-white font-medium border-r-2 border-blue-400"
+                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               {item.icon}
@@ -143,7 +143,7 @@ export function AppSidebar() {
         {/* Workspaces Section */}
         {!collapsed && (
           <div className="px-4 mb-2">
-            <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+            <h3 className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
               Workspaces
             </h3>
           </div>
@@ -158,8 +158,8 @@ export function AppSidebar() {
                 collapsed ? "justify-center" : ""
               } ${
                 location.pathname === item.to
-                  ? "bg-neutral-100 text-black font-medium border-r-2 border-black"
-                  : "text-neutral-600 hover:bg-neutral-50 hover:text-black"
+                  ? "bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-white font-medium border-r-2 border-blue-400"
+                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               <div className="flex items-center">
@@ -167,7 +167,7 @@ export function AppSidebar() {
                 {!collapsed && <span className="ml-3">{item.label}</span>}
               </div>
               {!collapsed && item.count && (
-                <span className="text-xs text-neutral-400 bg-neutral-100 px-1.5 py-0.5 rounded">{item.count}</span>
+                <span className="text-xs text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{item.count}</span>
               )}
             </Link>
           ))}
@@ -177,19 +177,19 @@ export function AppSidebar() {
       {/* Context Menu */}
       {contextMenu?.visible && (
         <div
-          className="fixed bg-white border border-neutral-200 rounded-lg shadow-lg py-1 z-50 min-w-[140px]"
+          className="fixed bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 z-50 min-w-[140px]"
           style={{ top: contextMenu.y, left: contextMenu.x }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={() => handleDeleteProject(contextMenu.projectId)}
-            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-neutral-50 transition-colors"
+            className="w-full px-4 py-2 text-left text-sm text-red-500 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           >
             Delete
           </button>
           <button
             onClick={() => setContextMenu(null)}
-            className="w-full px-4 py-2 text-left text-sm text-neutral-600 hover:bg-neutral-50 transition-colors"
+            className="w-full px-4 py-2 text-left text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           >
             Cancel
           </button>

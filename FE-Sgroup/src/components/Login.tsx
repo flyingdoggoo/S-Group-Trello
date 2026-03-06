@@ -38,13 +38,13 @@ export function Login() {
   return (
     <>
       <ToastContainer />
-      <div className="flex justify-center items-center min-h-screen w-screen bg-white">
-        <div className="w-[400px] border border-neutral-200 rounded-xl p-8 shadow-sm">
-          <h1 className="text-2xl font-bold text-center text-black">Login</h1>
-          <p className="text-sm text-neutral-500 text-center mt-1">Please fill out the form below to log in.</p>
+      <div className="flex justify-center items-center min-h-screen w-screen bg-gradient-to-br from-slate-100 via-slate-50 to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+        <div className="w-[400px] border border-slate-200 dark:border-slate-700 rounded-xl p-8 shadow-sm bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+          <h1 className="text-2xl font-bold text-center text-slate-800 dark:text-slate-100">Login</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 text-center mt-1">Please fill out the form below to log in.</p>
           <form onSubmit={handleSubmit} action="">
             <div className="mt-5">
-              <label htmlFor="email" className="text-sm font-medium text-black">Email</label>
+              <label htmlFor="email" className="text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
               <Input
                 value={email}
                 type="email"
@@ -58,7 +58,7 @@ export function Login() {
             </div>
 
             <div className="mt-4">
-              <label htmlFor="password" className="text-sm font-medium text-black">Password</label>
+              <label htmlFor="password" className="text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
               <Input
                 value={password}
                 type="password"
@@ -70,10 +70,10 @@ export function Login() {
                 className="mt-1"
               />
             </div>
-            <p className="mt-4 text-sm text-neutral-600">
+            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
               Don't have an account?{" "}
               <Link to="/register">
-                <button type="button" className="text-black font-medium underline underline-offset-2 hover:opacity-70 transition-opacity">
+                <button type="button" className="text-slate-800 dark:text-slate-200 font-medium underline underline-offset-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   Register here
                 </button>
               </Link>

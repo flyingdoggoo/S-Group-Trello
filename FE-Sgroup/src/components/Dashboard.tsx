@@ -56,7 +56,7 @@ export function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-950 dark:to-slate-900">
       <ToastContainer />
       <SidebarProvider>
         <AppSidebar />
@@ -64,8 +64,8 @@ export function Dashboard() {
           {/* Header */}
           <div className="flex items-center justify-between mb-10">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-black">Dashboard</h1>
-              <p className="text-sm text-neutral-500 mt-1">
+              <h1 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-100">Dashboard</h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Manage your workspaces and boards
               </p>
             </div>
@@ -75,11 +75,11 @@ export function Dashboard() {
 
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-32">
-              <svg className="animate-spin h-8 w-8 text-black mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin h-8 w-8 text-slate-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
               </svg>
-              <p className="text-sm text-neutral-400">Loading projects...</p>
+              <p className="text-sm text-slate-400">Loading projects...</p>
             </div>
           ) : (
           /* Projects */
@@ -103,14 +103,14 @@ export function Dashboard() {
                     <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
                     <path d="M7 7h3v9H7zm7 0h3v5h-3z" />
                   </svg>
-                  <h2 className="text-lg font-semibold text-black tracking-tight">
+                  <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 tracking-tight">
                     {project.title}
                   </h2>
                 </div>
                 {project.description && (
-                  <p className="text-sm text-neutral-500 mb-1 ml-8">{project.description}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-1 ml-8">{project.description}</p>
                 )}
-                <p className="text-xs text-neutral-400 mb-4 ml-8">
+                <p className="text-xs text-slate-400 dark:text-slate-500 mb-4 ml-8">
                   {project.boardCount || 0} Boards
                 </p>
 
@@ -122,7 +122,7 @@ export function Dashboard() {
                         key={board.id}
                         to={`/boards/${board.id}`}
                         onContextMenu={(e) => handleContextMenu(e, board.id, project.id)}
-                        className="group relative border border-neutral-200 rounded-lg p-5 bg-white hover:border-black hover:shadow-md transition-all duration-200 cursor-pointer"
+                        className="group relative border border-slate-200 dark:border-slate-700 rounded-lg p-5 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-md transition-all duration-200 cursor-pointer"
                       >
                         <div className="flex items-center gap-2 mb-2">
                           <svg
@@ -135,18 +135,18 @@ export function Dashboard() {
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className="text-neutral-400 group-hover:text-black transition-colors"
+                            className="text-slate-400 group-hover:text-slate-700 transition-colors"
                           >
                             <path d="M5 3v14"></path>
                             <path d="M12 3v8"></path>
                             <path d="M19 3v18"></path>
                           </svg>
-                          <h3 className="font-medium text-black">
+                          <h3 className="font-medium text-slate-800 dark:text-slate-100">
                             {board.title}
                           </h3>
                         </div>
                         {board.description && (
-                          <p className="text-sm text-neutral-500 line-clamp-2">{board.description}</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{board.description}</p>
                         )}
                       </Link>
                     ))}
@@ -160,19 +160,19 @@ export function Dashboard() {
           {/* Context Menu */}
           {contextMenu?.visible && (
             <div
-              className="fixed bg-white border border-neutral-200 rounded-lg shadow-lg py-1 z-50 min-w-[140px]"
+              className="fixed bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 z-50 min-w-[140px]"
               style={{ top: contextMenu.y, left: contextMenu.x }}
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={handleDeleteBoard}
-                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-neutral-50 transition-colors"
+                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-slate-50 transition-colors"
               >
                 Delete
               </button>
               <button
                 onClick={() => setContextMenu(null)}
-                className="w-full px-4 py-2 text-left text-sm text-neutral-600 hover:bg-neutral-50 transition-colors"
+                className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-50 transition-colors"
               >
                 Cancel
               </button>
