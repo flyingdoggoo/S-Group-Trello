@@ -86,4 +86,9 @@ export class BoardsRepository {
         });
     }
 
+    async findBoardByIdSimple(id: string): Promise<Board | null> {
+        return this.prismaService.board.findFirst({
+            where: { id, deletedAt: null },
+        });
+    }
 }

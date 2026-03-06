@@ -12,10 +12,10 @@ import { ListPermissionEnum } from "@/common/enums/permissions/listPermission.en
 
 const cardsController = new CardsController();
 
-const router = express.Router({ mergeParams: true });
+const router = express.Router();
 autoBindUtil(cardsController);
 
-// /boards/:boardId/lists/:listId/cards
+// GET /cards?listId=xxx
 router.get(
     '/',
     authMiddleware.verifyToken,
@@ -24,6 +24,7 @@ router.get(
     cardsController.getCards
 );
 
+// POST /cards  (listId in body)
 router.post(
     '/',
     authMiddleware.verifyToken,
@@ -32,6 +33,7 @@ router.post(
     cardsController.createCard
 );
 
+// GET /cards/:cardId
 router.get(
     '/:cardId',
     authMiddleware.verifyToken,
@@ -39,6 +41,7 @@ router.get(
     cardsController.getCardById
 );
 
+// PUT /cards/:cardId
 router.put(
     '/:cardId',
     authMiddleware.verifyToken,
@@ -47,6 +50,7 @@ router.put(
     cardsController.updateCard
 );
 
+// DELETE /cards/:cardId
 router.delete(
     '/:cardId',
     authMiddleware.verifyToken,

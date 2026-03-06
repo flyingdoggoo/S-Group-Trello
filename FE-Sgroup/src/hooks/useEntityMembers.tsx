@@ -29,7 +29,7 @@ export const useEntityMembers = (
       setLoading(true);
       const endpoint =
         entityType === "board"
-          ? `/projects/${projectId}/boards/${entityId}/members`
+          ? `/boards/${entityId}/members`
           : `/projects/${entityId}/members`;
 
       const response = await axiosClient.get(endpoint);

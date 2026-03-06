@@ -133,6 +133,31 @@ export class BoardsService {
 		);
 	}
 
+	async getBoardByIdFlat(
+		boardId: string,
+		userId: string,
+	): Promise<ServiceResponse<BoardResponseDto>> {
+		const board = await this.boardsRepository.findBoardByIdSimple(boardId);
+		if (!board) {
+			throw new NotFoundException('Board not found');
+		}
+
+		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
+			board.projectId,
+			userId,
+		);
+		if (!isMember) {
+			throw new ForbiddenException();
+		}
+
+		return new ServiceResponse(
+			ResponseStatus.Success,
+			'Board retrieved successfully',
+			new BoardResponseDto(board),
+			StatusCodes.OK,
+		);
+	}
+
 	async updateBoard(
 		id: string,
 		projectId: string,
@@ -204,50 +229,41 @@ export class BoardsService {
 	}
 
 	async getBoardsMembers(
-		projectId: string,
 		boardId: string,
 		userId: string,
 	): Promise<ServiceResponse<any>> {
-		const existingProject = await this.projectsRepository.findProjectById({
-			id: projectId,
-		});
-		if (!existingProject) {
-			throw new NotFoundException('Project not found');
-		}
-		const existingBoard = await this.boardsRepository.findBoardById({
-			id: boardId,
-			projectId: projectId,
-		});
-
+		const existingBoard = await this.boardsRepository.findBoardByIdSimple(boardId);
 		if (!existingBoard) {
 			throw new NotFoundException('Board not found');
 		}
+
+		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
+			existingBoard.projectId,
+			userId,
+		);
+		if (!isMember) {
+			throw new ForbiddenException();
+		}
+
 		const members = await this.boardMemberRepository.getBoardMembers(boardId);
 
 		return new ServiceResponse(
 			ResponseStatus.Success,
-			'Project members retrieved successfully',
+			'Board members retrieved successfully',
 			members,
 			StatusCodes.OK,
 		);
 	}
 
 	async changeRoleOfMemberBoard(
-		projectId: string,
 		boardId: string,
 		userId: string,
 		newRoleId: string,
 	): Promise<ServiceResponse<any>> {
-		const existingProject = await this.projectsRepository.findProjectById({
-			id: projectId,
-		});
-		if (!existingProject) {
-			throw new NotFoundException('Project not found');
+		const existingBoard = await this.boardsRepository.findBoardByIdSimple(boardId);
+		if (!existingBoard) {
+			throw new NotFoundException('Board not found');
 		}
-		const existingBoard = await this.boardsRepository.findBoardById({
-			id: boardId,
-			projectId: projectId,
-		});
 		if (!existingBoard) {
 			throw new NotFoundException('Board not found');
 		}

@@ -59,9 +59,9 @@ export function BoardModalCreate({ projectId }: { projectId: string }) {
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-5 hover:bg-gray-50 cursor-pointer transition">
-            <span className="text-3xl text-gray-400 mb-2">+</span>
-            <button className="text-gray-600 font-medium">Create a new board</button>
+          <div className="flex flex-col items-center justify-center border-2 border-dashed border-neutral-300 rounded-lg p-5 hover:border-black hover:bg-neutral-50 cursor-pointer transition-all duration-200">
+            <span className="text-2xl text-neutral-400 mb-1">+</span>
+            <button className="text-sm text-neutral-500 font-medium">Create a new board</button>
           </div>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">

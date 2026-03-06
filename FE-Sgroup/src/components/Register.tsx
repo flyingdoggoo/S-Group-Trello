@@ -24,6 +24,7 @@ export function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [openOTPDialog, setOpenOTPDialog] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -40,6 +41,7 @@ export function Register() {
       return;
     }
     try {
+      setIsSubmitting(true);
       const response = await apiClient.post("/auth/register", {
         name: name,
         email: email,
@@ -52,6 +54,8 @@ export function Register() {
     } catch (error) {
       console.log(error);
       toast.error("Created account failed");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -83,13 +87,13 @@ export function Register() {
   return (
     <>
       <ToastContainer />
-      <div className="flex justify-center items-center h-screen w-screen">
-        <div className="w-[400px] border rounded-2xl p-10">
-          <h1 className=" font-bold text-2xl text-center">Create an account</h1>
-          <p className="mt-4">Enter your email below to create your account</p>
+      <div className="flex justify-center items-center min-h-screen w-screen bg-white">
+        <div className="w-[400px] border border-neutral-200 rounded-xl p-8 shadow-sm">
+          <h1 className="font-bold text-2xl text-center text-black">Create an account</h1>
+          <p className="mt-2 text-sm text-neutral-500 text-center">Enter your email below to create your account</p>
           <form action="" onSubmit={handleSubmit}>
-            <div className="mt-4">
-              <label htmlFor="name">Name:</label>
+            <div className="mt-5">
+              <label htmlFor="name" className="text-sm font-medium text-black">Name:</label>
               <Input
                 value={name}
                 type="text"
@@ -101,7 +105,7 @@ export function Register() {
               />
             </div>
             <div className="mt-4">
-              <label htmlFor="email">Email:</label>
+              <label htmlFor="email" className="text-sm font-medium text-black">Email:</label>
               <Input
                 value={email}
                 type="email"
@@ -113,7 +117,7 @@ export function Register() {
               />
             </div>
             <div className="mt-4">
-              <label htmlFor="password">Password:</label>
+              <label htmlFor="password" className="text-sm font-medium text-black">Password:</label>
               <Input
                 value={password}
                 type="password"
@@ -126,7 +130,7 @@ export function Register() {
             </div>
 
             <div className="mt-4">
-              <label htmlFor="confirmPassword">Confirm Password:</label>
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-black">Confirm Password:</label>
               <Input
                 value={confirmPassword}
                 type="password"
@@ -138,11 +142,11 @@ export function Register() {
               />
             </div>
 
-            <p className="mt-4">
+            <p className="mt-4 text-sm text-neutral-600">
               Already have an account?{" "}
               <button
                 type="button"
-                className="text-blue-500 underline"
+                className="text-black font-medium underline underline-offset-2 hover:opacity-70 transition-opacity"
                 onClick={() => navigate("/login")}
               >
                 Login here
@@ -151,8 +155,13 @@ export function Register() {
 
             <Dialog open={openOTPDialog} onOpenChange={setOpenOTPDialog}>
               <DialogTrigger asChild>
-                <Button type="submit" className="mt-4">
-                  Create Account
+                <Button type="submit" className="mt-4 active:scale-95 transition-transform" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                  ) : "Create Account"}
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px] flex flex-col gap-4 items-center">

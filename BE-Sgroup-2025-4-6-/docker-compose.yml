@@ -13,6 +13,19 @@ services:
             - '5436:5432'
         volumes:
             - postgres_data:/var/lib/postgresql/data
-
+    trip-redis:
+        image: redis:8.4.0-alpine3.22
+        container_name: trip-redis
+        restart: on-failure
+        environment:
+            - ALLOW_EMPTY_PASSWORD=no
+            - REDIS_PASSWORD=StrongPass123
+            - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+            # - REDIS_PORT_NUMBER=6379
+            # - REDIS_TLS_ENABLED=no
+            # - REDIS_IO_THREADS=4
+            # - REDIS_IO_THREADS_DO_READS=yes
+        ports:
+            - "6380:6379"
 volumes:
     postgres_data:

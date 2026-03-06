@@ -15,7 +15,7 @@ import { useState } from "react"
 import { apiClient } from "@/api/apiClient"
 import { toast } from "react-toastify"
 
-export function ListModalCreate({ projectId, boardId, lists, setLists }: { projectId: string; boardId: string; lists: any[]; setLists: (v: any) => void }) {
+export function ListModalCreate({ boardId, lists, setLists }: { boardId: string; lists: any[]; setLists: (v: any) => void }) {
   const [title, setTitle] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -25,7 +25,8 @@ export function ListModalCreate({ projectId, boardId, lists, setLists }: { proje
     setLoading(true)
     try {
       const position = lists.length
-      const response = await apiClient.post(`projects/${projectId}/boards/${boardId}/lists`, {
+      const response = await apiClient.post('lists', {
+        boardId,
         title,
         position,
       })

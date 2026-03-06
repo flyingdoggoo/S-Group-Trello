@@ -3,9 +3,6 @@ import { apiClient } from "@/api/apiClient";
 
 interface CardModalProps {
   cardId: string;
-  projectId: string;
-  boardId: string;
-  listId: string;
   onClose: () => void;
   onDelete: () => void;
 }
@@ -20,7 +17,7 @@ interface CardData {
   comments: { id: string; userId: string; userName: string; content: string; createdAt: string }[];
 }
 
-export function CardModal({ cardId, projectId, boardId, listId, onClose, onDelete }: CardModalProps) {
+export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
   const [card, setCard] = useState<CardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [newTag, setNewTag] = useState("");
@@ -37,7 +34,7 @@ export function CardModal({ cardId, projectId, boardId, listId, onClose, onDelet
 
   async function loadCard() {
     try {
-      const res = await apiClient.get(`projects/${projectId}/boards/${boardId}/lists/${listId}/cards/${cardId}`);
+      const res = await apiClient.get(`cards/${cardId}`);
       const cardData = res.data?.data;
       // Map BE data to FE format
       setCard({
@@ -72,7 +69,7 @@ export function CardModal({ cardId, projectId, boardId, listId, onClose, onDelet
   async function handleAddTag() {
     if (!newTag.trim()) return;
     try {
-      const res = await apiClient.post(`projects/${projectId}/boards/${boardId}/lists/${listId}/cards/${cardId}/tags`, {
+      const res = await apiClient.post(`cards/${cardId}/tags`, {
         name: newTag,
         color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
       });
@@ -88,7 +85,7 @@ export function CardModal({ cardId, projectId, boardId, listId, onClose, onDelet
   async function handleAddTodo() {
     if (!newTodo.trim()) return;
     try {
-      const res = await apiClient.post(`projects/${projectId}/boards/${boardId}/lists/${listId}/cards/${cardId}/todos`, {
+      const res = await apiClient.post(`cards/${cardId}/todos`, {
         title: newTodo,
       });
       if (res.data?.data) {
@@ -102,7 +99,7 @@ export function CardModal({ cardId, projectId, boardId, listId, onClose, onDelet
 
   async function handleToggleTodo(todoId: string, completed: boolean) {
     try {
-      await apiClient.patch(`projects/${projectId}/boards/${boardId}/lists/${listId}/cards/${cardId}/todos/${todoId}`, {
+      await apiClient.patch(`cards/${cardId}/todos/${todoId}`, {
         completed,
       });
       setCard((prev) =>
@@ -121,7 +118,7 @@ export function CardModal({ cardId, projectId, boardId, listId, onClose, onDelet
   async function handleAddComment() {
     if (!newComment.trim()) return;
     try {
-      const res = await apiClient.post(`projects/${projectId}/boards/${boardId}/lists/${listId}/cards/${cardId}/comments`, {
+      const res = await apiClient.post(`cards/${cardId}/comments`, {
         content: newComment,
       });
       if (res.data?.data) {
@@ -136,7 +133,7 @@ export function CardModal({ cardId, projectId, boardId, listId, onClose, onDelet
   async function handleUpdateTitle() {
     if (!editedTitle.trim()) return;
     try {
-      await apiClient.put(`projects/${projectId}/boards/${boardId}/lists/${listId}/cards/${cardId}`, {
+      await apiClient.put(`cards/${cardId}`, {
         title: editedTitle,
       });
       setCard((prev) => prev ? { ...prev, title: editedTitle } : null);
@@ -148,7 +145,7 @@ export function CardModal({ cardId, projectId, boardId, listId, onClose, onDelet
 
   async function handleUpdateDescription() {
     try {
-      await apiClient.put(`projects/${projectId}/boards/${boardId}/lists/${listId}/cards/${cardId}`, {
+      await apiClient.put(`cards/${cardId}`, {
         description: editedDescription || null,
       });
       setCard((prev) => prev ? { ...prev, description: editedDescription || null } : null);
@@ -161,7 +158,7 @@ export function CardModal({ cardId, projectId, boardId, listId, onClose, onDelet
   async function handleDeleteCard() {
     if (!confirm("Are you sure you want to delete this card?")) return;
     try {
-      await apiClient.delete(`projects/${projectId}/boards/${boardId}/lists/${listId}/cards/${cardId}`);
+      await apiClient.delete(`cards/${cardId}`);
       onDelete();
       onClose();
     } catch (err) {

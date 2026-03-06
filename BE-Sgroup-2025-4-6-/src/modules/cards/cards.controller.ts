@@ -8,15 +8,11 @@ export class CardsController {
         autoBindUtil(this);
     }
 
-    // Assumes nested under /projects/:id/boards/:boardId/lists/:listId/cards
     async createCard(req: Request, res: Response, next: NextFunction) {
         try {
             const dto = new CreateCardRequestDto(req.body);
             const userId = req.user?.id as string;
-            const projectId = req.params.id as string;
-            const boardId = req.params.boardId as string;
-            const listId = req.params.listId as string;
-            const result = await this.cardsService.createCard(dto, userId, projectId, boardId, listId);
+            const result = await this.cardsService.createCard(dto, userId);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -26,11 +22,8 @@ export class CardsController {
     async getCards(req: Request, res: Response, next: NextFunction) {
         try {
             const dto = new GetCardsRequestDto(req.query);
-            const projectId = req.params.id as string;
-            const boardId = req.params.boardId as string;
-            const listId = req.params.listId as string;
             const userId = req.user?.id as string;
-            const result = await this.cardsService.getCards(dto, projectId, boardId, listId, userId);
+            const result = await this.cardsService.getCards(dto, userId);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -39,9 +32,9 @@ export class CardsController {
 
     async getCardById(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId, listId, cardId } = req.params;
+            const { cardId } = req.params;
             const userId = req.user?.id as string;
-            const result = await this.cardsService.getCardById(cardId, id, boardId, listId, userId);
+            const result = await this.cardsService.getCardById(cardId, userId);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -50,10 +43,10 @@ export class CardsController {
 
     async updateCard(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId, listId, cardId } = req.params;
+            const { cardId } = req.params;
             const dto = new UpdateCardRequestDto(req.body);
             const userId = req.user?.id as string;
-            const result = await this.cardsService.updateCard(cardId, id, boardId, listId, userId, dto);
+            const result = await this.cardsService.updateCard(cardId, userId, dto);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -62,9 +55,9 @@ export class CardsController {
 
     async deleteCard(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId, listId, cardId } = req.params;
+            const { cardId } = req.params;
             const userId = req.user?.id as string;
-            const result = await this.cardsService.deleteCard(cardId, id, boardId, listId, userId);
+            const result = await this.cardsService.deleteCard(cardId, userId);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -74,10 +67,10 @@ export class CardsController {
     // Tags
     async addTag(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId, listId, cardId } = req.params;
+            const { cardId } = req.params;
             const userId = req.user?.id as string;
             const { name, color } = req.body;
-            const result = await this.cardsService.addTag(cardId, id, boardId, listId, userId, name, color);
+            const result = await this.cardsService.addTag(cardId, userId, name, color);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -86,9 +79,9 @@ export class CardsController {
 
     async deleteTag(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId, listId, cardId, tagId } = req.params;
+            const { cardId, tagId } = req.params;
             const userId = req.user?.id as string;
-            const result = await this.cardsService.deleteTag(cardId, tagId, id, boardId, listId, userId);
+            const result = await this.cardsService.deleteTag(cardId, tagId, userId);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -98,10 +91,10 @@ export class CardsController {
     // Todos
     async addTodo(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId, listId, cardId } = req.params;
+            const { cardId } = req.params;
             const userId = req.user?.id as string;
             const { title } = req.body;
-            const result = await this.cardsService.addTodo(cardId, id, boardId, listId, userId, title);
+            const result = await this.cardsService.addTodo(cardId, userId, title);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -110,10 +103,10 @@ export class CardsController {
 
     async updateTodo(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId, listId, cardId, todoId } = req.params;
+            const { cardId, todoId } = req.params;
             const userId = req.user?.id as string;
             const { completed } = req.body;
-            const result = await this.cardsService.updateTodo(cardId, todoId, id, boardId, listId, userId, completed);
+            const result = await this.cardsService.updateTodo(cardId, todoId, userId, completed);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -122,9 +115,9 @@ export class CardsController {
 
     async deleteTodo(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId, listId, cardId, todoId } = req.params;
+            const { cardId, todoId } = req.params;
             const userId = req.user?.id as string;
-            const result = await this.cardsService.deleteTodo(cardId, todoId, id, boardId, listId, userId);
+            const result = await this.cardsService.deleteTodo(cardId, todoId, userId);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -134,10 +127,10 @@ export class CardsController {
     // Members
     async addMember(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId, listId, cardId } = req.params;
+            const { cardId } = req.params;
             const userId = req.user?.id as string;
             const { userId: memberUserId } = req.body;
-            const result = await this.cardsService.addMember(cardId, id, boardId, listId, userId, memberUserId);
+            const result = await this.cardsService.addMember(cardId, userId, memberUserId);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -146,9 +139,9 @@ export class CardsController {
 
     async removeMember(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId, listId, cardId, memberId } = req.params;
+            const { cardId, memberId } = req.params;
             const userId = req.user?.id as string;
-            const result = await this.cardsService.removeMember(cardId, memberId, id, boardId, listId, userId);
+            const result = await this.cardsService.removeMember(cardId, memberId, userId);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -158,10 +151,10 @@ export class CardsController {
     // Comments
     async addComment(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId, listId, cardId } = req.params;
+            const { cardId } = req.params;
             const userId = req.user?.id as string;
             const { content } = req.body;
-            const result = await this.cardsService.addComment(cardId, id, boardId, listId, userId, content);
+            const result = await this.cardsService.addComment(cardId, userId, content);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);
@@ -170,9 +163,9 @@ export class CardsController {
 
     async deleteComment(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id, boardId, listId, cardId, commentId } = req.params;
+            const { cardId, commentId } = req.params;
             const userId = req.user?.id as string;
-            const result = await this.cardsService.deleteComment(cardId, commentId, id, boardId, listId, userId);
+            const result = await this.cardsService.deleteComment(cardId, commentId, userId);
             res.status(result.code).json({ success: result.success, message: result.message, data: result.data });
         } catch (error) {
             next(error);

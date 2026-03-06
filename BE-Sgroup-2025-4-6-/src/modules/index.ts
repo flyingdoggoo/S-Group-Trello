@@ -5,6 +5,10 @@ import { projectsRouter } from './projects/projects.router';
 import { notificationRouter } from './notifications/notification.routers';
 import { invitationRouter } from './invitations/invitation.router';
 import { roleRouter } from './roles/role.router';
+import { ListsRouter } from './Lists/lists.router';
+import { CardsRouter } from './cards/cards.router';
+import { boardsStandaloneRouter } from './boards/boards.standalone.router';
+
 export const Modules = {
 	healthCheckRouter,
 	authRouter,
@@ -13,4 +17,7 @@ export const Modules = {
 	invitationRouter,
 	roleRouter,
 	notificationRouter,
+	listsRouter: ListsRouter,
+	cardsRouter: CardsRouter,
+	boardsStandaloneRouter,
 };

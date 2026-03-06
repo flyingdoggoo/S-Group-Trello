@@ -195,6 +195,9 @@ app.use('/projects', Modules.projectsRouter);
 app.use('/invites', Modules.invitationRouter);
 app.use('/roles', Modules.roleRouter);
 app.use('/notifications', Modules.notificationRouter);
+app.use('/lists', Modules.listsRouter);
+app.use('/cards', Modules.cardsRouter);
+app.use('/boards', Modules.boardsStandaloneRouter);
 app.use(errorHandlerMiddleware);
 
 // Start server for local development

@@ -112,7 +112,7 @@ export function InviteDialogEntity({
       try {
         let endpoint = "";
         if (entityType === "board") {
-          endpoint = `/projects/${projectId}/boards/${entityId}/members/change-role`;
+          endpoint = `/boards/${entityId}/members/change-role`;
         } else {
           endpoint = `/projects/${projectId}/members/change-role`;
         }
