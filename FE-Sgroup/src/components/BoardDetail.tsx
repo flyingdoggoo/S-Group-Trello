@@ -9,7 +9,6 @@ import { faker } from "@faker-js/faker";
 import { useParams } from "react-router";
 import useLists from "@/hooks/useLists";
 import type { ListItem } from "@/hooks/useLists";
-import useBoards from "@/hooks/useBoards";
 import { useMemo, useState, useEffect } from "react";
 import { ListModalCreate } from "@/components/ui/list.modal.create";
 import { apiClient } from "@/api/apiClient";
@@ -28,10 +27,26 @@ export default function BoardDetail() {
     const capitalize = (str: string) =>
         str.charAt(0).toUpperCase() + str.slice(1);
     const boardId = useParams().boardId as string;
-    const projectId = useParams().id as string;
-    const { boards } = useBoards({ projectId });
-    const currentBoard = boards.find(b => b.id === boardId);
-    const { lists, setLists } = useLists({ projectId, boardId });
+    const [currentBoard, setCurrentBoard] = useState<{ id: string; projectId: string; title: string; description?: string | null } | null>(null);
+    const [boardLoading, setBoardLoading] = useState(true);
+    const projectId = currentBoard?.projectId || "";
+
+    // Fetch board info from flat endpoint
+    useEffect(() => {
+        (async () => {
+            setBoardLoading(true);
+            try {
+                const res = await apiClient.get(`boards/${boardId}`);
+                setCurrentBoard(res.data?.data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setBoardLoading(false);
+            }
+        })();
+    }, [boardId]);
+
+    const { lists, setLists } = useLists({ boardId });
     const columns = useMemo(
         () =>
             lists.map((list: ListItem) => ({
@@ -62,7 +77,7 @@ export default function BoardDetail() {
                 const resultArrays = await Promise.all(
                     lists.map(async (l) => {
                         const res = await apiClient.get(
-                            `projects/${projectId}/boards/${boardId}/lists/${l.id}/cards`
+                            `cards?listId=${l.id}`
                         );
                         const raw = res.data?.data?.data || [];
                         return raw.map(
@@ -94,15 +109,15 @@ export default function BoardDetail() {
         return () => {
             mounted = false;
         };
-    }, [lists, projectId, boardId]);
+    }, [lists]);
 
     async function handleCreate(listId: string) {
         const title = (inputs[listId] || "").trim();
         if (!title) return;
         try {
             const res = await apiClient.post(
-                `projects/${projectId}/boards/${boardId}/lists/${listId}/cards`,
-                { title }
+                `cards`,
+                { title, listId }
             );
             const c = res.data?.data;
             if (c) {
@@ -146,10 +161,8 @@ export default function BoardDetail() {
             const cardsInTargetColumn = currentFeatures.filter(f => f.column === targetColumn);
             const newPosition = cardsInTargetColumn.findIndex(f => f.id === active.id);
 
-            const oldListId = cardToListMapping[active.id] || activeCard.column;
-
             try {
-                const url = `projects/${projectId}/boards/${boardId}/lists/${oldListId}/cards/${active.id}`;
+                const url = `cards/${active.id}`;
                 const payload = { 
                     listId: targetColumn,
                     position: newPosition
@@ -171,10 +184,20 @@ export default function BoardDetail() {
     }
 
     return (
-        <div>
+        <div className="min-h-screen bg-neutral-50">
             <SidebarProvider>
                 <AppSidebar />
-                <div className="p-4 space-y-4">
+                <div className="flex-1 p-6 space-y-4">
+                    {boardLoading ? (
+                        <div className="flex flex-col items-center justify-center py-32">
+                            <svg className="animate-spin h-8 w-8 text-black mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            <p className="text-sm text-neutral-400">Loading board...</p>
+                        </div>
+                    ) : (
+                    <>
                     <HeaderEntity
                         title={currentBoard?.title || "Board"}
                         entityType="board"
@@ -182,8 +205,7 @@ export default function BoardDetail() {
                         projectId={projectId}
                     />
                     
-                    {/* Đường ngăn cách */}
-                    <hr className="border-t border-gray-200" />
+                    <hr className="border-t border-neutral-200" />
                     
                     <div className="overflow-x-auto">
                         <div className="flex gap-4 min-w-max">
@@ -197,15 +219,15 @@ export default function BoardDetail() {
                                     <KanbanBoard
                                         id={column.id}
                                         key={column.id}
-                                        className="w-70 flex-shrink-0 bg-white rounded-lg"
+                                        className="w-72 flex-shrink-0 bg-white rounded-lg border border-neutral-200"
                                     >
-                                        <KanbanHeader className="bg-gray-50 mb-5 p-4">
+                                        <KanbanHeader className="bg-neutral-50 border-b border-neutral-200 mb-0 p-4">
                                             <div className="flex items-center justify-between w-full">
-                                                <span>{column.name}</span>
+                                                <span className="text-sm font-semibold text-black">{column.name}</span>
                                                 <div className="relative">
                                                     <button
                                                         onClick={() => setShowMenu((prev) => ({ ...prev, [column.id]: !prev[column.id] }))}
-                                                        className="p-1 hover:bg-gray-200 rounded transition-colors"
+                                                        className="p-1 hover:bg-neutral-200 rounded transition-colors"
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                             <circle cx="12" cy="12" r="1"></circle>
@@ -219,13 +241,13 @@ export default function BoardDetail() {
                                                                 className="fixed inset-0 z-10"
                                                                 onClick={() => setShowMenu((prev) => ({ ...prev, [column.id]: false }))}
                                                             />
-                                                            <div className="absolute right-0 top-8 z-20 bg-white rounded-lg shadow-lg border py-1 min-w-[150px]">
+                                                            <div className="absolute right-0 top-8 z-20 bg-white rounded-lg shadow-lg border border-neutral-200 py-1 min-w-[150px]">
                                                                 <button
                                                                     onClick={() => {
                                                                         setShowMenu((prev) => ({ ...prev, [column.id]: false }));
                                                                         // TODO: Implement rename
                                                                     }}
-                                                                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors flex items-center gap-2"
+                                                                    className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50 transition-colors flex items-center gap-2"
                                                                 >
                                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                                         <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
@@ -237,14 +259,14 @@ export default function BoardDetail() {
                                                                     onClick={async () => {
                                                                         setShowMenu((prev) => ({ ...prev, [column.id]: false }));
                                                                         try {
-                                                                            await apiClient.delete(`projects/${projectId}/boards/${boardId}/lists/${column.id}`);
+                                                                            await apiClient.delete(`lists/${column.id}`);
                                                                             setLists((prev) => prev.filter(l => l.id !== column.id));
                                                                             setFeatures((prev) => prev.filter(f => f.column !== column.id));
                                                                         } catch (err) {
                                                                             console.error('Delete list error:', err);
                                                                         }
                                                                     }}
-                                                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                                                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-neutral-50 transition-colors flex items-center gap-2"
                                                                 >
                                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                                         <path d="M3 6h18"></path>
@@ -263,7 +285,7 @@ export default function BoardDetail() {
                                         </KanbanHeader>
                                         <KanbanCards
                                             id={column.id}
-                                            className="bg-gray-50"
+                                            className="bg-white px-2 pt-2"
                                         >
                                             {(feature: FeatureItem) => (
                                                 <KanbanCard
@@ -271,17 +293,17 @@ export default function BoardDetail() {
                                                     id={feature.id}
                                                     key={feature.id}
                                                     name={feature.name}
-                                                    className="ml-5 mr-5 min-h-[150px] rounded-lg"
+                                                    className="mx-3 min-h-[80px] rounded-lg border border-neutral-200 hover:border-neutral-400 transition-colors bg-white shadow-sm hover:shadow-md"
                                                     onCardClick={(id, listId) => {
                                                         // Dùng listId thực tế từ mapping (DB) thay vì từ UI state
                                                         const realListId = cardToListMapping[id] || listId;
                                                         setSelectedCard({ id, listId: realListId });
                                                     }}
                                                 >
-                                                    <div className="flex flex-col justify-center text-left h-full">
-                                                        <h3 className="font-semibold text-sm mb-2">{feature.name}</h3>
+                                                    <div className="flex flex-col justify-center text-left h-full p-1">
+                                                        <h3 className="font-medium text-sm text-black mb-1">{feature.name}</h3>
                                                         {feature.description && (
-                                                            <p className="text-xs text-gray-500 line-clamp-3">
+                                                            <p className="text-xs text-neutral-500 line-clamp-2">
                                                                 {feature.description}
                                                             </p>
                                                         )}
@@ -292,7 +314,7 @@ export default function BoardDetail() {
                                         {!showForm[column.id] ? (
                                             <button
                                                 onClick={() => setShowForm((prev) => ({ ...prev, [column.id]: true }))}
-                                                className="ml-5 mr-5 mb-2 inline-flex items-center whitespace-nowrap text-sm font-medium transition-all hover:bg-gray-100 rounded-md gap-1.5 px-3 py-2 justify-start text-gray-500 hover:text-gray-700"
+                                                className="mx-3 mb-3 inline-flex items-center whitespace-nowrap text-sm font-medium transition-all hover:bg-neutral-100 active:bg-neutral-200 rounded-md gap-1.5 px-3 py-2 justify-start text-neutral-500 hover:text-black"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                                                     <path d="M5 12h14"></path>
@@ -301,7 +323,7 @@ export default function BoardDetail() {
                                                 Add a card
                                             </button>
                                         ) : (
-                                            <div className="ml-5 mr-5 mb-2 space-y-2 bg-white p-3 rounded-lg border">
+                                            <div className="mx-3 mb-3 space-y-2 bg-white p-3 rounded-lg border border-neutral-200">
                                                 <input
                                                     value={inputs[column.id] || ""}
                                                     onChange={(e) =>
@@ -321,13 +343,13 @@ export default function BoardDetail() {
                                                         }
                                                     }}
                                                     placeholder="Enter card title..."
-                                                    className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+                                                    className="w-full rounded border border-neutral-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                                                     autoFocus
                                                 />
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => handleCreate(column.id)}
-                                                        className="px-3 py-1 text-sm font-medium text-white bg-gray-600 rounded hover:bg-gray-700 transition-colors"
+                                                        className="px-3 py-1 text-sm font-medium text-white bg-black rounded hover:bg-neutral-800 active:bg-neutral-700 transition-colors"
                                                     >
                                                         Add card
                                                     </button>
@@ -336,7 +358,7 @@ export default function BoardDetail() {
                                                             setShowForm((prev) => ({ ...prev, [column.id]: false }));
                                                             setInputs((prev) => ({ ...prev, [column.id]: "" }));
                                                         }}
-                                                        className="px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded transition-colors"
+                                                        className="px-3 py-1 text-sm font-medium text-neutral-600 hover:bg-neutral-100 rounded transition-colors"
                                                     >
                                                         Cancel
                                                     </button>
@@ -366,9 +388,8 @@ export default function BoardDetail() {
                                 )}
                             </KanbanProvider>                            
                             {/* Button tạo list mới cùng cấp với các list */}
-                            <div className="w-70 flex-shrink-0">
+                            <div className="w-72 flex-shrink-0">
                                 <ListModalCreate
-                                    projectId={projectId}
                                     boardId={boardId}
                                     lists={lists}
                                     setLists={setLists}
@@ -377,6 +398,8 @@ export default function BoardDetail() {
                     </div>
 
                     {/* </SidebarProvider> */}
+                    </>
+                    )}
                 </div>
             </SidebarProvider>
                                 
@@ -384,9 +407,6 @@ export default function BoardDetail() {
             {selectedCard && (
                 <CardModal
                     cardId={selectedCard.id}
-                    projectId={projectId}
-                    boardId={boardId}
-                    listId={selectedCard.listId}
                     onClose={() => setSelectedCard(null)}
                     onDelete={() => {
                         setFeatures((prev) => prev.filter((f) => f.id !== selectedCard.id));

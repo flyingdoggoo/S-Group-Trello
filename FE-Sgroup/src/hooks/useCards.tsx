@@ -10,17 +10,15 @@ export type CardItem = {
 	status: string;
 };
 
-export default function useCards({ projectId, boardId, listId }: { projectId: string; boardId: string; listId: string }) {
+export default function useCards({ listId }: { listId: string }) {
 	const [cards, setCards] = useState<CardItem[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const basePath = `projects/${projectId}/boards/${boardId}/lists/${listId}/cards`;
-
 	const fetchCards = useCallback(async () => {
 		setLoading(true);
 		try {
-			const response = await apiClient.get(basePath);
+			const response = await apiClient.get(`cards?listId=${listId}`);
 			const raw = response.data?.data?.data || [];
 			const mapped: CardItem[] = raw.map((c: any) => ({
 				id: c.id,
@@ -37,11 +35,11 @@ export default function useCards({ projectId, boardId, listId }: { projectId: st
 		} finally {
 			setLoading(false);
 		}
-	}, [basePath]);
+	}, [listId]);
 
 	const createCard = useCallback(async (data: { title: string; description?: string }) => {
 		try {
-			const response = await apiClient.post(basePath, data);
+			const response = await apiClient.post('cards', { ...data, listId });
 			const newCardRaw = response.data?.data;
 			if (newCardRaw) {
 				const newCard: CardItem = {
@@ -58,7 +56,7 @@ export default function useCards({ projectId, boardId, listId }: { projectId: st
 			setError(err?.response?.data?.message || err.message);
 			console.error(err);
 		}
-	}, [basePath]);
+	}, [listId]);
 
 	useEffect(() => {
 		fetchCards();

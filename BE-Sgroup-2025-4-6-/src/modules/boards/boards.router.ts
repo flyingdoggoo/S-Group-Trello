@@ -9,7 +9,6 @@ import {
 
 import authMiddleware from '@/common/middlewares/auth.middleware';
 import { BoardPermissionEnum } from '@/common/enums/permissions/boardPermission.enum';
-import { ListsRouter } from '../Lists/lists.router';
 
 const boardsController = new BoardsController();
 
@@ -64,6 +63,5 @@ router.put(
 	authMiddleware.verifyPermission(BoardPermissionEnum.UPDATE_MEMBER_ROLE),
 	boardsController.changeRoleOfMemberBoard,
 );
-router.use('/:boardId/lists', ListsRouter);
 
 export const boardsRouter = router;

@@ -165,4 +165,35 @@ export class CardsRepository {
     async deleteComment({ id }: { id: string }) {
         return this.prismaService.cardComment.delete({ where: { id } });
     }
+
+    async findCardByIdSimple(id: string): Promise<Card | null> {
+        return this.prismaService.card.findFirst({
+            where: { id, deletedAt: null },
+        });
+    }
+
+    async findCardByIdFull(id: string) {
+        return this.prismaService.card.findFirst({
+            where: { id, deletedAt: null },
+            include: {
+                tags: true,
+                todos: { orderBy: { position: 'asc' } },
+                members: {
+                    include: {
+                        user: {
+                            select: { id: true, name: true, avatar: true }
+                        }
+                    }
+                },
+                comments: {
+                    include: {
+                        user: {
+                            select: { id: true, name: true, avatar: true }
+                        }
+                    },
+                    orderBy: { createdAt: 'desc' }
+                }
+            }
+        });
+    }
 }

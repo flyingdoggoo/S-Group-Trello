@@ -68,6 +68,22 @@ export class BoardsController {
 		}
 	}
 
+	async getBoardByIdFlat(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { boardId } = req.params;
+			const userId = req.user?.id as string;
+			const result = await this.boardsService.getBoardByIdFlat(boardId, userId);
+
+			res.status(result.code).json({
+				success: result.success,
+				message: result.message,
+				data: result.data,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
 	async updateBoard(req: Request, res: Response, next: NextFunction) {
 		try {
 			const { id, boardId } = req.params;
@@ -103,9 +119,9 @@ export class BoardsController {
 
 	async getBoardMembers(req: Request, res: Response, next: NextFunction) {
 		try {
-			const { id, boardId } = req.params;
+			const { boardId } = req.params;
 			const userId = req.user?.id as string;
-			const result = await this.boardsService.getBoardsMembers(id, boardId, userId);
+			const result = await this.boardsService.getBoardsMembers(boardId, userId);
 
 			res.status(result.code).json({
 				success: result.success,
@@ -119,11 +135,10 @@ export class BoardsController {
 
 	async changeRoleOfMemberBoard(req: Request, res: Response, next: NextFunction) {
 		try {
-			const { id, boardId } = req.params;
+			const { boardId } = req.params;
 			const { userId, newRoleId } = req.body;
 
 			const result = await this.boardsService.changeRoleOfMemberBoard(
-				id,
 				boardId,
 				userId,
 				newRoleId,

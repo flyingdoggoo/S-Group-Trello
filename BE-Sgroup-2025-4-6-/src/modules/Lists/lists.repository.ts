@@ -91,4 +91,16 @@ export class ListsRepository {
         });
     }
 
+    async findListByIdSimple(id: string): Promise<List | null> {
+        return this.prismaService.list.findFirst({
+            where: { id, deletedAt: null },
+        });
+    }
+
+    async findListByIdWithBoard(id: string) {
+        return this.prismaService.list.findFirst({
+            where: { id, deletedAt: null },
+            include: { board: { select: { id: true, projectId: true } } }
+        });
+    }
 }

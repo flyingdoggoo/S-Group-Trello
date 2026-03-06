@@ -4,6 +4,7 @@ import z from "zod";
 
 export class BoardResponseDto {
     id: string;
+    projectId: string;
     title: string;
     description: string | null;
     status: BoardStatusEnum;
@@ -12,6 +13,7 @@ export class BoardResponseDto {
 
     constructor(data: Board) {
         this.id = data.id;
+        this.projectId = data.projectId;
         this.title = data.title;
         this.description = data.description ?? null;
         this.status = data.status;
@@ -22,6 +24,7 @@ export class BoardResponseDto {
 
 export const BoardResponseDtoSchema = z.object({
     id: z.string(),
+    projectId: z.string(),
     title: z.string(),
     description: z.string().nullable(),
     status: z.nativeEnum(BoardStatusEnum),

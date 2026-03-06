@@ -76,7 +76,7 @@ export function AppSidebar() {
 
   // Map projects to workspace items with board count
   const workspaceItems = projects.map((project: any) => ({
-    to: `/projects/${project.id}/boards`,
+    to: `/projects/${project.id}`,
     label: project.title,
     icon: <Folder className="h-4 w-4" />,
     count: project.boardCount,
@@ -84,29 +84,30 @@ export function AppSidebar() {
 
   return (
     <div
-      className={`sticky top-0 self-start flex flex-col bg-white border-r h-screen transition-all duration-300 z-40 ${
+      className={`sticky top-0 self-start flex flex-col bg-white border-r border-neutral-200 h-screen transition-all duration-300 z-40 ${
         collapsed ? "w-16" : "w-64"
       }`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200">
         {!collapsed && (
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            <FontAwesomeIcon
-              icon={faTrello}
-              style={{ color: "#1e5076" }}
-              className="text-3xl"
-            />
-            Trello
-          </h2>
+          <Link to="/dashboard">  
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-black hover:opacity-70 transition-opacity">
+              <FontAwesomeIcon
+                icon={faTrello}
+                className="text-3xl text-black"
+              />
+              Trello
+            </h2>
+          </Link>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className={`p-1 rounded-md hover:bg-gray-100 transition-colors ${
+          className={`p-1.5 rounded-md hover:bg-neutral-100 active:bg-neutral-200 transition-colors ${
             collapsed ? "mx-auto" : ""
           }`}
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-5 w-5 text-neutral-600" />
         </button>
       </div>
 
@@ -115,7 +116,7 @@ export function AppSidebar() {
         {/* Navigation Section */}
         {!collapsed && (
           <div className="px-4 mb-2">
-            <h3 className="text-xs font-semibold text-gray-500 tracking-wider">
+            <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
               Navigation
             </h3>
           </div>
@@ -125,10 +126,12 @@ export function AppSidebar() {
             <Link
               key={item.to}
               to={item.to}
-              className={`flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors ${
+              className={`flex items-center px-4 py-2 text-sm transition-colors ${
                 collapsed ? "justify-center" : ""
               } ${
-                location.pathname === item.to ? "bg-gray-200 font-medium" : ""
+                location.pathname === item.to
+                  ? "bg-neutral-100 text-black font-medium border-r-2 border-black"
+                  : "text-neutral-600 hover:bg-neutral-50 hover:text-black"
               }`}
             >
               {item.icon}
@@ -140,7 +143,7 @@ export function AppSidebar() {
         {/* Workspaces Section */}
         {!collapsed && (
           <div className="px-4 mb-2">
-            <h3 className="text-xs font-semibold text-gray-500 tracking-wider">
+            <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
               Workspaces
             </h3>
           </div>
@@ -151,42 +154,42 @@ export function AppSidebar() {
               key={`${item.to}-${index}`}
               to={item.to}
               onContextMenu={(e) => handleContextMenu(e, projects[index].id)}
-              className={`flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors ${
+              className={`flex items-center justify-between px-4 py-2 text-sm transition-colors ${
                 collapsed ? "justify-center" : ""
               } ${
-                location.pathname === item.to ? "bg-gray-200 font-medium" : ""
+                location.pathname === item.to
+                  ? "bg-neutral-100 text-black font-medium border-r-2 border-black"
+                  : "text-neutral-600 hover:bg-neutral-50 hover:text-black"
               }`}
             >
-              <div className="flex items-center fontsize-sm">
+              <div className="flex items-center">
                 {item.icon}
                 {!collapsed && <span className="ml-3">{item.label}</span>}
               </div>
               {!collapsed && item.count && (
-                <span className="text-sm text-gray-500">{item.count}</span>
+                <span className="text-xs text-neutral-400 bg-neutral-100 px-1.5 py-0.5 rounded">{item.count}</span>
               )}
             </Link>
           ))}
         </div>
       </div>
 
-      {/* Footer */}
-
       {/* Context Menu */}
       {contextMenu?.visible && (
         <div
-          className="fixed bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50"
+          className="fixed bg-white border border-neutral-200 rounded-lg shadow-lg py-1 z-50 min-w-[140px]"
           style={{ top: contextMenu.y, left: contextMenu.x }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={() => handleDeleteProject(contextMenu.projectId)}
-            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors"
+            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-neutral-50 transition-colors"
           >
             Delete
           </button>
           <button
             onClick={() => setContextMenu(null)}
-            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+            className="w-full px-4 py-2 text-left text-sm text-neutral-600 hover:bg-neutral-50 transition-colors"
           >
             Cancel
           </button>

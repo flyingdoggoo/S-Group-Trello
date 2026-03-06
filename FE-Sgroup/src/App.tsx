@@ -31,7 +31,7 @@ export default function App() {
         }
       />
       <Route
-        path="/projects/:id/boards"
+        path="/projects/:id"
         element={
           <ProtectedRoute>
             <ProjectDetail />
@@ -39,7 +39,7 @@ export default function App() {
         }
       />
       <Route
-        path="/projects/:id/boards/:boardId/lists"
+        path="/boards/:boardId"
         element={
           <ProtectedRoute>
             <BoardDetail />

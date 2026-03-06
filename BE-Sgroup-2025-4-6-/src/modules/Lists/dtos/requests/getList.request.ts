@@ -3,6 +3,7 @@ import { ZodValidationSchema } from "@/common";
 import { ListStatusEnum } from "@prisma/client";
 
 export class GetListsRequestDto {
+    boardId: string;
     title?: string;
     status?: ListStatusEnum;
     position?: number;
@@ -10,6 +11,7 @@ export class GetListsRequestDto {
     limit?: number;
 
     constructor(data?: Partial<GetListsRequestDto> | any) {
+        this.boardId = data?.boardId ?? '';
         this.title = data?.title;
         this.status = data?.status;
         this.position = data?.position ? parseInt(data.position as string, 10) : undefined;
@@ -19,6 +21,7 @@ export class GetListsRequestDto {
 }
 
 const getListsRequestQuery = z.object({
+    boardId: z.string().min(1, { message: 'boardId is required' }),
     title: z.string().optional(),
     status: z.nativeEnum(ListStatusEnum).optional(),
     position: z.coerce.number().int().optional(),

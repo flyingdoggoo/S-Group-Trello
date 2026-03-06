@@ -9,14 +9,13 @@ import {
 
 import authMiddleware from '@/common/middlewares/auth.middleware';
 import { ListPermissionEnum } from "@/common/enums/permissions/listPermission.enum";
-import { CardsRouter } from "../cards/cards.router";
 
 const listsController = new ListsController();
 
-const router = express.Router({ mergeParams: true });
+const router = express.Router();
 autoBindUtil(listsController);
 
-///boards/:boardId/lists
+// GET /lists?boardId=xxx
 router.get(
     '/',
     authMiddleware.verifyToken,
@@ -25,6 +24,7 @@ router.get(
     listsController.getLists
 );
 
+// POST /lists  (boardId in body)
 router.post(
     '/',
     authMiddleware.verifyToken,
@@ -33,6 +33,7 @@ router.post(
     listsController.createList
 );
 
+// GET /lists/:listId
 router.get(
     '/:listId',
     authMiddleware.verifyToken,
@@ -40,6 +41,7 @@ router.get(
     listsController.getListById
 );
 
+// PUT /lists/:listId
 router.put(
     '/:listId',
     authMiddleware.verifyToken,
@@ -48,6 +50,7 @@ router.put(
     listsController.updateList
 );
 
+// DELETE /lists/:listId
 router.delete(
     '/:listId',
     authMiddleware.verifyToken,
@@ -56,6 +59,3 @@ router.delete(
 );
 
 export const ListsRouter = router;
-
-// Nested route for cards under a list
-router.use('/:listId/cards', CardsRouter);

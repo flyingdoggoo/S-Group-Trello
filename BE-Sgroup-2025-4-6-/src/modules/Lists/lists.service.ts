@@ -5,35 +5,45 @@ import { ListResponseDto } from './dtos/responses/list.response';
 import { NotFoundException, ForbiddenException } from '@/common/exceptions';
 import { ServiceResponse, ResponseStatus } from '@/common/dtos';
 import { StatusCodes } from 'http-status-codes';
-import { ProjectsRepository } from '../projects/projects.repository';
 import { ProjectMembersRepository } from '../projectMembers/projectMembers.repository';
 import { BoardsRepository } from '../boards/boards.repository';
+
 export class ListsService {
     constructor(
         private readonly listsRepository = new ListsRepository(),
-        private readonly projectsRepository = new ProjectsRepository(),
         private readonly projectMembersRepository = new ProjectMembersRepository(),
         private readonly boardsRepository = new BoardsRepository()
     ) { }
 
-    async createList(dto: CreateListRequestDto, userId: string, projectId: string, boardId: string): Promise<ServiceResponse<ListResponseDto>> {
-        const project = await this.projectsRepository.findProjectById({ id: projectId });
-        if (!project) throw new NotFoundException('Project not found');
-
-        const board = await this.boardsRepository.findBoardById({ id: boardId, projectId });
+    /** Verify membership via board → project chain */
+    private async verifyMembershipViaBoard(boardId: string, userId: string) {
+        const board = await this.boardsRepository.findBoardByIdSimple(boardId);
         if (!board) throw new NotFoundException('Board not found');
-
-        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
+        const isMember = await this.projectMembersRepository.isUserMemberOfProject(board.projectId, userId);
         if (!isMember) throw new ForbiddenException();
+        return board;
+    }
+
+    /** Verify membership via list → board → project chain */
+    private async verifyMembershipViaList(listId: string, userId: string) {
+        const list = await this.listsRepository.findListByIdWithBoard(listId);
+        if (!list || !list.board) throw new NotFoundException('List not found');
+        const isMember = await this.projectMembersRepository.isUserMemberOfProject(list.board.projectId, userId);
+        if (!isMember) throw new ForbiddenException();
+        return list;
+    }
+
+    async createList(dto: CreateListRequestDto, userId: string): Promise<ServiceResponse<ListResponseDto>> {
+        await this.verifyMembershipViaBoard(dto.boardId, userId);
 
         let position: number;
         if (typeof dto.position === 'number') {
             position = dto.position;
         } else {
-            position = await this.listsRepository.getNextPosition(boardId);
+            position = await this.listsRepository.getNextPosition(dto.boardId);
         }
 
-        const list = await this.listsRepository.createList({ boardId, title: dto.title, position });
+        const list = await this.listsRepository.createList({ boardId: dto.boardId, title: dto.title, position });
 
         return new ServiceResponse(
             ResponseStatus.Success,
@@ -43,22 +53,15 @@ export class ListsService {
         );
     }
 
-    async getLists(dto: GetListsRequestDto, projectId: string, boardId: string, userId: string): Promise<ServiceResponse<GetListsResponseDto>> {
-        const project = await this.projectsRepository.findProjectById({ id: projectId });
-        if (!project) throw new NotFoundException('Project not found');
-
-        const board = await this.boardsRepository.findBoardById({ id: boardId, projectId });
-        if (!board) throw new NotFoundException('Board not found');
-
-        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
-        if (!isMember) throw new ForbiddenException();
+    async getLists(dto: GetListsRequestDto, userId: string): Promise<ServiceResponse<GetListsResponseDto>> {
+        await this.verifyMembershipViaBoard(dto.boardId, userId);
 
         const page = dto.page ?? 1;
         const limit = dto.limit ?? 30;
         const skip = (page - 1) * limit;
 
         const [lists, total] = await this.listsRepository.findLists({
-            boardId,
+            boardId: dto.boardId,
             title: dto.title,
             status: dto.status,
             skip,
@@ -74,12 +77,8 @@ export class ListsService {
         );
     }
 
-    async getListById(id: string, projectId: string, boardId: string, userId: string): Promise<ServiceResponse<ListResponseDto>> {
-        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
-        if (!isMember) throw new ForbiddenException();
-
-        const list = await this.listsRepository.findListById({ id, boardId });
-        if (!list) throw new NotFoundException('List not found');
+    async getListById(listId: string, userId: string): Promise<ServiceResponse<ListResponseDto>> {
+        const list = await this.verifyMembershipViaList(listId, userId);
 
         return new ServiceResponse(
             ResponseStatus.Success,
@@ -89,14 +88,10 @@ export class ListsService {
         );
     }
 
-    async updateList(id: string, projectId: string, boardId: string, userId: string, dto: UpdateListRequestDto): Promise<ServiceResponse<ListResponseDto>> {
-        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
-        if (!isMember) throw new ForbiddenException();
+    async updateList(listId: string, userId: string, dto: UpdateListRequestDto): Promise<ServiceResponse<ListResponseDto>> {
+        const existingList = await this.verifyMembershipViaList(listId, userId);
 
-        const existingList = await this.listsRepository.findListById({ id, boardId });
-        if (!existingList) throw new NotFoundException('List not found');
-
-        const list = await this.listsRepository.updateList({ id, boardId, title: dto.title });
+        const list = await this.listsRepository.updateList({ id: listId, boardId: existingList.boardId, title: dto.title });
 
         return new ServiceResponse(
             ResponseStatus.Success,
@@ -106,14 +101,9 @@ export class ListsService {
         );
     }
 
-    async deleteList(id: string, projectId: string, boardId: string, userId: string): Promise<ServiceResponse<null>> {
-        const isMember = await this.projectMembersRepository.isUserMemberOfProject(projectId, userId);
-        if (!isMember) throw new ForbiddenException();
-
-        const existingList = await this.listsRepository.findListById({ id, boardId });
-        if (!existingList) throw new NotFoundException('List not found');
-
-        await this.listsRepository.deleteList({ id });
+    async deleteList(listId: string, userId: string): Promise<ServiceResponse<null>> {
+        await this.verifyMembershipViaList(listId, userId);
+        await this.listsRepository.deleteList({ id: listId });
 
         return new ServiceResponse(
             ResponseStatus.Success,
