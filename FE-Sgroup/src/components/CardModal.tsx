@@ -168,8 +168,8 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6">Loading...</div>
+      <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-lg">Loading...</div>
       </div>
     );
   }
@@ -177,8 +177,8 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
   if (!card) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 dark:border-slate-700">
         <div className="p-6 space-y-4">
           {/* Header with Title */}
           <div className="flex items-start justify-between">
@@ -195,19 +195,19 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
                       setIsEditingTitle(false);
                     }
                   }}
-                  className="w-full text-2xl font-semibold border-b-2 border-blue-500 focus:outline-none"
+                  className="w-full text-2xl font-semibold border-b-2 border-blue-500 focus:outline-none bg-transparent dark:text-slate-100"
                   autoFocus
                 />
               </div>
             ) : (
               <h2 
-                className="text-2xl font-semibold cursor-pointer hover:bg-gray-50 px-2 py-1 rounded flex-1"
+                className="text-2xl font-semibold cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 dark:text-slate-100 px-2 py-1 rounded flex-1"
                 onClick={() => setIsEditingTitle(true)}
               >
                 {card.title}
               </h2>
             )}
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-slate-200">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -219,7 +219,7 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
           <div className="flex gap-2 flex-wrap">
             <button 
               onClick={() => setIsEditingDescription(true)}
-              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-semibold border border-gray-300 rounded hover:bg-gray-100"
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-semibold border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-100 dark:hover:bg-slate-700 dark:text-slate-300"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 5v14M5 12h14"/>
@@ -228,7 +228,7 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
             </button>
             <button 
               onClick={() => document.getElementById('todo-input')?.focus()}
-              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-semibold border border-gray-300 rounded hover:bg-gray-100"
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-semibold border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-100 dark:hover:bg-slate-700 dark:text-slate-300"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M9 11l3 3L22 4"/>
@@ -236,7 +236,7 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
               </svg>
               Add todo
             </button>
-            <button className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-semibold border border-gray-300 rounded hover:bg-gray-100">
+            <button className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-semibold border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-100 dark:hover:bg-slate-700 dark:text-slate-300">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
@@ -248,20 +248,20 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
 
           {/* Description */}
           <div>
-            <h3 className="text-sm font-semibold mb-2">Description</h3>
+            <h3 className="text-sm font-semibold mb-2 dark:text-slate-200">Description</h3>
             {isEditingDescription ? (
               <div className="space-y-2">
                 <textarea
                   value={editedDescription}
                   onChange={(e) => setEditedDescription(e.target.value)}
                   placeholder="Add a more detailed description..."
-                  className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
+                  className="w-full border dark:border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px] dark:bg-slate-900 dark:text-slate-100"
                   autoFocus
                 />
                 <div className="flex gap-2">
                   <button 
                     onClick={handleUpdateDescription}
-                    className="px-3 py-1.5 text-sm font-semibold bg-gray-900 text-white rounded hover:bg-gray-800"
+                    className="px-3 py-1.5 text-sm font-semibold bg-gray-900 dark:bg-blue-600 text-white rounded hover:bg-gray-800 dark:hover:bg-blue-700"
                   >
                     Save
                   </button>
@@ -270,7 +270,7 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
                       setEditedDescription(card.description || "");
                       setIsEditingDescription(false);
                     }}
-                    className="px-3 py-1.5 text-sm font-semibold border border-gray-300 rounded hover:bg-gray-100"
+                    className="px-3 py-1.5 text-sm font-semibold border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-100 dark:hover:bg-slate-700 dark:text-slate-300"
                   >
                     Cancel
                   </button>
@@ -279,7 +279,7 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
             ) : (
               <div 
                 onClick={() => setIsEditingDescription(true)}
-                className="text-gray-700 bg-gray-50 rounded px-3 py-2 cursor-pointer hover:bg-gray-100 min-h-[60px]"
+                className="text-gray-700 dark:text-slate-300 bg-gray-50 dark:bg-slate-700/50 rounded px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 min-h-[60px]"
               >
                 {card.description || "Add a more detailed description..."}
               </div>
@@ -288,7 +288,7 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
 
           {/* Tags */}
           <div>
-            <h3 className="text-sm font-semibold mb-2">Tags</h3>
+            <h3 className="text-sm font-semibold mb-2 dark:text-slate-200">Tags</h3>
             <div className="flex flex-wrap gap-2 mb-2">
               {card.tags.map((tag) => (
                 <span
@@ -306,9 +306,9 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
                 placeholder="Add tag..."
-                className="flex-1 border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 border dark:border-slate-600 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-900 dark:text-slate-100"
               />
-              <button onClick={handleAddTag} className="px-4 py-1.5 font-semibold bg-gray-900 text-white rounded text-sm hover:bg-gray-800">
+              <button onClick={handleAddTag} className="px-4 py-1.5 font-semibold bg-gray-900 dark:bg-blue-600 text-white rounded text-sm hover:bg-gray-800 dark:hover:bg-blue-700">
                 Add
               </button>
             </div>
@@ -316,17 +316,17 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
 
           {/* Todos */}
           <div>
-            <h3 className="text-sm font-semibold mb-2">Checklist</h3>
+            <h3 className="text-sm font-semibold mb-2 dark:text-slate-200">Checklist</h3>
             <div className="space-y-2 mb-2">
               {card.todos.map((todo) => (
-                <label key={todo.id} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                <label key={todo.id} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 p-2 rounded">
                   <input
                     type="checkbox"
                     checked={todo.completed}
                     onChange={(e) => handleToggleTodo(todo.id, e.target.checked)}
                     className="w-4 h-4"
                   />
-                  <span className={todo.completed ? "line-through text-gray-500" : ""}>{todo.title}</span>
+                  <span className={todo.completed ? "line-through text-gray-500 dark:text-slate-500" : "dark:text-slate-200"}>{todo.title}</span>
                 </label>
               ))}
             </div>
@@ -337,9 +337,9 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
                 onChange={(e) => setNewTodo(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleAddTodo()}
                 placeholder="Add an item..."
-                className="flex-1 border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 border dark:border-slate-600 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-900 dark:text-slate-100"
               />
-              <button onClick={handleAddTodo} className="px-4 py-1.5 font-semibold bg-gray-900 text-white rounded text-sm hover:bg-gray-800">
+              <button onClick={handleAddTodo} className="px-4 py-1.5 font-semibold bg-gray-900 dark:bg-blue-600 text-white rounded text-sm hover:bg-gray-800 dark:hover:bg-blue-700">
                 Add
               </button>
             </div>
@@ -347,11 +347,11 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
 
           {/* Assigned Users */}
           <div>
-            <h3 className="text-sm font-semibold mb-2">Assigned Users</h3>
+            <h3 className="text-sm font-semibold mb-2 dark:text-slate-200">Assigned Users</h3>
             {card.members.length > 0 ? (
               <div className="flex flex-wrap gap-2 mb-2">
                 {card.members.map((member) => (
-                  <div key={member.id} className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1.5">
+                  <div key={member.id} className="flex items-center gap-2 bg-gray-100 dark:bg-slate-700 rounded-full px-3 py-1.5">
                     {member.avatar ? (
                       <img src={member.avatar} alt={member.name} className="w-6 h-6 rounded-full" />
                     ) : (
@@ -359,19 +359,19 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
                         {member.name.charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <span className="text-sm">{member.name}</span>
-                    <button className="text-gray-400 hover:text-gray-600">×</button>
+                    <span className="text-sm dark:text-slate-200">{member.name}</span>
+                    <button className="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-slate-200">×</button>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm mb-2">No members assigned</p>
+              <p className="text-gray-500 dark:text-slate-400 text-sm mb-2">No members assigned</p>
             )}
           </div>
 
           {/* Comments */}
           <div>
-            <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+            <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 dark:text-slate-200">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
               </svg>
@@ -380,19 +380,19 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
             <div className="space-y-3 mb-3">
               {card.comments && card.comments.length > 0 ? (
                 card.comments.map((comment) => (
-                  <div key={comment.id} className="bg-gray-50 rounded p-3">
+                  <div key={comment.id} className="bg-gray-50 dark:bg-slate-700/50 rounded p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs">
                         {comment.userName ? comment.userName.charAt(0).toUpperCase() : '?'}
                       </div>
-                      <span className="font-semibold text-sm">{comment.userName || 'Unknown'}</span>
-                      <span className="text-xs text-gray-500">{new Date(comment.createdAt).toLocaleString()}</span>
+                      <span className="font-semibold text-sm dark:text-slate-200">{comment.userName || 'Unknown'}</span>
+                      <span className="text-xs text-gray-500 dark:text-slate-400">{new Date(comment.createdAt).toLocaleString()}</span>
                     </div>
-                    <p className="text-sm text-gray-700 ml-8">{comment.content}</p>
+                    <p className="text-sm text-gray-700 dark:text-slate-300 ml-8">{comment.content}</p>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-500">No comments yet</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400">No comments yet</p>
               )}
             </div>
             <div className="flex gap-2">
@@ -401,16 +401,16 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
                 onChange={(e) => setNewComment(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
                 placeholder="Write a comment..."
-                className="flex-1 border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 border dark:border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-900 dark:text-slate-100"
               />
-              <button onClick={handleAddComment} className="px-4 py-2 font-semibold bg-gray-900 text-white rounded text-sm hover:bg-gray-800">
+              <button onClick={handleAddComment} className="px-4 py-2 font-semibold bg-gray-900 dark:bg-blue-600 text-white rounded text-sm hover:bg-gray-800 dark:hover:bg-blue-700">
                 Comment
               </button>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t">
+          <div className="flex gap-3 pt-4 border-t dark:border-slate-700">
             <button
               onClick={handleDeleteCard}
               className="px-4 py-2 font-semibold bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center gap-2"
@@ -422,7 +422,7 @@ export function CardModal({ cardId, onClose, onDelete }: CardModalProps) {
               </svg>
               Delete Card
             </button>
-            <button onClick={onClose} className="ml-auto px-4 py-2 font-semibold border border-gray-300 rounded hover:bg-gray-100 transition-colors">
+            <button onClick={onClose} className="ml-auto px-4 py-2 font-semibold border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-100 dark:hover:bg-slate-700 dark:text-slate-300 transition-colors">
               Close
             </button>
           </div>

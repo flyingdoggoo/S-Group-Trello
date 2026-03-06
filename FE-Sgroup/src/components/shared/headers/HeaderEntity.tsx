@@ -53,10 +53,10 @@ export function HeaderEntity({
   return (
     <header className="mb-6 flex justify-between items-center">
       <div className="flex justify-center items-center gap-3">
-        <h1 className="text-3xl font-bold tracking-tight text-black">{title}</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-100">{title}</h1>
         <FontAwesomeIcon
           icon={faPenToSquare}
-          className="text-lg text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-md p-1.5 cursor-pointer transition-colors"
+          className="text-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md p-1.5 cursor-pointer transition-colors"
           onClick={onEditTitle}
         />
         {additionalActions && <div>{additionalActions}</div>}

@@ -1,86 +1,50 @@
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuPortal,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Settings } from "lucide-react"
+import { Settings, Sun, Moon, Github, LogOut } from "lucide-react"
+import { useThemeStore } from "@/stores/theme.store"
 
 export function DropUpSettings(collapsed: any) {
+    const { theme, toggleTheme } = useThemeStore()
+
     function Logout() {
         localStorage.removeItem("accessToken")
-        window.location.reload()
         window.location.href = "/"
     }
-    return (
 
+    return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <div className={`p-2 border-t ${collapsed ? "flex justify-center" : ""}`}>
+                <div className={`p-2 border-t border-slate-200 dark:border-slate-700/50 ${collapsed ? "flex justify-center" : ""}`}>
                     <button
-                        className={`flex items-center w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer ${collapsed ? "justify-center" : ""
+                        className={`flex items-center w-full px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white rounded-md cursor-pointer transition-colors ${collapsed ? "justify-center" : ""
                             }`}
                     >
-                        <Settings className="h-5 w-5 " />
+                        <Settings className="h-5 w-5" />
                         {!collapsed && <span className="ml-3">Settings</span>}
                     </button>
                 </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="start">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        Profile
-                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        Billing
-                        <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        Settings
-                        <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        Keyboard shortcuts
-                        <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                </DropdownMenuGroup>
+            <DropdownMenuContent className="w-48" align="start" side="top">
+                <DropdownMenuItem className="cursor-pointer gap-2" onClick={toggleTheme}>
+                    {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                    {theme === "light" ? "Dark mode" : "Light mode"}
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                    <DropdownMenuItem>Team</DropdownMenuItem>
-                    <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
-                        <DropdownMenuPortal>
-                            <DropdownMenuSubContent>
-                                <DropdownMenuItem>Email</DropdownMenuItem>
-                                <DropdownMenuItem>Message</DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>More...</DropdownMenuItem>
-                            </DropdownMenuSubContent>
-                        </DropdownMenuPortal>
-                    </DropdownMenuSub>
-                    <DropdownMenuItem>
-                        New Team
-                        <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                </DropdownMenuGroup>
+                <DropdownMenuItem className="cursor-pointer gap-2" asChild>
+                    <a href="https://github.com/flyingdoggoo/S-Group-Trello" target="_blank" rel="noopener noreferrer">
+                        <Github className="h-4 w-4" />
+                        GitHub
+                    </a>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>GitHub</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
-                <DropdownMenuItem disabled>API</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer" onClick={Logout}>
+                <DropdownMenuItem className="cursor-pointer gap-2 text-red-400 focus:text-red-400" onClick={Logout}>
+                    <LogOut className="h-4 w-4" />
                     Log out
-                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

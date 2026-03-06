@@ -184,17 +184,17 @@ export default function BoardDetail() {
     }
 
     return (
-        <div className="min-h-screen bg-neutral-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-950 dark:to-slate-900">
             <SidebarProvider>
                 <AppSidebar />
                 <div className="flex-1 p-6 space-y-4">
                     {boardLoading ? (
                         <div className="flex flex-col items-center justify-center py-32">
-                            <svg className="animate-spin h-8 w-8 text-black mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <svg className="animate-spin h-8 w-8 text-slate-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                             </svg>
-                            <p className="text-sm text-neutral-400">Loading board...</p>
+                            <p className="text-sm text-slate-400">Loading board...</p>
                         </div>
                     ) : (
                     <>
@@ -205,7 +205,7 @@ export default function BoardDetail() {
                         projectId={projectId}
                     />
                     
-                    <hr className="border-t border-neutral-200" />
+                    <hr className="border-t border-slate-200 dark:border-slate-700" />
                     
                     <div className="overflow-x-auto">
                         <div className="flex gap-4 min-w-max">
@@ -219,15 +219,15 @@ export default function BoardDetail() {
                                     <KanbanBoard
                                         id={column.id}
                                         key={column.id}
-                                        className="w-72 flex-shrink-0 bg-white rounded-lg border border-neutral-200"
+                                        className="w-72 flex-shrink-0 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-lg border border-slate-200 dark:border-slate-700"
                                     >
-                                        <KanbanHeader className="bg-neutral-50 border-b border-neutral-200 mb-0 p-4">
+                                        <KanbanHeader className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 mb-0 p-4">
                                             <div className="flex items-center justify-between w-full">
-                                                <span className="text-sm font-semibold text-black">{column.name}</span>
+                                                <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{column.name}</span>
                                                 <div className="relative">
                                                     <button
                                                         onClick={() => setShowMenu((prev) => ({ ...prev, [column.id]: !prev[column.id] }))}
-                                                        className="p-1 hover:bg-neutral-200 rounded transition-colors"
+                                                        className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors"
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                             <circle cx="12" cy="12" r="1"></circle>
@@ -241,13 +241,13 @@ export default function BoardDetail() {
                                                                 className="fixed inset-0 z-10"
                                                                 onClick={() => setShowMenu((prev) => ({ ...prev, [column.id]: false }))}
                                                             />
-                                                            <div className="absolute right-0 top-8 z-20 bg-white rounded-lg shadow-lg border border-neutral-200 py-1 min-w-[150px]">
+                                                            <div className="absolute right-0 top-8 z-20 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 min-w-[150px]">
                                                                 <button
                                                                     onClick={() => {
                                                                         setShowMenu((prev) => ({ ...prev, [column.id]: false }));
                                                                         // TODO: Implement rename
                                                                     }}
-                                                                    className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50 transition-colors flex items-center gap-2"
+                                                                    className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 transition-colors flex items-center gap-2"
                                                                 >
                                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                                         <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
@@ -266,7 +266,7 @@ export default function BoardDetail() {
                                                                             console.error('Delete list error:', err);
                                                                         }
                                                                     }}
-                                                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-neutral-50 transition-colors flex items-center gap-2"
+                                                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-slate-50 transition-colors flex items-center gap-2"
                                                                 >
                                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                                         <path d="M3 6h18"></path>
@@ -285,7 +285,7 @@ export default function BoardDetail() {
                                         </KanbanHeader>
                                         <KanbanCards
                                             id={column.id}
-                                            className="bg-white px-2 pt-2"
+                                            className="bg-white/50 dark:bg-slate-800/50 px-2 pt-2"
                                         >
                                             {(feature: FeatureItem) => (
                                                 <KanbanCard
@@ -293,7 +293,7 @@ export default function BoardDetail() {
                                                     id={feature.id}
                                                     key={feature.id}
                                                     name={feature.name}
-                                                    className="mx-3 min-h-[80px] rounded-lg border border-neutral-200 hover:border-neutral-400 transition-colors bg-white shadow-sm hover:shadow-md"
+                                                    className="mx-3 min-h-[80px] rounded-lg border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 transition-colors bg-white dark:bg-slate-800 shadow-sm hover:shadow-md"
                                                     onCardClick={(id, listId) => {
                                                         // Dùng listId thực tế từ mapping (DB) thay vì từ UI state
                                                         const realListId = cardToListMapping[id] || listId;
@@ -301,9 +301,9 @@ export default function BoardDetail() {
                                                     }}
                                                 >
                                                     <div className="flex flex-col justify-center text-left h-full p-1">
-                                                        <h3 className="font-medium text-sm text-black mb-1">{feature.name}</h3>
+                                                        <h3 className="font-medium text-sm text-slate-800 dark:text-slate-100 mb-1">{feature.name}</h3>
                                                         {feature.description && (
-                                                            <p className="text-xs text-neutral-500 line-clamp-2">
+                                                            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
                                                                 {feature.description}
                                                             </p>
                                                         )}
@@ -314,7 +314,7 @@ export default function BoardDetail() {
                                         {!showForm[column.id] ? (
                                             <button
                                                 onClick={() => setShowForm((prev) => ({ ...prev, [column.id]: true }))}
-                                                className="mx-3 mb-3 inline-flex items-center whitespace-nowrap text-sm font-medium transition-all hover:bg-neutral-100 active:bg-neutral-200 rounded-md gap-1.5 px-3 py-2 justify-start text-neutral-500 hover:text-black"
+                                                className="mx-3 mb-3 inline-flex items-center whitespace-nowrap text-sm font-medium transition-all hover:bg-slate-100 dark:hover:bg-slate-700 active:bg-slate-200 dark:active:bg-slate-600 rounded-md gap-1.5 px-3 py-2 justify-start text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                                                     <path d="M5 12h14"></path>
@@ -323,7 +323,7 @@ export default function BoardDetail() {
                                                 Add a card
                                             </button>
                                         ) : (
-                                            <div className="mx-3 mb-3 space-y-2 bg-white p-3 rounded-lg border border-neutral-200">
+                                            <div className="mx-3 mb-3 space-y-2 bg-white/80 dark:bg-slate-800/80 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
                                                 <input
                                                     value={inputs[column.id] || ""}
                                                     onChange={(e) =>
@@ -343,13 +343,13 @@ export default function BoardDetail() {
                                                         }
                                                     }}
                                                     placeholder="Enter card title..."
-                                                    className="w-full rounded border border-neutral-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                                                    className="w-full rounded border border-slate-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
                                                     autoFocus
                                                 />
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => handleCreate(column.id)}
-                                                        className="px-3 py-1 text-sm font-medium text-white bg-black rounded hover:bg-neutral-800 active:bg-neutral-700 transition-colors"
+                                                        className="px-3 py-1 text-sm font-medium text-white bg-slate-700 rounded hover:bg-slate-800 active:bg-slate-900 transition-colors"
                                                     >
                                                         Add card
                                                     </button>
@@ -358,7 +358,7 @@ export default function BoardDetail() {
                                                             setShowForm((prev) => ({ ...prev, [column.id]: false }));
                                                             setInputs((prev) => ({ ...prev, [column.id]: "" }));
                                                         }}
-                                                        className="px-3 py-1 text-sm font-medium text-neutral-600 hover:bg-neutral-100 rounded transition-colors"
+                                                        className="px-3 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded transition-colors"
                                                     >
                                                         Cancel
                                                     </button>

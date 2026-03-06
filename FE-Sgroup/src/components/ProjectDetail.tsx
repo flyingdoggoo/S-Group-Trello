@@ -55,7 +55,7 @@ export default function ProjectDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-950 dark:to-slate-900">
       <ToastContainer />
       <SidebarProvider>
         <AppSidebar />
@@ -68,18 +68,18 @@ export default function ProjectDetail() {
           />
 
           {project?.description && (
-            <p className="text-sm text-neutral-500 mb-2">{project.description}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{project.description}</p>
           )}
-          <p className="text-xs text-neutral-400 mb-8">{boards.length} Boards</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mb-8">{boards.length} Boards</p>
           {error && <div className="text-red-600 text-sm mb-4 px-3 py-2 bg-red-50 rounded-md border border-red-200">{error}</div>}
 
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-32">
-              <svg className="animate-spin h-8 w-8 text-black mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin h-8 w-8 text-slate-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
               </svg>
-              <p className="text-sm text-neutral-400">Loading boards...</p>
+              <p className="text-sm text-slate-400">Loading boards...</p>
             </div>
           ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -88,7 +88,7 @@ export default function ProjectDetail() {
                 key={board.id}
                 to={`/boards/${board.id}`}
                 onContextMenu={(e) => handleContextMenu(e, board.id)}
-                className="group border border-neutral-200 rounded-lg p-5 bg-white hover:border-black hover:shadow-md transition-all duration-200 cursor-pointer"
+                className="group border border-slate-200 dark:border-slate-700 rounded-lg p-5 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-md transition-all duration-200 cursor-pointer"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <svg
@@ -101,16 +101,16 @@ export default function ProjectDetail() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="text-neutral-400 group-hover:text-black transition-colors"
+                    className="text-slate-400 group-hover:text-slate-700 transition-colors"
                   >
                     <path d="M5 3v14"></path>
                     <path d="M12 3v8"></path>
                     <path d="M19 3v18"></path>
                   </svg>
-                  <h2 className="font-medium text-black">{board.title}</h2>
+                  <h2 className="font-medium text-slate-800 dark:text-slate-100">{board.title}</h2>
                 </div>
                 {board.description && (
-                  <p className="text-sm text-neutral-500 line-clamp-2">{board.description}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{board.description}</p>
                 )}
               </Link>
             ))}
@@ -121,19 +121,19 @@ export default function ProjectDetail() {
           {/* Context Menu */}
           {contextMenu?.visible && (
             <div
-              className="fixed bg-white border border-neutral-200 rounded-lg shadow-lg py-1 z-50 min-w-[140px]"
+              className="fixed bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 z-50 min-w-[140px]"
               style={{ top: contextMenu.y, left: contextMenu.x }}
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => handleDeleteBoard(contextMenu.boardId)}
-                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-neutral-50 transition-colors"
+                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-slate-50 transition-colors"
               >
                 Delete
               </button>
               <button
                 onClick={() => setContextMenu(null)}
-                className="w-full px-4 py-2 text-left text-sm text-neutral-600 hover:bg-neutral-50 transition-colors"
+                className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-50 transition-colors"
               >
                 Cancel
               </button>
