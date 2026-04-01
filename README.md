@@ -1,17 +1,26 @@
-﻿# S-Group-Trello
-Ứng dụng quản lý dự án kiểu Trello với Backend (Node.js + Express + Prisma) và Frontend (React + Vite).
+# S-Group Trello
 
-# Deploy
-https://s-group-trello-pro.vercel.app/
+Ứng dụng quản lý dự án kiểu Trello, gồm:
+- Backend: Node.js + Express + Prisma + PostgreSQL
+- Frontend: React + Vite + TailwindCSS
 
-## 📋 Yêu cầu hệ thống
+## Cấu trúc thư mục
 
-- **Node.js**: >= 18.x
-- **npm**: >= 9.x (đi kèm với Node.js)
-- **Docker Desktop**: Để chạy PostgreSQL
-- **Git**: Để clone repository
+```text
+BE-Pull/
+|- BE-Sgroup-2025-4-6-   # Backend
+|- FE-Sgroup             # Frontend
+|- README.md
+```
 
-## 🚀 Hướng dẫn setup cho teammates
+## Yêu cầu hệ thống
+
+- Node.js `>=18`
+- npm `>=9`
+- Docker Desktop (để chạy PostgreSQL local)
+- Git
+
+## Quick Start
 
 ### 1. Clone repository
 
@@ -22,27 +31,51 @@ cd S-Group-Trello
 
 ### 2. Setup Backend
 
-#### 3.1. Di chuyển vào thư mục backend
-
 ```bash
 cd BE-Sgroup-2025-4-6-
-```
-
-#### 2.2. Cài đặt dependencies
-
-```bash
 npm install
-```
-
-#### 2.3. Tạo file .env từ .env.example
-
-```bash
 copy .env.example .env
 ```
 
-#### 2.4. Cấu hình file .env
+Sau đó mở file `.env` và điền giá trị theo môi trường local của bạn.
 
-Mở file `.env` và điền các thông tin sau:
+Chạy database:
+
+```bash
+docker-compose up -d
+docker ps
+```
+
+Chạy migration + generate:
+
+```bash
+npm run db:push
+npm run db:gen-dto
+```
+
+Chạy backend:
+
+```bash
+npm run dev
+```
+
+Backend mặc định: `http://localhost:8000`
+
+### 3. Setup Frontend
+
+Mở terminal mới:
+
+```bash
+cd FE-Sgroup
+npm install
+npm run dev
+```
+
+Frontend mặc định: `http://localhost:5173`
+
+## Environment Variables (Safe Template)
+
+Không commit giá trị thật lên Git. Chỉ dùng placeholder như bên dưới:
 
 ```env
 NODE_ENV=development
@@ -50,167 +83,80 @@ PORT=8000
 HOST=localhost
 CORS_ORIGIN=http://localhost:5173
 
-# Database connection (với Docker)
-DATABASE_URL="postgresql://root:root@localhost:5434/trip?schema=public"
+DATABASE_URL="postgresql://<DB_USER>:<DB_PASSWORD>@localhost:<DB_PORT>/<DB_NAME>?schema=public"
 
-# Google OAuth (tùy chọn - nếu dùng đăng nhập Google)
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_CLIENT_ID=<YOUR_GOOGLE_CLIENT_ID>
+GOOGLE_CLIENT_SECRET=<YOUR_GOOGLE_CLIENT_SECRET>
 GOOGLE_REDIRECT_URI=http://localhost:8000/api/v1/auth/google/callback
 
-# User settings
 DEFAULT_USER_AVATAR_URL=https://via.placeholder.com/150
 
-# JWT settings
 EXPIRES_IN_ACCESS_TOKEN=15m
-JWT_SECRET_ACCESS_TOKEN=your_secret_access_token_here
+JWT_SECRET_ACCESS_TOKEN=<YOUR_ACCESS_TOKEN_SECRET>
 EXPIRES_IN_REFRESH_TOKEN=7d
-JWT_SECRET_REFRESH_TOKEN=your_secret_refresh_token_here
+JWT_SECRET_REFRESH_TOKEN=<YOUR_REFRESH_TOKEN_SECRET>
 ```
 
-#### 2.5. Chạy PostgreSQL với Docker
+## Security Notes
 
-```bash
-docker-compose up -d
-```
+- Tuyệt đối không commit file `.env` hoặc bất kỳ secret/token/key thật nào.
+- Không đưa thông tin nhạy cảm lên README, issue, PR comment, hoặc screenshot.
+- Nếu lỡ lộ secret:
+1. Rotate secret ngay lập tức (JWT, OAuth, DB password, mail credentials...).
+2. Thu hồi token/session liên quan.
+3. Cập nhật lại biến môi trường trên server và local.
 
-Kiểm tra database đã chạy:
-```bash
-docker ps
-```
+## Scripts hữu ích
 
-#### 2.6. Chạy migration database
+### Backend (`BE-Sgroup-2025-4-6-`)
 
-```bash
-npm run db:push
-```
+- `npm run dev`: chạy development server
+- `npm run build`: build production
+- `npm run start`: chạy bản build
+- `npm run lint`: lint + fix
+- `npm run format`: format code
+- `npm run db:push`: đồng bộ schema DB
+- `npm run db:gen-dto`: generate Prisma client
+- `npm run db:gen-migration`: tạo migration mới
 
-#### 2.7. Generate Prisma client
+### Frontend (`FE-Sgroup`)
 
-```bash
-npm run db:gen-dto
-```
+- `npm run dev`: chạy dev server
+- `npm run build`: build production
+- `npm run preview`: preview bản build
+- `npm run lint`: lint source code
 
-#### 2.8. Chạy backend ở chế độ development
+## API Docs
 
-```bash
-npm run dev
-```
+Swagger UI: `http://localhost:8000/api-docs` (sau khi backend chạy).
 
-Backend sẽ chạy tại: `http://localhost:8000`
+## Troubleshooting nhanh
 
-### 3. Setup Frontend
+### Không kết nối được DB
 
-#### 3.1. Mở terminal mới và di chuyển vào thư mục frontend
+1. Kiểm tra Docker Desktop đã chạy.
+2. Kiểm tra container bằng `docker ps`.
+3. Kiểm tra `DATABASE_URL` trong `.env`.
+4. Khởi động lại container: `docker-compose restart`.
 
-```bash
-cd FE-Sgroup
-```
+### Port bị trùng
 
-#### 3.2. Cài đặt dependencies
+- Backend: đổi `PORT` trong `.env`.
+- Frontend: Vite tự nhảy sang port khác.
+- PostgreSQL: đổi port ở `docker-compose.yml` và cập nhật `DATABASE_URL`.
 
-```bash
-npm install
-```
+## Git workflow gợi ý
 
-#### 3.3. Chạy frontend
-
-```bash
-npm run dev
-```
-
-Frontend sẽ chạy tại: `http://localhost:5173`
-
-## 📝 Scripts hữu ích
-
-### Backend
-
-- `npm run dev` - Chạy server ở chế độ development với hot reload
-- `npm run build` - Build production
-- `npm start` - Chạy production build
-- `npm run db:push` - Đồng bộ schema với database
-- `npm run db:gen-dto` - Generate Prisma client
-- `npm run db:gen-migration` - Tạo migration mới
-- `npm run lint` - Kiểm tra và fix lỗi ESLint
-- `npm run format` - Format code với Prettier
-
-### Frontend
-
-- `npm run dev` - Chạy development server
-- `npm run build` - Build production
-- `npm run preview` - Preview production build
-- `npm run lint` - Kiểm tra lỗi ESLint
-
-## 🐛 Troubleshooting
-
-### Database connection error
-
-Nếu gặp lỗi kết nối database:
-1. Kiểm tra Docker Desktop đã chạy
-2. Kiểm tra container database: `docker ps`
-3. Kiểm tra DATABASE_URL trong .env đúng với cấu hình docker-compose
-4. Restart container: `docker-compose restart`
-
-### Port đã được sử dụng
-
-- Backend (8000): Thay đổi PORT trong .env
-- Frontend (5173): Vite sẽ tự động chọn port khác
-- PostgreSQL (5434): Thay đổi port trong docker-compose.yml và DATABASE_URL
-
-### Prisma generate error
-
-```bash
-npm run db:gen-dto
-```
-
-### Module not found
-
-```bash
-# Xóa node_modules và cài lại
-rm -rf node_modules package-lock.json
-npm install
-```
-
-## 🔗 API Documentation
-
-Swagger UI: `http://localhost:8000/api-docs` (sau khi chạy backend)
-
-## 👥 Workflow làm việc với Git
-
-1. Tạo branch mới từ main:
 ```bash
 git checkout main
 git pull origin main
-git checkout -b feature/ten-tinh-nang
+git checkout -b feature/<ten-tinh-nang>
 ```
 
-2. Commit changes:
+Sau đó:
+
 ```bash
 git add .
-git commit -m "feat: mô tả thay đổi"
+git commit -m "feat: mo ta thay doi"
+git push origin feature/<ten-tinh-nang>
 ```
-
-3. Push và tạo Pull Request:
-```bash
-git push origin feature/ten-tinh-nang
-```
-
-## 📦 Tech Stack
-
-**Backend:**
-- Node.js + Express
-- TypeScript
-- Prisma ORM
-- PostgreSQL
-- JWT Authentication
-- Passport (Google OAuth)
-
-**Frontend:**
-- React 19
-- TypeScript
-- Vite
-- TailwindCSS
-- React Router
-- Axios
-
-- Radix UI Components
