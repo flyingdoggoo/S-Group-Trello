@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -53,101 +54,164 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  --kanban-board-circle-blue: oklch(0.6232 0.1879 259.80);
-  --kanban-board-circle-cyan: oklch(0.7146 0.1256 215.13);
-  --kanban-board-circle-gray: oklch(0.5513 0.0233 264.36);
-  --kanban-board-circle-green: oklch(0.7229 0.1921 149.58);
-  --kanban-board-circle-indigo: oklch(0.5860 0.2037 277.12);
-  --kanban-board-circle-pink: oklch(0.6559 0.2117 354.34);
-  --kanban-board-circle-purple: oklch(0.6267 0.2325 303.86);
-  --kanban-board-circle-red: oklch(0.6368 0.2078 25.33);
-  --kanban-board-circle-violet: oklch(0.6059 0.2187 292.72);
-  --kanban-board-circle-yellow: oklch(0.7959 0.1618 86.05);
+  --radius: 0.875rem;
+  --background: #f5f7fb;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #2563eb;
+  --primary-foreground: #eff6ff;
+  --secondary: #eef2ff;
+  --secondary-foreground: #1e293b;
+  --muted: #e2e8f0;
+  --muted-foreground: #64748b;
+  --accent: #dbeafe;
+  --accent-foreground: #1e3a8a;
+  --destructive: #dc2626;
+  --border: rgb(148 163 184 / 0.28);
+  --input: rgb(148 163 184 / 0.3);
+  --ring: rgb(59 130 246 / 0.42);
+  --chart-1: #3b82f6;
+  --chart-2: #14b8a6;
+  --chart-3: #f59e0b;
+  --chart-4: #f43f5e;
+  --chart-5: #8b5cf6;
+  --sidebar: #eaf0fb;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #eff6ff;
+  --sidebar-accent: #dbeafe;
+  --sidebar-accent-foreground: #1e3a8a;
+  --sidebar-border: rgb(148 163 184 / 0.35);
+  --sidebar-ring: rgb(59 130 246 / 0.4);
+  --kanban-board-circle-primary: #3b82f6;
+  --kanban-board-circle-blue: #7ba9ff;
+  --kanban-board-circle-cyan: #67d3dc;
+  --kanban-board-circle-gray: #8d9aae;
+  --kanban-board-circle-green: #5ccb97;
+  --kanban-board-circle-indigo: #8b7bff;
+  --kanban-board-circle-pink: #f49dc3;
+  --kanban-board-circle-purple: #b98cfa;
+  --kanban-board-circle-red: #f0898f;
+  --kanban-board-circle-violet: #a78bfa;
+  --kanban-board-circle-yellow: #f4c98c;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-  --kanban-board-circle-blue: oklch(0.7135 0.1435 254.61);
-  --kanban-board-circle-cyan: oklch(0.7973 0.1339 211.45);
-  --kanban-board-circle-gray: oklch(0.7137 0.0192 261.33);
-  --kanban-board-circle-green: oklch(0.8003 0.1823 151.70);
-  --kanban-board-circle-indigo: oklch(0.6797 0.1586 276.96);
-  --kanban-board-circle-pink: oklch(0.7253 0.1752 349.74);
-  --kanban-board-circle-purple: oklch(0.7218 0.1766 305.51);
-  --kanban-board-circle-red: oklch(0.7108 0.1660 22.21);
-  --kanban-board-circle-violet: oklch(0.7093 0.1589 293.52);
-  --kanban-board-circle-yellow: oklch(0.8601 0.1730 91.84);
+  --background: #0f172a;
+  --foreground: #e2e8f0;
+  --card: #111827;
+  --card-foreground: #e5e7eb;
+  --popover: rgb(17 24 39 / 0.94);
+  --popover-foreground: #e5e7eb;
+  --primary: #3b82f6;
+  --primary-foreground: #f8fbff;
+  --secondary: rgb(30 41 59 / 0.9);
+  --secondary-foreground: #e2e8f0;
+  --muted: rgb(30 41 59 / 0.55);
+  --muted-foreground: #94a3b8;
+  --accent: rgb(59 130 246 / 0.16);
+  --accent-foreground: #dbeafe;
+  --destructive: #f87171;
+  --border: rgb(148 163 184 / 0.2);
+  --input: rgb(148 163 184 / 0.24);
+  --ring: rgb(59 130 246 / 0.46);
+  --chart-1: #60a5fa;
+  --chart-2: #2dd4bf;
+  --chart-3: #fbbf24;
+  --chart-4: #fb7185;
+  --chart-5: #a78bfa;
+  --sidebar: rgb(15 23 42 / 0.96);
+  --sidebar-foreground: #dbe3f0;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #f8fbff;
+  --sidebar-accent: rgb(59 130 246 / 0.14);
+  --sidebar-accent-foreground: #dbeafe;
+  --sidebar-border: rgb(148 163 184 / 0.18);
+  --sidebar-ring: rgb(59 130 246 / 0.45);
+  --kanban-board-circle-primary: #60a5fa;
+  --kanban-board-circle-blue: #8ab8ff;
+  --kanban-board-circle-cyan: #84e2e9;
+  --kanban-board-circle-gray: #99a5b9;
+  --kanban-board-circle-green: #78d7ac;
+  --kanban-board-circle-indigo: #9d93ff;
+  --kanban-board-circle-pink: #f8b2d2;
+  --kanban-board-circle-purple: #c69dfa;
+  --kanban-board-circle-red: #f7a2a8;
+  --kanban-board-circle-violet: #ba9fff;
+  --kanban-board-circle-yellow: #f8d8a4;
+}
+
+@keyframes subtle-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translateY(-10px) scale(1.06);
+  }
+}
+
+@keyframes soft-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
   }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Inter", "SF Pro Display", "SF Pro Text", -apple-system,
+      BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background-image:
+      radial-gradient(circle at 0% 0%, rgb(59 130 246 / 0.14), transparent 42%),
+      radial-gradient(circle at 100% 100%, rgb(99 102 241 / 0.12), transparent 48%),
+      linear-gradient(140deg, #f5f7fb 0%, #eef2ff 46%, #e2e8f0 100%);
+    background-attachment: fixed;
+    letter-spacing: 0.01em;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(circle at 0% 0%, rgb(59 130 246 / 0.14), transparent 42%),
+      radial-gradient(circle at 100% 100%, rgb(99 102 241 / 0.12), transparent 48%),
+      linear-gradient(140deg, #0f172a 0%, #111827 46%, #0b1224 100%);
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.12;
+    background-image: radial-gradient(rgb(148 163 184 / 0.28) 0.65px, transparent 0.65px);
+    background-size: 2px 2px;
+    z-index: -1;
+  }
+
+  a {
+    @apply transition-colors;
+  }
+
   :root {
     --color-kanban-board-circle-blue: var(--kanban-board-circle-blue);
     --color-kanban-board-circle-cyan: var(--kanban-board-circle-cyan);
@@ -161,4 +225,68 @@
     --color-kanban-board-circle-violet: var(--kanban-board-circle-violet);
     --color-kanban-board-circle-yellow: var(--kanban-board-circle-yellow);
   }
+}
+
+@layer components {
+  .surface-glass {
+    @apply rounded-2xl border border-white/12 bg-slate-900/55 backdrop-blur-2xl;
+    box-shadow: 0 28px 70px -38px rgb(2 6 23 / 0.95);
+  }
+
+  .surface-panel {
+    @apply rounded-2xl border border-white/12 bg-slate-900/80;
+    box-shadow: 0 20px 45px -30px rgb(2 6 23 / 0.9);
+  }
+
+  .surface-card {
+    @apply rounded-2xl border border-white/12 bg-slate-900/65 backdrop-blur-xl transition-all duration-200;
+    box-shadow: 0 20px 30px -24px rgb(2 6 23 / 0.85);
+  }
+
+  .surface-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 26px 45px -28px rgb(2 6 23 / 0.95);
+    border-color: rgb(96 165 250 / 0.5);
+  }
+
+  .divider-soft {
+    @apply border-b border-white/10;
+  }
+}
+
+@layer utilities {
+  .grid-8 {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .ring-soft {
+    box-shadow: 0 0 0 1px rgb(148 163 184 / 0.2), 0 0 0 5px rgb(59 130 246 / 0.15);
+  }
+
+  .animate-subtle-glow {
+    animation: subtle-glow 7s ease-in-out infinite;
+  }
+
+  .animate-soft-fade-up {
+    animation: soft-fade-up 0.35s ease-out both;
+  }
+}
+
+*::-webkit-scrollbar {
+  height: 9px;
+  width: 9px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgb(15 23 42 / 0.4);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgb(100 116 139 / 0.42);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgb(148 163 184 / 0.62);
 }

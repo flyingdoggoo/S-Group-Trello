@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -8,102 +8,97 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { useState } from "react"
-import { toast } from "react-toastify"
-import { apiClient } from "@/api/apiClient"
-import { useProjectsStore } from "@/stores/projects.store"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import { apiClient } from "@/api/apiClient";
+import { useProjectsStore } from "@/stores/projects.store";
+import { Plus } from "lucide-react";
 
 export function ProjectModalCreate() {
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [loading, setLoading] = useState(false)
-  const addProject = useProjectsStore((state) => state.addProject)
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const addProject = useProjectsStore((state) => state.addProject);
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
+
     try {
-      const response = await apiClient.post("projects", {
-        title,
-        description
-      })
-      if (response.data && response.data.data) {
-        setTitle("")
-        setDescription("")
-        let newProject = response.data.data
-        console.log("New project:", newProject)
-        addProject(newProject) // Sử dụng store action thay vì setProjects
-        toast.success("Project created successfully!")
+      const response = await apiClient.post("projects", { title, description });
+      if (response.data?.data) {
+        addProject(response.data.data);
+        setTitle("");
+        setDescription("");
+        toast.success("Workspace created successfully!");
       }
     } catch (error: any) {
       if (error.response?.status === 403) {
-        toast.error("You do not have permission to create a project.")
-      }
-      else {
-        toast.error("Failed to create project." + (error as any).message)
+        toast.error("You do not have permission to create a workspace.");
+      } else {
+        toast.error("Failed to create workspace." + (error as any).message);
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
+
   return (
-    <>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button
-            variant="outline"
-            className="text-white border-gray-600 bg-gray-900"
-          >
-            <FontAwesomeIcon icon={faPlus} /> New Workspace
-          </Button>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="h-10 px-4">
+          <Plus className="h-4 w-4" />
+          Create workspace
+        </Button>
+      </DialogTrigger>
 
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <form className="dialog-form" onSubmit={handleSubmit}>
-            <DialogHeader>
-              <DialogTitle>Create New Project</DialogTitle>
-              <DialogDescription>
-                Fill in the details below to create a new project.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4">
-              <div className="grid gap-3">
-                <Label htmlFor="name-1">Title</Label>
-                <Input id="name-1" name="name" placeholder="Project Title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-3 mb-4">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Project Description"
-                  className="resize-none"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
+      <DialogContent className="sm:max-w-[460px]">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>Create New Workspace</DialogTitle>
+            <DialogDescription>Set up a workspace to group your boards by team, product, or initiative.</DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-5 grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="workspace-title" className="text-slate-200">
+                Workspace name
+              </Label>
+              <Input
+                id="workspace-title"
+                placeholder="Product Design Team"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
             </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button type="submit" disabled={loading}>
-                Save changes
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </>
+            <div className="grid gap-2">
+              <Label htmlFor="workspace-description" className="text-slate-200">
+                Description
+              </Label>
+              <Textarea
+                id="workspace-description"
+                placeholder="What kind of work will this workspace manage?"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+          </div>
 
-  )
+          <DialogFooter className="mt-6">
+            <DialogClose asChild>
+              <Button variant="ghost">Cancel</Button>
+            </DialogClose>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Creating..." : "Create workspace"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 }
