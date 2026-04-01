@@ -8,8 +8,8 @@ import { useProjectsStore } from "@/stores/projects.store";
 import "react-toastify/dist/ReactToastify.css";
 import { useState, useEffect } from "react";
 import { apiClient } from "@/api/apiClient";
-
 import { HeaderEntity } from "./shared/headers/HeaderEntity";
+import { LayoutGrid, MoreHorizontal } from "lucide-react";
 
 export default function ProjectDetail() {
   const projectId = useParams().id as string;
@@ -24,7 +24,6 @@ export default function ProjectDetail() {
 
   const project = projects.find((p) => p.id === projectId);
 
-  // Close context menu on click outside
   useEffect(() => {
     const handleClick = () => setContextMenu(null);
     document.addEventListener("click", handleClick);
@@ -55,92 +54,92 @@ export default function ProjectDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-950 dark:to-slate-900">
+    <div className="min-h-screen">
       <ToastContainer />
       <SidebarProvider>
         <AppSidebar />
-        <main className="flex-1 p-10">
-          <HeaderEntity
-            title={project?.title ?? ""}
-            entityType="project"
-            entityId={projectId}
-            projectId={projectId}
-          />
+        <main className="flex-1">
+          <div className="mx-auto flex w-full max-w-[1450px] flex-col gap-6 px-6 py-8 lg:px-10">
+            <section className="surface-panel animate-soft-fade-up p-6">
+              <HeaderEntity
+                title={project?.title ?? "Workspace"}
+                entityType="project"
+                entityId={projectId}
+                projectId={projectId}
+              />
+              <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-300">
+                <p>{project?.description || "Boards for this workspace appear below."}</p>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-slate-900/65 px-3 py-1 text-xs uppercase tracking-wide text-slate-300">
+                  <LayoutGrid className="h-3.5 w-3.5" />
+                  {boards.length} Boards
+                </span>
+              </div>
+            </section>
 
-          {project?.description && (
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{project.description}</p>
-          )}
-          <p className="text-xs text-slate-400 dark:text-slate-500 mb-8">{boards.length} Boards</p>
-          {error && <div className="text-red-600 text-sm mb-4 px-3 py-2 bg-red-50 rounded-md border border-red-200">{error}</div>}
+            {error && (
+              <div className="rounded-xl border border-red-300/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>
+            )}
 
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-32">
-              <svg className="animate-spin h-8 w-8 text-slate-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-              </svg>
-              <p className="text-sm text-slate-400">Loading boards...</p>
-            </div>
-          ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {boards.map((board: any) => (
-              <Link
-                key={board.id}
-                to={`/boards/${board.id}`}
-                onContextMenu={(e) => handleContextMenu(e, board.id)}
-                className="group border border-slate-200 dark:border-slate-700 rounded-lg p-5 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-md transition-all duration-200 cursor-pointer"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-slate-400 group-hover:text-slate-700 transition-colors"
-                  >
-                    <path d="M5 3v14"></path>
-                    <path d="M12 3v8"></path>
-                    <path d="M19 3v18"></path>
-                  </svg>
-                  <h2 className="font-medium text-slate-800 dark:text-slate-100">{board.title}</h2>
+            {isLoading ? (
+              <section className="surface-panel flex flex-col items-center justify-center py-28">
+                <svg className="mb-3 h-8 w-8 animate-spin text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <p className="text-sm text-slate-300">Loading boards...</p>
+              </section>
+            ) : (
+              <section className="surface-panel animate-soft-fade-up p-6">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  {boards.map((board: any) => (
+                    <Link
+                      key={board.id}
+                      to={`/boards/${board.id}`}
+                      onContextMenu={(e) => handleContextMenu(e, board.id)}
+                      className="surface-card group relative p-5"
+                    >
+                      <div className="mb-3 flex items-start justify-between gap-3">
+                        <div>
+                          <h2 className="text-base font-semibold text-slate-100">{board.title}</h2>
+                          <p className="mt-1 text-xs uppercase tracking-wide text-blue-200/80">Board</p>
+                        </div>
+                        <span className="rounded-lg border border-white/12 bg-slate-900/70 p-1.5 text-slate-400 transition-colors group-hover:text-slate-200">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </span>
+                      </div>
+                      <p className="line-clamp-2 text-sm leading-relaxed text-slate-300">
+                        {board.description || "Manage cards, members, and flow with a cleaner board experience."}
+                      </p>
+                    </Link>
+                  ))}
+                  <BoardModalCreate projectId={projectId} />
                 </div>
-                {board.description && (
-                  <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{board.description}</p>
-                )}
-              </Link>
-            ))}
-            <BoardModalCreate projectId={projectId} />
+              </section>
+            )}
           </div>
-          )}
-
-          {/* Context Menu */}
-          {contextMenu?.visible && (
-            <div
-              className="fixed bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 z-50 min-w-[140px]"
-              style={{ top: contextMenu.y, left: contextMenu.x }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => handleDeleteBoard(contextMenu.boardId)}
-                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-slate-50 transition-colors"
-              >
-                Delete
-              </button>
-              <button
-                onClick={() => setContextMenu(null)}
-                className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-50 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          )}
         </main>
       </SidebarProvider>
+
+      {contextMenu?.visible && (
+        <div
+          className="fixed z-50 min-w-[168px] rounded-xl border border-white/12 bg-slate-900/95 p-1.5 shadow-[0_20px_44px_-24px_rgba(2,6,23,0.95)] backdrop-blur-xl"
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={() => handleDeleteBoard(contextMenu.boardId)}
+            className="w-full rounded-lg px-3 py-2 text-left text-sm text-red-300 transition-colors hover:bg-red-400/10 hover:text-red-200"
+          >
+            Delete board
+          </button>
+          <button
+            onClick={() => setContextMenu(null)}
+            className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-300 transition-colors hover:bg-slate-800/75 hover:text-white"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 }

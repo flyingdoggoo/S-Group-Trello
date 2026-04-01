@@ -9,6 +9,7 @@ import { apiClient } from "@/api/apiClient";
 import { useProjectsStore } from "@/stores/projects.store";
 import { useState, useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
+import { LayoutGrid, MoreHorizontal } from "lucide-react";
 
 export function Dashboard() {
   const { projects, error, isLoading } = useProjects();
@@ -22,7 +23,6 @@ export function Dashboard() {
     projectId: string;
   } | null>(null);
 
-  // Close context menu on click outside
   useEffect(() => {
     const handleClick = () => setContextMenu(null);
     document.addEventListener("click", handleClick);
@@ -38,14 +38,18 @@ export function Dashboard() {
   const handleDeleteBoard = async () => {
     if (!contextMenu) return;
     const { boardId, projectId } = contextMenu;
+
     try {
       await apiClient.delete(`/projects/${projectId}/boards/${boardId}`);
       toast.success("Board deleted successfully");
-      // Remove board from local store
-      const updated = projects.map((p: any) =>
-        p.id === projectId
-          ? { ...p, boards: (p.boards || []).filter((b: any) => b.id !== boardId), boardCount: (p.boardCount || 1) - 1 }
-          : p
+      const updated = projects.map((project: any) =>
+        project.id === projectId
+          ? {
+              ...project,
+              boards: (project.boards || []).filter((board: any) => board.id !== boardId),
+              boardCount: Math.max((project.boardCount || 1) - 1, 0),
+            }
+          : project
       );
       setProjects(updated);
       setContextMenu(null);
@@ -56,130 +60,110 @@ export function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-950 dark:to-slate-900">
+    <div className="min-h-screen">
       <ToastContainer />
+
       <SidebarProvider>
         <AppSidebar />
-        <main className="flex-1 p-10">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-10">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-100">Dashboard</h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Manage your workspaces and boards
-              </p>
-            </div>
-            <ProjectModalCreate />
-          </div>
-          {error && <div className="text-red-600 text-sm mb-4 px-3 py-2 bg-red-50 rounded-md border border-red-200">{error}</div>}
-
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-32">
-              <svg className="animate-spin h-8 w-8 text-slate-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-              </svg>
-              <p className="text-sm text-slate-400">Loading projects...</p>
-            </div>
-          ) : (
-          /* Projects */
-          <div className="flex flex-col gap-10">
-            {projects.map((project: any) => (
-              <section key={project.id}>
-                {/* Project header */}
-                <div className="flex items-center gap-3 mb-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    width="20"
-                    height="20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-black"
-                  >
-                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-                    <path d="M7 7h3v9H7zm7 0h3v5h-3z" />
-                  </svg>
-                  <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 tracking-tight">
-                    {project.title}
-                  </h2>
-                </div>
-                {project.description && (
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-1 ml-8">{project.description}</p>
-                )}
-                <p className="text-xs text-slate-400 dark:text-slate-500 mb-4 ml-8">
-                  {project.boardCount || 0} Boards
+        <main className="flex-1">
+          <div className="mx-auto flex w-full max-w-[1450px] flex-col gap-8 px-6 py-8 lg:px-10">
+            <header className="surface-panel animate-soft-fade-up flex flex-col gap-5 p-6 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h1 className="text-3xl font-semibold tracking-tight text-slate-100">Workspace Dashboard</h1>
+                <p className="mt-2 text-sm text-slate-300">
+                  Keep projects organized, jump into boards quickly, and maintain momentum.
                 </p>
+              </div>
+              <ProjectModalCreate />
+            </header>
 
-                {/* Board grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ml-8">
-                  {project.boards &&
-                    project.boards.map((board: any) => (
-                      <Link
-                        key={board.id}
-                        to={`/boards/${board.id}`}
-                        onContextMenu={(e) => handleContextMenu(e, board.id, project.id)}
-                        className="group relative border border-slate-200 dark:border-slate-700 rounded-lg p-5 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-md transition-all duration-200 cursor-pointer"
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="text-slate-400 group-hover:text-slate-700 transition-colors"
-                          >
-                            <path d="M5 3v14"></path>
-                            <path d="M12 3v8"></path>
-                            <path d="M19 3v18"></path>
-                          </svg>
-                          <h3 className="font-medium text-slate-800 dark:text-slate-100">
-                            {board.title}
-                          </h3>
-                        </div>
-                        {board.description && (
-                          <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{board.description}</p>
-                        )}
-                      </Link>
-                    ))}
-                  <BoardModalCreate projectId={project.id} />
-                </div>
-              </section>
-            ))}
+            {error && (
+              <div className="rounded-xl border border-red-300/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>
+            )}
+
+            {isLoading ? (
+              <div className="surface-panel flex flex-col items-center justify-center py-28">
+                <svg className="mb-3 h-8 w-8 animate-spin text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <p className="text-sm text-slate-300">Loading workspaces...</p>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {projects.length === 0 && (
+                  <section className="surface-panel p-8 text-center">
+                    <p className="text-lg font-medium text-slate-100">No workspaces yet</p>
+                    <p className="mt-2 text-sm text-slate-300">Create your first workspace to start building boards.</p>
+                  </section>
+                )}
+
+                {projects.map((project: any) => (
+                  <section key={project.id} className="surface-panel animate-soft-fade-up p-6">
+                    <div className="divider-soft mb-5 flex flex-col gap-3 pb-5 md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <h2 className="text-xl font-semibold text-slate-100">{project.title}</h2>
+                        <p className="mt-1 text-sm text-slate-300">{project.description || "No description provided yet."}</p>
+                      </div>
+                      <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/12 bg-slate-900/70 px-3 py-1 text-xs font-medium uppercase tracking-wide text-slate-300">
+                        <LayoutGrid className="h-3.5 w-3.5" />
+                        {project.boardCount || 0} Boards
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                      {project.boards?.map((board: any) => (
+                        <Link
+                          key={board.id}
+                          to={`/boards/${board.id}`}
+                          onContextMenu={(e) => handleContextMenu(e, board.id, project.id)}
+                          className="surface-card group relative p-5"
+                        >
+                          <div className="mb-3 flex items-start justify-between gap-3">
+                            <div>
+                              <h3 className="text-base font-semibold text-slate-100">{board.title}</h3>
+                              <p className="mt-1 text-xs uppercase tracking-wide text-blue-200/80">Board</p>
+                            </div>
+                            <span className="rounded-lg border border-white/12 bg-slate-900/70 p-1.5 text-slate-400 transition-colors group-hover:text-slate-200">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </span>
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-relaxed text-slate-300">
+                            {board.description || "Plan tasks, assign owners, and deliver work confidently."}
+                          </p>
+                        </Link>
+                      ))}
+
+                      <BoardModalCreate projectId={project.id} />
+                    </div>
+                  </section>
+                ))}
+              </div>
+            )}
           </div>
-          )}
-
-          {/* Context Menu */}
-          {contextMenu?.visible && (
-            <div
-              className="fixed bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 z-50 min-w-[140px]"
-              style={{ top: contextMenu.y, left: contextMenu.x }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={handleDeleteBoard}
-                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-slate-50 transition-colors"
-              >
-                Delete
-              </button>
-              <button
-                onClick={() => setContextMenu(null)}
-                className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-50 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          )}
         </main>
       </SidebarProvider>
+
+      {contextMenu?.visible && (
+        <div
+          className="fixed z-50 min-w-[168px] rounded-xl border border-white/12 bg-slate-900/95 p-1.5 shadow-[0_20px_44px_-24px_rgba(2,6,23,0.95)] backdrop-blur-xl"
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={handleDeleteBoard}
+            className="w-full rounded-lg px-3 py-2 text-left text-sm text-red-300 transition-colors hover:bg-red-400/10 hover:text-red-200"
+          >
+            Delete board
+          </button>
+          <button
+            onClick={() => setContextMenu(null)}
+            className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-300 transition-colors hover:bg-slate-800/75 hover:text-white"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 }
