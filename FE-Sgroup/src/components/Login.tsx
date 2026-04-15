@@ -187,11 +187,11 @@ export function Login() {
             <div className="relative z-10 grid grid-cols-2 gap-4">
               <div className="surface-card p-4">
                 <p className="text-xs uppercase tracking-wider text-slate-400">Workspaces</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-100">08</p>
+                <p className="mt-2 text-2xl font-semibold text-slate-100">100+</p>
               </div>
               <div className="surface-card p-4">
                 <p className="text-xs uppercase tracking-wider text-slate-400">Boards</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-100">42</p>
+                <p className="mt-2 text-2xl font-semibold text-slate-100">100+</p>
               </div>
               <div className="surface-card col-span-2 p-4">
                 <p className="text-xs uppercase tracking-wider text-slate-400">Live Collaboration</p>
