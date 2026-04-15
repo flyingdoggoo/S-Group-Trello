@@ -8,6 +8,7 @@ import { InvitationsCreateNestedManyWithoutProjectInputSchema } from './Invitati
 
 export const projectCreateInputSchema: z.ZodType<Prisma.projectCreateInput> = z.strictObject({
   id: z.uuid().optional(),
+  slug: z.string(),
   title: z.string(),
   description: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),

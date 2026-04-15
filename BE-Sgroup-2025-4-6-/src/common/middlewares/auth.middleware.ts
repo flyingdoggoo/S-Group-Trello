@@ -1,73 +1,75 @@
 import { jwtConfig } from '@/configs';
 import { Request, Response, NextFunction } from 'express';
 import { JsonWebTokenError, TokenExpiredError, verify } from 'jsonwebtoken';
+import { StatusCodes } from 'http-status-codes';
+
 import {
 	ForbiddenException,
 	OptionalException,
 	UnauthorizedException,
 } from '../exceptions';
-import { StatusCodes } from 'http-status-codes';
 import { ITokenPayload } from '../interfaces';
-import { UsersRepository } from '@/modules/users/users.repository';
-import { users } from '@/models/modelSchema/usersSchema';
-import { autoBindUtil } from '@/common/utils';
-import { UserInformationDto } from '@/modules/users/dtos';
-import { RolesRepository } from '@/modules/roles/roles.repository';
+import { autoBindUtil, getCookieValue } from '@/common/utils';
+
 import { PermissionsRepository } from '@/modules/permissions/permissions.repository';
-import { ca } from 'zod/v4/locales';
+import { UsersRepository } from '@/modules/users/users.repository';
+import { UserInformationDto } from '@/modules/users/dtos';
+
 class AuthMiddleware {
 	constructor(
 		private readonly userRepository = new UsersRepository(),
-		private readonly roleRepository = new RolesRepository(),
 		private readonly permissionRepository = new PermissionsRepository(),
 	) {}
 
-	async verifyToken(req: Request, res: Response, next: NextFunction) {
-		try {
-			const authHeader = req.headers.authorization;
+	private extractAccessToken(req: Request): string | undefined {
+		const tokenFromCookie = getCookieValue(req.headers.cookie, 'accessToken');
+		if (tokenFromCookie) {
+			return tokenFromCookie;
+		}
 
-			console.log('=== AUTH MIDDLEWARE DEBUG ===');
-			console.log('Full headers:', req.headers);
-			console.log('Authorization header:', authHeader);
-
-			if (!authHeader || !authHeader.startsWith('Bearer ')) {
-				console.log('ERROR: No Bearer token found');
-				throw new UnauthorizedException('Access token is required');
+		const authHeader = req.headers.authorization;
+		if (authHeader && authHeader.startsWith('Bearer ')) {
+			const tokenFromBearer = authHeader.substring(7).trim();
+			if (tokenFromBearer) {
+				return tokenFromBearer;
 			}
+		}
 
-			const accessToken = authHeader.substring(7); // Remove 'Bearer ' prefix
-			console.log('Extracted token:', accessToken);
+		return undefined;
+	}
+
+	async verifyToken(req: Request, _res: Response, next: NextFunction) {
+		try {
+			const accessToken = this.extractAccessToken(req);
 
 			if (!accessToken) {
-				console.log('ERROR: Token is empty after extraction');
 				throw new UnauthorizedException('Access token is required');
 			}
 
 			try {
-				// Verify token
-				console.log('Verifying token with secret...');
 				const payload = verify(
 					accessToken,
 					jwtConfig.secretAccessToken,
-				) as ITokenPayload;
-				console.log('Token payload:', payload);
+				) as Partial<ITokenPayload>;
 
-				// Lấy thông tin user từ database
-				const user = await this.userRepository.findUser({ email: payload.email });
-				console.log('User found:', user ? 'YES' : 'NO');
+				const user = payload.userId
+					? await this.userRepository.findUserById(payload.userId)
+					: payload.email
+						? await this.userRepository.findUser({ email: payload.email })
+						: null;
 
 				if (!user) {
-					console.log('ERROR: User not found in database');
 					throw new UnauthorizedException('User not found');
 				}
 
-				// Gán user vào request
-				(req as any).user = user;
-				console.log('=== AUTH SUCCESS ===');
+				req.user = {
+					id: user.id,
+					email: user.email,
+					name: user.name ?? undefined,
+				};
 
 				next();
 			} catch (error) {
-				console.log('ERROR during token verification:', error);
 				if (error instanceof TokenExpiredError) {
 					throw new OptionalException(
 						StatusCodes.UNAUTHORIZED,
@@ -94,7 +96,6 @@ class AuthMiddleware {
 				);
 				if (ok) return next();
 				throw new ForbiddenException();
-				console.log('User does not have permission:', permission);
 			} catch (error) {
 				next(error);
 			}

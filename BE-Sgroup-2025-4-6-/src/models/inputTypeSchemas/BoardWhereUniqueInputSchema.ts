@@ -14,11 +14,21 @@ import { ListListRelationFilterSchema } from './ListListRelationFilterSchema';
 import { InvitationsListRelationFilterSchema } from './InvitationsListRelationFilterSchema';
 import { BoardMemberListRelationFilterSchema } from './BoardMemberListRelationFilterSchema';
 
-export const BoardWhereUniqueInputSchema: z.ZodType<Prisma.BoardWhereUniqueInput> = z.object({
-  id: z.uuid(),
-})
+export const BoardWhereUniqueInputSchema: z.ZodType<Prisma.BoardWhereUniqueInput> = z.union([
+  z.object({
+    id: z.uuid(),
+    slug: z.string(),
+  }),
+  z.object({
+    id: z.uuid(),
+  }),
+  z.object({
+    slug: z.string(),
+  }),
+])
 .and(z.strictObject({
   id: z.uuid().optional(),
+  slug: z.string().optional(),
   AND: z.union([ z.lazy(() => BoardWhereInputSchema), z.lazy(() => BoardWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => BoardWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => BoardWhereInputSchema), z.lazy(() => BoardWhereInputSchema).array() ]).optional(),

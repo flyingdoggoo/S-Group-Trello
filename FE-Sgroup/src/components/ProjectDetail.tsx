@@ -10,19 +10,23 @@ import { useState, useEffect } from "react";
 import { apiClient } from "@/api/apiClient";
 import { HeaderEntity } from "./shared/headers/HeaderEntity";
 import { LayoutGrid, MoreHorizontal } from "lucide-react";
+import { entityMatchesIdentifier, getEntityRouteIdentifier } from "@/lib/entityIdentifiers";
 
 export default function ProjectDetail() {
-  const projectId = useParams().id as string;
-  const { boards, error, isLoading, refetch } = useBoards({ projectId });
+  const projectSlug = useParams().projectSlug as string;
   const projects = useProjectsStore((state) => state.projects);
+  const project = projects.find((p) => entityMatchesIdentifier(p, projectSlug));
+  const projectIdentifier = getEntityRouteIdentifier(project) || projectSlug;
+  const projectEntityId = project?.id || projectSlug;
+
+  const { boards, error, isLoading, refetch } = useBoards({ projectId: projectIdentifier });
   const [contextMenu, setContextMenu] = useState<{
     visible: boolean;
     x: number;
     y: number;
     boardId: string;
+    boardIdentifier: string;
   } | null>(null);
-
-  const project = projects.find((p) => p.id === projectId);
 
   useEffect(() => {
     const handleClick = () => setContextMenu(null);
@@ -30,20 +34,21 @@ export default function ProjectDetail() {
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
-  const handleContextMenu = (e: React.MouseEvent, boardId: string) => {
+  const handleContextMenu = (e: React.MouseEvent, board: { id: string; slug?: string }) => {
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({
       visible: true,
       x: e.clientX,
       y: e.clientY,
-      boardId,
+      boardId: board.id,
+      boardIdentifier: getEntityRouteIdentifier(board),
     });
   };
 
-  const handleDeleteBoard = async (boardId: string) => {
+  const handleDeleteBoard = async (boardIdentifier: string) => {
     try {
-      await apiClient.delete(`/projects/${projectId}/boards/${boardId}`);
+      await apiClient.delete(`/projects/${projectIdentifier}/boards/${boardIdentifier}`);
       toast.success("Board deleted successfully");
       refetch();
       setContextMenu(null);
@@ -64,8 +69,8 @@ export default function ProjectDetail() {
               <HeaderEntity
                 title={project?.title ?? "Workspace"}
                 entityType="project"
-                entityId={projectId}
-                projectId={projectId}
+                entityId={projectEntityId}
+                projectId={projectEntityId}
               />
               <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-300">
                 <p>{project?.description || "Boards for this workspace appear below."}</p>
@@ -94,8 +99,8 @@ export default function ProjectDetail() {
                   {boards.map((board: any) => (
                     <Link
                       key={board.id}
-                      to={`/boards/${board.id}`}
-                      onContextMenu={(e) => handleContextMenu(e, board.id)}
+                      to={`/boards/${getEntityRouteIdentifier(board)}`}
+                      onContextMenu={(e) => handleContextMenu(e, board)}
                       className="surface-card group relative p-5"
                     >
                       <div className="mb-3 flex items-start justify-between gap-3">
@@ -112,7 +117,11 @@ export default function ProjectDetail() {
                       </p>
                     </Link>
                   ))}
-                  <BoardModalCreate projectId={projectId} />
+                  <BoardModalCreate
+                    projectId={projectIdentifier}
+                    boardsStoreKey={projectIdentifier}
+                    projectStoreId={projectEntityId}
+                  />
                 </div>
               </section>
             )}
@@ -127,7 +136,7 @@ export default function ProjectDetail() {
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            onClick={() => handleDeleteBoard(contextMenu.boardId)}
+            onClick={() => handleDeleteBoard(contextMenu.boardIdentifier)}
             className="w-full rounded-lg px-3 py-2 text-left text-sm text-red-300 transition-colors hover:bg-red-400/10 hover:text-red-200"
           >
             Delete board

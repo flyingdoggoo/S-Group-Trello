@@ -16,8 +16,9 @@ export default function useLists({ boardId }: { boardId: string }) {
         }
     }
     useEffect(() => {
+        if (!boardId) return
         fetchLists()
-    }, [])
+    }, [boardId])
     return { lists, setLists, error }
 }
 

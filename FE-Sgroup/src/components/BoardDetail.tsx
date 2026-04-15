@@ -42,21 +42,23 @@ function hashText(value: string) {
 }
 
 export default function BoardDetail() {
-  const boardId = useParams().boardId as string;
+  const boardSlug = useParams().boardSlug as string;
   const [currentBoard, setCurrentBoard] = useState<{
     id: string;
+    slug?: string;
     projectId: string;
     title: string;
     description?: string | null;
   } | null>(null);
   const [boardLoading, setBoardLoading] = useState(true);
+  const boardId = currentBoard?.id || boardSlug;
   const projectId = currentBoard?.projectId || "";
 
   useEffect(() => {
     (async () => {
       setBoardLoading(true);
       try {
-        const res = await apiClient.get(`boards/${boardId}`);
+        const res = await apiClient.get(`boards/${boardSlug}`);
         setCurrentBoard(res.data?.data);
       } catch (err) {
         console.error(err);
@@ -64,7 +66,7 @@ export default function BoardDetail() {
         setBoardLoading(false);
       }
     })();
-  }, [boardId]);
+  }, [boardSlug]);
 
   const { lists, setLists, error: listError } = useLists({ boardId });
   const columns = useMemo(

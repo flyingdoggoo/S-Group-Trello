@@ -6,6 +6,8 @@ import { InvitationsUncheckedCreateInputSchema } from '../inputTypeSchemas/Invit
 import { usersArgsSchema } from "../outputTypeSchemas/usersArgsSchema"
 import { projectArgsSchema } from "../outputTypeSchemas/projectArgsSchema"
 import { BoardArgsSchema } from "../outputTypeSchemas/BoardArgsSchema"
+import { NotificationFindManyArgsSchema } from "../outputTypeSchemas/NotificationFindManyArgsSchema"
+import { InvitationsCountOutputTypeArgsSchema } from "../outputTypeSchemas/InvitationsCountOutputTypeArgsSchema"
 // Select schema needs to be in file to prevent circular imports
 //------------------------------------------------------
 
@@ -24,6 +26,8 @@ export const InvitationsSelectSchema: z.ZodType<Prisma.InvitationsSelect> = z.ob
   owner: z.union([z.boolean(),z.lazy(() => usersArgsSchema)]).optional(),
   project: z.union([z.boolean(),z.lazy(() => projectArgsSchema)]).optional(),
   board: z.union([z.boolean(),z.lazy(() => BoardArgsSchema)]).optional(),
+  notifications: z.union([z.boolean(),z.lazy(() => NotificationFindManyArgsSchema)]).optional(),
+  _count: z.union([z.boolean(),z.lazy(() => InvitationsCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
 export const InvitationsCreateArgsSchema: z.ZodType<Prisma.InvitationsCreateArgs> = z.object({

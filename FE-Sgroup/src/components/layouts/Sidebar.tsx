@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { LayoutGrid, FolderKanban, Folder, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { LayoutGrid, FolderKanban, Folder, PanelLeftClose, PanelLeftOpen, Bell } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { DropUpSettings } from "../ui/drop-up.settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,6 +9,8 @@ import { faTrello } from "@fortawesome/free-brands-svg-icons";
 import { useProjectsStore } from "@/stores/projects.store";
 import { apiClient } from "@/api/apiClient";
 import { toast } from "react-toastify";
+import { NotificationBell } from "@/components/shared/notifications/NotificationBell";
+import { getEntityRouteIdentifier } from "@/lib/entityIdentifiers";
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -54,6 +56,12 @@ export function AppSidebar() {
         label: "Workspaces",
         icon: FolderKanban,
         isActive: location.pathname.startsWith("/projects") || location.pathname.startsWith("/boards"),
+      },
+      {
+        to: "/notifications",
+        label: "Notifications",
+        icon: Bell,
+        isActive: location.pathname.startsWith("/notifications"),
       },
     ],
     [location.pathname]
@@ -101,15 +109,18 @@ export function AppSidebar() {
             </Link>
           )}
 
-          <button
-            onClick={() => setCollapsed((prev) => !prev)}
-            className={`rounded-xl border border-white/10 bg-slate-900/65 p-2 text-slate-300 transition-all hover:border-blue-300/40 hover:bg-slate-800/80 hover:text-white ${
-              collapsed ? "mx-auto" : ""
-            }`}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-          </button>
+          <div className={`flex items-center gap-2 ${collapsed ? "mx-auto flex-col" : ""}`}>
+            <NotificationBell collapsed={collapsed} />
+            <button
+              onClick={() => setCollapsed((prev) => !prev)}
+              className={`rounded-xl border border-white/10 bg-slate-900/65 p-2 text-slate-300 transition-all hover:border-blue-300/40 hover:bg-slate-800/80 hover:text-white ${
+                collapsed ? "mx-auto" : ""
+              }`}
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -157,11 +168,12 @@ export function AppSidebar() {
 
         <div className="space-y-1">
           {projects.map((project: any) => {
-            const isActive = location.pathname === `/projects/${project.id}`;
+            const projectIdentifier = getEntityRouteIdentifier(project);
+            const isActive = location.pathname === `/projects/${projectIdentifier}`;
             return (
               <Link
                 key={project.id}
-                to={`/projects/${project.id}`}
+                to={`/projects/${projectIdentifier}`}
                 onContextMenu={(e) => handleContextMenu(e, project.id)}
                 className={`group flex items-center rounded-xl border px-3 py-2.5 text-sm transition-all ${
                   collapsed ? "justify-center" : "justify-between"

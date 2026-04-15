@@ -5,6 +5,7 @@ import { SortOrderSchema } from './SortOrderSchema';
 
 export const projectMinOrderByAggregateInputSchema: z.ZodType<Prisma.projectMinOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
+  slug: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
   description: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),

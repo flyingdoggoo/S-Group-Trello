@@ -7,12 +7,16 @@ import { Dashboard } from "./components/Dashboard";
 import ProjectDetail from "./components/ProjectDetail";
 import BoardDetail from "./components/BoardDetail";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ForgotPassword } from "./components/ForgotPassword";
+import { InvitationActionPage } from "./components/InvitationActionPage";
+import { NotificationCenter } from "./components/NotificationCenter";
 
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       <Route
         path="/dashboard"
@@ -31,7 +35,7 @@ export default function App() {
         }
       />
       <Route
-        path="/projects/:id"
+        path="/projects/:projectSlug"
         element={
           <ProtectedRoute>
             <ProjectDetail />
@@ -39,15 +43,31 @@ export default function App() {
         }
       />
       <Route
-        path="/boards/:boardId"
+        path="/boards/:boardSlug"
         element={
           <ProtectedRoute>
             <BoardDetail />
           </ProtectedRoute>
         }
       />
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <NotificationCenter />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/invites/:token"
+        element={
+          <ProtectedRoute>
+            <InvitationActionPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }

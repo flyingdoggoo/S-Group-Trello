@@ -18,3 +18,4 @@ export * from './CardTodoSchema';
 export * from './CardMemberSchema';
 export * from './CardCommentSchema';
 export * from './InvitationsSchema';
+export * from './NotificationSchema';

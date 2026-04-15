@@ -36,8 +36,9 @@ export class BoardsService {
 		if (!project) {
 			throw new NotFoundException('Project not found');
 		}
+		const resolvedProjectId = project.id;
 		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
-			projectId,
+			resolvedProjectId,
 			userId,
 		);
 		if (!isMember) {
@@ -45,7 +46,7 @@ export class BoardsService {
 		}
 
 		const board = await this.boardsRepository.createBoard({
-			projectId,
+			projectId: resolvedProjectId,
 			title: dto.title,
 			description: dto.description,
 		});
@@ -77,9 +78,10 @@ export class BoardsService {
 		if (!project) {
 			throw new NotFoundException('Project not found');
 		}
+		const resolvedProjectId = project.id;
 		// Membership check
 		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
-			projectId,
+			resolvedProjectId,
 			userId,
 		);
 		if (!isMember) {
@@ -90,7 +92,7 @@ export class BoardsService {
 		const skip = (page - 1) * limit;
 
 		const [boards, total] = await this.boardsRepository.findBoards({
-			projectId,
+			projectId: resolvedProjectId,
 			title: dto.title,
 			status: dto.status,
 			skip,
@@ -112,14 +114,22 @@ export class BoardsService {
 		projectId: string,
 		userId: string,
 	): Promise<ServiceResponse<BoardResponseDto>> {
+		const project = await this.projectsRepository.findProjectById({ id: projectId });
+		if (!project) {
+			throw new NotFoundException('Project not found');
+		}
+
 		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
-			projectId,
+			project.id,
 			userId,
 		);
 		if (!isMember) {
 			throw new ForbiddenException();
 		}
-		const board = await this.boardsRepository.findBoardById({ id, projectId });
+		const board = await this.boardsRepository.findBoardById({
+			id,
+			projectId: project.id,
+		});
 
 		if (!board) {
 			throw new NotFoundException('Board not found');
@@ -164,8 +174,13 @@ export class BoardsService {
 		userId: string,
 		dto: UpdateBoardRequestDto,
 	): Promise<ServiceResponse<BoardResponseDto>> {
+		const project = await this.projectsRepository.findProjectById({ id: projectId });
+		if (!project) {
+			throw new NotFoundException('Project not found');
+		}
+
 		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
-			projectId,
+			project.id,
 			userId,
 		);
 		if (!isMember) {
@@ -174,7 +189,7 @@ export class BoardsService {
 		// Ensure board belongs to the project
 		const existingBoard = await this.boardsRepository.findBoardById({
 			id,
-			projectId,
+			projectId: project.id,
 		});
 
 		if (!existingBoard) {
@@ -183,7 +198,7 @@ export class BoardsService {
 
 		const board = await this.boardsRepository.updateBoard({
 			id,
-			projectId,
+			projectId: project.id,
 			title: dto.title,
 			description: dto.description,
 		});
@@ -201,8 +216,13 @@ export class BoardsService {
 		projectId: string,
 		userId: string,
 	): Promise<ServiceResponse<null>> {
+		const project = await this.projectsRepository.findProjectById({ id: projectId });
+		if (!project) {
+			throw new NotFoundException('Project not found');
+		}
+
 		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
-			projectId,
+			project.id,
 			userId,
 		);
 		if (!isMember) {
@@ -211,14 +231,17 @@ export class BoardsService {
 		// Ensure board belongs to the project
 		const existingBoard = await this.boardsRepository.findBoardById({
 			id,
-			projectId,
+			projectId: project.id,
 		});
 
 		if (!existingBoard) {
 			throw new NotFoundException('Board not found');
 		}
 
-		await this.boardsRepository.deleteBoard({ id, projectId });
+		await this.boardsRepository.deleteBoard({
+			id,
+			projectId: project.id,
+		});
 
 		return new ServiceResponse(
 			ResponseStatus.Success,
@@ -245,7 +268,7 @@ export class BoardsService {
 			throw new ForbiddenException();
 		}
 
-		const members = await this.boardMemberRepository.getBoardMembers(boardId);
+		const members = await this.boardMemberRepository.getBoardMembers(existingBoard.id);
 
 		return new ServiceResponse(
 			ResponseStatus.Success,
@@ -269,7 +292,7 @@ export class BoardsService {
 		}
 
 		const isMember = await this.boardMemberRepository.isUserMemberOfBoard(
-			boardId,
+			existingBoard.id,
 			userId,
 		);
 		if (!isMember) {
@@ -277,7 +300,7 @@ export class BoardsService {
 		}
 
 		const changed = await this.boardMemberRepository.changeRoleOfMemberBoard(
-			boardId,
+			existingBoard.id,
 			userId,
 			newRoleId,
 		);

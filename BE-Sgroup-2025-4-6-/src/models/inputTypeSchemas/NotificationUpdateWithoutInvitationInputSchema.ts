@@ -1,0 +1,26 @@
+import type { Prisma } from '@prisma/client';
+
+import { z } from 'zod';
+import { StringFieldUpdateOperationsInputSchema } from './StringFieldUpdateOperationsInputSchema';
+import { NotificationTypeEnumSchema } from './NotificationTypeEnumSchema';
+import { EnumNotificationTypeEnumFieldUpdateOperationsInputSchema } from './EnumNotificationTypeEnumFieldUpdateOperationsInputSchema';
+import { BoolFieldUpdateOperationsInputSchema } from './BoolFieldUpdateOperationsInputSchema';
+import { NullableDateTimeFieldUpdateOperationsInputSchema } from './NullableDateTimeFieldUpdateOperationsInputSchema';
+import { DateTimeFieldUpdateOperationsInputSchema } from './DateTimeFieldUpdateOperationsInputSchema';
+import { usersUpdateOneRequiredWithoutNotificationsNestedInputSchema } from './usersUpdateOneRequiredWithoutNotificationsNestedInputSchema';
+import { usersUpdateOneWithoutActionsNestedInputSchema } from './usersUpdateOneWithoutActionsNestedInputSchema';
+
+export const NotificationUpdateWithoutInvitationInputSchema: z.ZodType<Prisma.NotificationUpdateWithoutInvitationInput> = z.strictObject({
+  id: z.union([ z.uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.lazy(() => NotificationTypeEnumSchema), z.lazy(() => EnumNotificationTypeEnumFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  message: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  isRead: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  readAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  user: z.lazy(() => usersUpdateOneRequiredWithoutNotificationsNestedInputSchema).optional(),
+  actor: z.lazy(() => usersUpdateOneWithoutActionsNestedInputSchema).optional(),
+});
+
+export default NotificationUpdateWithoutInvitationInputSchema;

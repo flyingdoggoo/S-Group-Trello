@@ -4,14 +4,16 @@ import { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
-import { apiClient } from "@/api/apiClient";
-import { Link, useNavigate } from "react-router-dom";
+import { apiClient, setAccessToken } from "@/api/apiClient";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Lock, Mail, Sparkles, ArrowRight } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrello } from "@fortawesome/free-brands-svg-icons";
 
 export function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = new URLSearchParams(location.search).get("redirect") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,10 +26,9 @@ export function Login() {
 
     try {
       const response = await apiClient.post("/auth/login", { email, password });
-      localStorage.setItem("accessToken", response.data.data.accessToken);
-      document.cookie = `accessToken=${response.data.data.accessToken}; path=/`;
+      setAccessToken(response?.data?.data?.accessToken ?? null);
       toast.success("Login success");
-      navigate("/dashboard", { replace: true });
+      navigate(redirectTo, { replace: true });
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || "Login failed";
       setSubmitError(errorMessage);
@@ -85,12 +86,12 @@ export function Login() {
                   <label htmlFor="password" className="text-sm font-medium text-slate-200">
                     Password
                   </label>
-                  <button
-                    type="button"
+                  <Link
+                    to="/forgot-password"
                     className="text-xs font-medium text-blue-300 transition-colors hover:text-blue-200"
                   >
                     Forgot password?
-                  </button>
+                  </Link>
                 </div>
                 <div className="relative">
                   <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />

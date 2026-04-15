@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client';
 
 import { z } from 'zod';
 import { InvitationStatusEnumSchema } from './InvitationStatusEnumSchema';
+import { NotificationUncheckedCreateNestedManyWithoutInvitationInputSchema } from './NotificationUncheckedCreateNestedManyWithoutInvitationInputSchema';
 
 export const InvitationsUncheckedCreateWithoutOwnerInputSchema: z.ZodType<Prisma.InvitationsUncheckedCreateWithoutOwnerInput> = z.strictObject({
   id: z.uuid().optional(),
@@ -14,6 +15,7 @@ export const InvitationsUncheckedCreateWithoutOwnerInputSchema: z.ZodType<Prisma
   createdAt: z.coerce.date().optional(),
   expiresAt: z.coerce.date(),
   acceptedAt: z.coerce.date().optional().nullable(),
+  notifications: z.lazy(() => NotificationUncheckedCreateNestedManyWithoutInvitationInputSchema).optional(),
 });
 
 export default InvitationsUncheckedCreateWithoutOwnerInputSchema;

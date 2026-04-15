@@ -7,6 +7,7 @@ import { BoardCreateNestedManyWithoutProjectInputSchema } from './BoardCreateNes
 
 export const projectCreateWithoutInvitationInputSchema: z.ZodType<Prisma.projectCreateWithoutInvitationInput> = z.strictObject({
   id: z.uuid().optional(),
+  slug: z.string(),
   title: z.string(),
   description: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),

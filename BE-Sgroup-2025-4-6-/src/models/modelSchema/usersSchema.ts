@@ -20,6 +20,8 @@ import { CardMemberWithRelationsSchema, CardMemberPartialWithRelationsSchema, Ca
 import type { CardMemberWithRelations, CardMemberPartialWithRelations, CardMemberOptionalDefaultsWithRelations } from './CardMemberSchema'
 import { CardCommentWithRelationsSchema, CardCommentPartialWithRelationsSchema, CardCommentOptionalDefaultsWithRelationsSchema } from './CardCommentSchema'
 import type { CardCommentWithRelations, CardCommentPartialWithRelations, CardCommentOptionalDefaultsWithRelations } from './CardCommentSchema'
+import { NotificationWithRelationsSchema, NotificationPartialWithRelationsSchema, NotificationOptionalDefaultsWithRelationsSchema } from './NotificationSchema'
+import type { NotificationWithRelations, NotificationPartialWithRelations, NotificationOptionalDefaultsWithRelations } from './NotificationSchema'
 
 /////////////////////////////////////////
 // USERS SCHEMA
@@ -78,6 +80,8 @@ export type usersRelations = {
   Invitations: InvitationsWithRelations[];
   CardMember: CardMemberWithRelations[];
   CardComment: CardCommentWithRelations[];
+  notifications: NotificationWithRelations[];
+  actions: NotificationWithRelations[];
 };
 
 export type usersWithRelations = z.infer<typeof usersSchema> & usersRelations
@@ -93,6 +97,8 @@ export const usersWithRelationsSchema: z.ZodType<usersWithRelations> = usersSche
   Invitations: z.lazy(() => InvitationsWithRelationsSchema).array(),
   CardMember: z.lazy(() => CardMemberWithRelationsSchema).array(),
   CardComment: z.lazy(() => CardCommentWithRelationsSchema).array(),
+  notifications: z.lazy(() => NotificationWithRelationsSchema).array(),
+  actions: z.lazy(() => NotificationWithRelationsSchema).array(),
 }))
 
 /////////////////////////////////////////
@@ -110,6 +116,8 @@ export type usersOptionalDefaultsRelations = {
   Invitations: InvitationsOptionalDefaultsWithRelations[];
   CardMember: CardMemberOptionalDefaultsWithRelations[];
   CardComment: CardCommentOptionalDefaultsWithRelations[];
+  notifications: NotificationOptionalDefaultsWithRelations[];
+  actions: NotificationOptionalDefaultsWithRelations[];
 };
 
 export type usersOptionalDefaultsWithRelations = z.infer<typeof usersOptionalDefaultsSchema> & usersOptionalDefaultsRelations
@@ -125,6 +133,8 @@ export const usersOptionalDefaultsWithRelationsSchema: z.ZodType<usersOptionalDe
   Invitations: z.lazy(() => InvitationsOptionalDefaultsWithRelationsSchema).array(),
   CardMember: z.lazy(() => CardMemberOptionalDefaultsWithRelationsSchema).array(),
   CardComment: z.lazy(() => CardCommentOptionalDefaultsWithRelationsSchema).array(),
+  notifications: z.lazy(() => NotificationOptionalDefaultsWithRelationsSchema).array(),
+  actions: z.lazy(() => NotificationOptionalDefaultsWithRelationsSchema).array(),
 }))
 
 /////////////////////////////////////////
@@ -142,6 +152,8 @@ export type usersPartialRelations = {
   Invitations?: InvitationsPartialWithRelations[];
   CardMember?: CardMemberPartialWithRelations[];
   CardComment?: CardCommentPartialWithRelations[];
+  notifications?: NotificationPartialWithRelations[];
+  actions?: NotificationPartialWithRelations[];
 };
 
 export type usersPartialWithRelations = z.infer<typeof usersPartialSchema> & usersPartialRelations
@@ -157,6 +169,8 @@ export const usersPartialWithRelationsSchema: z.ZodType<usersPartialWithRelation
   Invitations: z.lazy(() => InvitationsPartialWithRelationsSchema).array(),
   CardMember: z.lazy(() => CardMemberPartialWithRelationsSchema).array(),
   CardComment: z.lazy(() => CardCommentPartialWithRelationsSchema).array(),
+  notifications: z.lazy(() => NotificationPartialWithRelationsSchema).array(),
+  actions: z.lazy(() => NotificationPartialWithRelationsSchema).array(),
 })).partial()
 
 export type usersOptionalDefaultsWithPartialRelations = z.infer<typeof usersOptionalDefaultsSchema> & usersPartialRelations
@@ -172,6 +186,8 @@ export const usersOptionalDefaultsWithPartialRelationsSchema: z.ZodType<usersOpt
   Invitations: z.lazy(() => InvitationsPartialWithRelationsSchema).array(),
   CardMember: z.lazy(() => CardMemberPartialWithRelationsSchema).array(),
   CardComment: z.lazy(() => CardCommentPartialWithRelationsSchema).array(),
+  notifications: z.lazy(() => NotificationPartialWithRelationsSchema).array(),
+  actions: z.lazy(() => NotificationPartialWithRelationsSchema).array(),
 }).partial())
 
 export type usersWithPartialRelations = z.infer<typeof usersSchema> & usersPartialRelations
@@ -187,6 +203,8 @@ export const usersWithPartialRelationsSchema: z.ZodType<usersWithPartialRelation
   Invitations: z.lazy(() => InvitationsPartialWithRelationsSchema).array(),
   CardMember: z.lazy(() => CardMemberPartialWithRelationsSchema).array(),
   CardComment: z.lazy(() => CardCommentPartialWithRelationsSchema).array(),
+  notifications: z.lazy(() => NotificationPartialWithRelationsSchema).array(),
+  actions: z.lazy(() => NotificationPartialWithRelationsSchema).array(),
 }).partial())
 
 export default usersSchema;

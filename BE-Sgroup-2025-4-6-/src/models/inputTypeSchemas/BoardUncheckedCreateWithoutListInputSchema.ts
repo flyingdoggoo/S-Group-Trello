@@ -7,6 +7,7 @@ import { BoardMemberUncheckedCreateNestedManyWithoutBoardInputSchema } from './B
 
 export const BoardUncheckedCreateWithoutListInputSchema: z.ZodType<Prisma.BoardUncheckedCreateWithoutListInput> = z.strictObject({
   id: z.uuid().optional(),
+  slug: z.string(),
   projectId: z.string(),
   title: z.string(),
   description: z.string().optional().nullable(),

@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { InvitationStatusEnumSchema } from './InvitationStatusEnumSchema';
 import { usersCreateNestedOneWithoutInvitationsInputSchema } from './usersCreateNestedOneWithoutInvitationsInputSchema';
 import { BoardCreateNestedOneWithoutInvitationInputSchema } from './BoardCreateNestedOneWithoutInvitationInputSchema';
+import { NotificationCreateNestedManyWithoutInvitationInputSchema } from './NotificationCreateNestedManyWithoutInvitationInputSchema';
 
 export const InvitationsCreateWithoutProjectInputSchema: z.ZodType<Prisma.InvitationsCreateWithoutProjectInput> = z.strictObject({
   id: z.uuid().optional(),
@@ -16,6 +17,7 @@ export const InvitationsCreateWithoutProjectInputSchema: z.ZodType<Prisma.Invita
   acceptedAt: z.coerce.date().optional().nullable(),
   owner: z.lazy(() => usersCreateNestedOneWithoutInvitationsInputSchema),
   board: z.lazy(() => BoardCreateNestedOneWithoutInvitationInputSchema).optional(),
+  notifications: z.lazy(() => NotificationCreateNestedManyWithoutInvitationInputSchema).optional(),
 });
 
 export default InvitationsCreateWithoutProjectInputSchema;

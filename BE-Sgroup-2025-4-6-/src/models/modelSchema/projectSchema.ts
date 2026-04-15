@@ -14,6 +14,7 @@ import type { InvitationsWithRelations, InvitationsPartialWithRelations, Invitat
 export const projectSchema = z.object({
   status: ProjectStatusEnumSchema,
   id: z.uuid(),
+  slug: z.string(),
   title: z.string(),
   description: z.string().nullish(),
   createdAt: z.coerce.date(),

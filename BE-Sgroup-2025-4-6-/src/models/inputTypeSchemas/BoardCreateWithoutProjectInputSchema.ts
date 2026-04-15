@@ -8,6 +8,7 @@ import { BoardMemberCreateNestedManyWithoutBoardInputSchema } from './BoardMembe
 
 export const BoardCreateWithoutProjectInputSchema: z.ZodType<Prisma.BoardCreateWithoutProjectInput> = z.strictObject({
   id: z.uuid().optional(),
+  slug: z.string(),
   title: z.string(),
   description: z.string().optional().nullable(),
   status: z.lazy(() => BoardStatusEnumSchema).optional(),

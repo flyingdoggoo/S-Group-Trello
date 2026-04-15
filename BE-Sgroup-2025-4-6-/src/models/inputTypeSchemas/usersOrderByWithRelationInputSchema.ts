@@ -13,6 +13,7 @@ import { BoardMemberOrderByRelationAggregateInputSchema } from './BoardMemberOrd
 import { InvitationsOrderByRelationAggregateInputSchema } from './InvitationsOrderByRelationAggregateInputSchema';
 import { CardMemberOrderByRelationAggregateInputSchema } from './CardMemberOrderByRelationAggregateInputSchema';
 import { CardCommentOrderByRelationAggregateInputSchema } from './CardCommentOrderByRelationAggregateInputSchema';
+import { NotificationOrderByRelationAggregateInputSchema } from './NotificationOrderByRelationAggregateInputSchema';
 
 export const usersOrderByWithRelationInputSchema: z.ZodType<Prisma.usersOrderByWithRelationInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
@@ -36,6 +37,8 @@ export const usersOrderByWithRelationInputSchema: z.ZodType<Prisma.usersOrderByW
   Invitations: z.lazy(() => InvitationsOrderByRelationAggregateInputSchema).optional(),
   CardMember: z.lazy(() => CardMemberOrderByRelationAggregateInputSchema).optional(),
   CardComment: z.lazy(() => CardCommentOrderByRelationAggregateInputSchema).optional(),
+  notifications: z.lazy(() => NotificationOrderByRelationAggregateInputSchema).optional(),
+  actions: z.lazy(() => NotificationOrderByRelationAggregateInputSchema).optional(),
 });
 
 export default usersOrderByWithRelationInputSchema;

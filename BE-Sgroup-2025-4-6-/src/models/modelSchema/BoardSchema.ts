@@ -16,6 +16,7 @@ import type { BoardMemberWithRelations, BoardMemberPartialWithRelations, BoardMe
 export const BoardSchema = z.object({
   status: BoardStatusEnumSchema,
   id: z.uuid(),
+  slug: z.string(),
   projectId: z.string(),
   title: z.string(),
   description: z.string().nullish(),

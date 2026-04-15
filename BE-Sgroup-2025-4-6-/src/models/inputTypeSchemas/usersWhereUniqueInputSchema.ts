@@ -21,6 +21,7 @@ import { BoardMemberListRelationFilterSchema } from './BoardMemberListRelationFi
 import { InvitationsListRelationFilterSchema } from './InvitationsListRelationFilterSchema';
 import { CardMemberListRelationFilterSchema } from './CardMemberListRelationFilterSchema';
 import { CardCommentListRelationFilterSchema } from './CardCommentListRelationFilterSchema';
+import { NotificationListRelationFilterSchema } from './NotificationListRelationFilterSchema';
 
 export const usersWhereUniqueInputSchema: z.ZodType<Prisma.usersWhereUniqueInput> = z.union([
   z.object({
@@ -59,6 +60,8 @@ export const usersWhereUniqueInputSchema: z.ZodType<Prisma.usersWhereUniqueInput
   Invitations: z.lazy(() => InvitationsListRelationFilterSchema).optional(),
   CardMember: z.lazy(() => CardMemberListRelationFilterSchema).optional(),
   CardComment: z.lazy(() => CardCommentListRelationFilterSchema).optional(),
+  notifications: z.lazy(() => NotificationListRelationFilterSchema).optional(),
+  actions: z.lazy(() => NotificationListRelationFilterSchema).optional(),
 }));
 
 export default usersWhereUniqueInputSchema;

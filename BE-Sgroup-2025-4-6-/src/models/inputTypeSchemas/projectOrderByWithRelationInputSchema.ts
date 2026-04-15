@@ -9,6 +9,7 @@ import { InvitationsOrderByRelationAggregateInputSchema } from './InvitationsOrd
 
 export const projectOrderByWithRelationInputSchema: z.ZodType<Prisma.projectOrderByWithRelationInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
+  slug: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
   description: z.union([ z.lazy(() => SortOrderSchema), z.lazy(() => SortOrderInputSchema) ]).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),

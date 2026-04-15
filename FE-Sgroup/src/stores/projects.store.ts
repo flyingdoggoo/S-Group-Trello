@@ -2,12 +2,14 @@ import { create } from "zustand";
 
 interface Board {
   id: string;
+  slug?: string;
   title: string;
   description: string | null;
 }
 
 interface Project {
   id: string;
+  slug?: string;
   title: string;
   description: string;
   boardCount?: number;

@@ -96,6 +96,7 @@ export class ProjectsService {
 				boardCount,
 				boards: boards.map((b: any) => ({
 					id: b.id,
+					slug: b.slug,
 					title: b.title,
 					description: b.description,
 				})),
@@ -120,7 +121,7 @@ export class ProjectsService {
 			throw new NotFoundException('Project not found');
 		}
 		const isMember = await this.projectMemberRepository.isUserMemberOfProject(
-			id,
+			project.id,
 			userId,
 		);
 		if (!isMember) {
@@ -147,7 +148,7 @@ export class ProjectsService {
 			throw new NotFoundException('Project not found');
 		}
 		const isMember = await this.projectMemberRepository.isUserMemberOfProject(
-			id,
+			existingProject.id,
 			userId,
 		);
 		if (!isMember) {
@@ -155,7 +156,7 @@ export class ProjectsService {
 		}
 
 		const project = await this.projectsRepository.updateProject({
-			id,
+			id: existingProject.id,
 			title: dto.title,
 			description: dto.description,
 		});
@@ -176,14 +177,14 @@ export class ProjectsService {
 			throw new NotFoundException('Project not found');
 		}
 		const isMember = await this.projectMemberRepository.isUserMemberOfProject(
-			id,
+			existingProject.id,
 			userId,
 		);
 		if (!isMember) {
 			throw new ForbiddenException();
 		}
 
-		await this.projectsRepository.deleteProject({ id });
+		await this.projectsRepository.deleteProject({ id: existingProject.id });
 
 		return new ServiceResponse(
 			ResponseStatus.Success,
@@ -204,14 +205,16 @@ export class ProjectsService {
 			throw new NotFoundException('Project not found');
 		}
 		const isMember = await this.projectMemberRepository.isUserMemberOfProject(
-			id,
+			existingProject.id,
 			userId,
 		);
 		if (!isMember) {
 			throw new ForbiddenException();
 		}
 
-		const project = await this.projectsRepository.archiveProject({ id });
+		const project = await this.projectsRepository.archiveProject({
+			id: existingProject.id,
+		});
 
 		return new ServiceResponse(
 			ResponseStatus.Success,
@@ -232,7 +235,9 @@ export class ProjectsService {
 		if (!existingProject) {
 			throw new NotFoundException('Project not found');
 		}
-		const members = await this.projectMemberRepository.getProjectMembers(projectId);
+		const members = await this.projectMemberRepository.getProjectMembers(
+			existingProject.id,
+		);
 
 		return new ServiceResponse(
 			ResponseStatus.Success,
@@ -255,14 +260,14 @@ export class ProjectsService {
 		}
 
 		const isMember = await this.projectMemberRepository.isUserMemberOfProject(
-			projectId,
+			existingProject.id,
 			userId,
 		);
 		if (!isMember) {
 			throw new NotFoundException('Member not found in project');
 		}
 		const changed = await this.projectMemberRepository.changeRoleOfMemberProject(
-			projectId,
+			existingProject.id,
 			userId,
 			newRoleId,
 		);
@@ -283,13 +288,13 @@ export class ProjectsService {
 		}
 
 		const isMember = await this.projectMemberRepository.isUserMemberOfProject(
-			projectId,
+			existingProject.id,
 			userId,
 		);
 		if (!isMember) {
 			throw new NotFoundException('Member not found in project');
 		}
-		await this.projectMemberRepository.removeMember(projectId, userId);
+		await this.projectMemberRepository.removeMember(existingProject.id, userId);
 		return new ServiceResponse(
 			ResponseStatus.Success,
 			'Member removed successfully',

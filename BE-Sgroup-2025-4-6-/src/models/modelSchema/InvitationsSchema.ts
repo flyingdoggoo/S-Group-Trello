@@ -6,6 +6,8 @@ import { projectWithRelationsSchema, projectPartialWithRelationsSchema, projectO
 import type { projectWithRelations, projectPartialWithRelations, projectOptionalDefaultsWithRelations } from './projectSchema'
 import { BoardWithRelationsSchema, BoardPartialWithRelationsSchema, BoardOptionalDefaultsWithRelationsSchema } from './BoardSchema'
 import type { BoardWithRelations, BoardPartialWithRelations, BoardOptionalDefaultsWithRelations } from './BoardSchema'
+import { NotificationWithRelationsSchema, NotificationPartialWithRelationsSchema, NotificationOptionalDefaultsWithRelationsSchema } from './NotificationSchema'
+import type { NotificationWithRelations, NotificationPartialWithRelations, NotificationOptionalDefaultsWithRelations } from './NotificationSchema'
 
 /////////////////////////////////////////
 // INVITATIONS SCHEMA
@@ -55,6 +57,7 @@ export type InvitationsRelations = {
   owner: usersWithRelations;
   project?: projectWithRelations | null;
   board?: BoardWithRelations | null;
+  notifications: NotificationWithRelations[];
 };
 
 export type InvitationsWithRelations = z.infer<typeof InvitationsSchema> & InvitationsRelations
@@ -63,6 +66,7 @@ export const InvitationsWithRelationsSchema: z.ZodType<InvitationsWithRelations>
   owner: z.lazy(() => usersWithRelationsSchema),
   project: z.lazy(() => projectWithRelationsSchema).nullish(),
   board: z.lazy(() => BoardWithRelationsSchema).nullish(),
+  notifications: z.lazy(() => NotificationWithRelationsSchema).array(),
 }))
 
 /////////////////////////////////////////
@@ -73,6 +77,7 @@ export type InvitationsOptionalDefaultsRelations = {
   owner: usersOptionalDefaultsWithRelations;
   project?: projectOptionalDefaultsWithRelations | null;
   board?: BoardOptionalDefaultsWithRelations | null;
+  notifications: NotificationOptionalDefaultsWithRelations[];
 };
 
 export type InvitationsOptionalDefaultsWithRelations = z.infer<typeof InvitationsOptionalDefaultsSchema> & InvitationsOptionalDefaultsRelations
@@ -81,6 +86,7 @@ export const InvitationsOptionalDefaultsWithRelationsSchema: z.ZodType<Invitatio
   owner: z.lazy(() => usersOptionalDefaultsWithRelationsSchema),
   project: z.lazy(() => projectOptionalDefaultsWithRelationsSchema).nullish(),
   board: z.lazy(() => BoardOptionalDefaultsWithRelationsSchema).nullish(),
+  notifications: z.lazy(() => NotificationOptionalDefaultsWithRelationsSchema).array(),
 }))
 
 /////////////////////////////////////////
@@ -91,6 +97,7 @@ export type InvitationsPartialRelations = {
   owner?: usersPartialWithRelations;
   project?: projectPartialWithRelations | null;
   board?: BoardPartialWithRelations | null;
+  notifications?: NotificationPartialWithRelations[];
 };
 
 export type InvitationsPartialWithRelations = z.infer<typeof InvitationsPartialSchema> & InvitationsPartialRelations
@@ -99,6 +106,7 @@ export const InvitationsPartialWithRelationsSchema: z.ZodType<InvitationsPartial
   owner: z.lazy(() => usersPartialWithRelationsSchema),
   project: z.lazy(() => projectPartialWithRelationsSchema).nullish(),
   board: z.lazy(() => BoardPartialWithRelationsSchema).nullish(),
+  notifications: z.lazy(() => NotificationPartialWithRelationsSchema).array(),
 })).partial()
 
 export type InvitationsOptionalDefaultsWithPartialRelations = z.infer<typeof InvitationsOptionalDefaultsSchema> & InvitationsPartialRelations
@@ -107,6 +115,7 @@ export const InvitationsOptionalDefaultsWithPartialRelationsSchema: z.ZodType<In
   owner: z.lazy(() => usersPartialWithRelationsSchema),
   project: z.lazy(() => projectPartialWithRelationsSchema).nullish(),
   board: z.lazy(() => BoardPartialWithRelationsSchema).nullish(),
+  notifications: z.lazy(() => NotificationPartialWithRelationsSchema).array(),
 }).partial())
 
 export type InvitationsWithPartialRelations = z.infer<typeof InvitationsSchema> & InvitationsPartialRelations
@@ -115,6 +124,7 @@ export const InvitationsWithPartialRelationsSchema: z.ZodType<InvitationsWithPar
   owner: z.lazy(() => usersPartialWithRelationsSchema),
   project: z.lazy(() => projectPartialWithRelationsSchema).nullish(),
   board: z.lazy(() => BoardPartialWithRelationsSchema).nullish(),
+  notifications: z.lazy(() => NotificationPartialWithRelationsSchema).array(),
 }).partial())
 
 export default InvitationsSchema;

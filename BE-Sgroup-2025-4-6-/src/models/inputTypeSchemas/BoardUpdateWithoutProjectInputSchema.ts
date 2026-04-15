@@ -13,6 +13,7 @@ import { BoardMemberUpdateManyWithoutBoardNestedInputSchema } from './BoardMembe
 
 export const BoardUpdateWithoutProjectInputSchema: z.ZodType<Prisma.BoardUpdateWithoutProjectInput> = z.strictObject({
   id: z.union([ z.uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   status: z.union([ z.lazy(() => BoardStatusEnumSchema), z.lazy(() => EnumBoardStatusEnumFieldUpdateOperationsInputSchema) ]).optional(),

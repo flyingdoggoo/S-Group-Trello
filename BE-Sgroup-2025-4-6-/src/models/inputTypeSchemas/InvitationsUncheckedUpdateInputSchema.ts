@@ -7,6 +7,7 @@ import { InvitationStatusEnumSchema } from './InvitationStatusEnumSchema';
 import { EnumInvitationStatusEnumFieldUpdateOperationsInputSchema } from './EnumInvitationStatusEnumFieldUpdateOperationsInputSchema';
 import { DateTimeFieldUpdateOperationsInputSchema } from './DateTimeFieldUpdateOperationsInputSchema';
 import { NullableDateTimeFieldUpdateOperationsInputSchema } from './NullableDateTimeFieldUpdateOperationsInputSchema';
+import { NotificationUncheckedUpdateManyWithoutInvitationNestedInputSchema } from './NotificationUncheckedUpdateManyWithoutInvitationNestedInputSchema';
 
 export const InvitationsUncheckedUpdateInputSchema: z.ZodType<Prisma.InvitationsUncheckedUpdateInput> = z.strictObject({
   id: z.union([ z.uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -20,6 +21,7 @@ export const InvitationsUncheckedUpdateInputSchema: z.ZodType<Prisma.Invitations
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   expiresAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   acceptedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  notifications: z.lazy(() => NotificationUncheckedUpdateManyWithoutInvitationNestedInputSchema).optional(),
 });
 
 export default InvitationsUncheckedUpdateInputSchema;

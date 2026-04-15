@@ -5,6 +5,7 @@ import { SortOrderSchema } from './SortOrderSchema';
 
 export const BoardMaxOrderByAggregateInputSchema: z.ZodType<Prisma.BoardMaxOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
+  slug: z.lazy(() => SortOrderSchema).optional(),
   projectId: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
   description: z.lazy(() => SortOrderSchema).optional(),

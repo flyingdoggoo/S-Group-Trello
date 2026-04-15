@@ -2,6 +2,7 @@ import { UserStatusEnum } from '@prisma/client';
 import { Exception } from '@/common/exceptions/base.exception';
 import { genSalt, hash } from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
+import { JsonWebTokenError, TokenExpiredError, verify } from 'jsonwebtoken';
 
 import { Prisma } from '../database';
 import { UsersRepository } from '../users/users.repository';
@@ -11,10 +12,12 @@ import { RolesEnum } from '@/common/enums';
 import { AuthRepository } from './auth.repository';
 import {
 	CheckLoginWithGoogleOauthRequestDto,
+	ForgotPasswordRequestDto,
 	LoginRequestDto,
 	LoginResponseDto,
+	LogoutRequestDto,
 	RegisterRequestDto,
-	RegisterResponseDto,
+	ResetPasswordRequestDto,
 	SendOtpRequestDto,
 	VerifyRequestDto,
 	AccountResponseDto,
@@ -27,12 +30,11 @@ import {
 	OptionalException,
 	signJWT,
 } from '@/common';
-import { userConfig } from '@/configs';
+import { jwtConfig, otpsConfig, userConfig } from '@/configs';
 import { UserRoleRepository } from '../role_user/UserRole.repository';
-import { InvitationService } from '../invitations/invitation.service';
 import { MailsService } from '../mails/mail.service';
 import { OtpsService } from '../otps/otps.service';
-import { otpsConfig } from '@/configs';
+
 export class AuthService {
 	constructor(
 		private readonly otpsService = new OtpsService(),
@@ -41,9 +43,44 @@ export class AuthService {
 		private readonly usersRepository = new UsersRepository(),
 		private readonly userRoleRepository = new UserRoleRepository(),
 		private readonly rolesRepository = new RolesRepository(),
-
-		private readonly invitationsService = new InvitationService(),
 	) {}
+
+	private async issueAuthTokens(params: {
+		userId: string;
+		email?: string;
+	}): Promise<HttpResponseBodySuccessDto<LoginResponseDto>> {
+		const payload: Record<string, unknown> = {
+			userId: params.userId,
+		};
+		if (params.email) {
+			payload.email = params.email;
+		}
+
+		const { accessToken, refreshToken } = await signJWT(payload);
+
+		await this.authRepository.createToken({
+			token: {
+				refreshToken,
+				user: {
+					connect: {
+						id: params.userId,
+					},
+				},
+			},
+		});
+
+		return {
+			success: true,
+			data: {
+				accessToken,
+				refreshToken,
+			},
+			cookies: {
+				accessToken,
+				refreshToken,
+			},
+		};
+	}
 
 	async register(
 		registerDto: RegisterRequestDto,
@@ -107,8 +144,9 @@ export class AuthService {
 	async login(
 		loginInformation: LoginRequestDto,
 	): Promise<HttpResponseBodySuccessDto<LoginResponseDto> | Exception> {
+		const normalizedEmail = loginInformation.email.trim().toLowerCase();
 		const account = await this.authRepository.findAccount({
-			email: loginInformation.email,
+			email: normalizedEmail,
 		});
 
 		if (!account) {
@@ -133,33 +171,10 @@ export class AuthService {
 			throw new OptionalException(StatusCodes.UNAUTHORIZED, 'Invalid password');
 		}
 
-		const { accessToken, refreshToken } = await signJWT({
+		return this.issueAuthTokens({
 			userId: account.userId,
-			email: loginInformation.email,
+			email: account.user?.email,
 		});
-
-		await this.authRepository.createToken({
-			token: {
-				refreshToken: refreshToken,
-				user: {
-					connect: {
-						id: account.userId,
-					},
-				},
-			},
-		});
-
-		return {
-			success: true,
-			data: {
-				accessToken: accessToken,
-				refreshToken: refreshToken,
-			},
-			cookies: {
-				accessToken: accessToken,
-				refreshToken: refreshToken,
-			},
-		};
 	}
 
 	async CheckLoginWithGoogleOauth(
@@ -167,39 +182,185 @@ export class AuthService {
 	): Promise<HttpResponseBodySuccessDto<LoginResponseDto> | Exception> {
 		const { socialAccountInformation } = googleAuthData;
 
-		const { accessToken, refreshToken } = await signJWT({
+		return this.issueAuthTokens({
 			userId: socialAccountInformation.userId,
+			email: socialAccountInformation.user?.email,
+		});
+	}
+
+	async refreshToken(
+		refreshToken: string,
+	): Promise<HttpResponseBodySuccessDto<LoginResponseDto> | Exception> {
+		if (!refreshToken) {
+			throw new OptionalException(
+				StatusCodes.UNAUTHORIZED,
+				'Refresh token is required',
+			);
+		}
+
+		try {
+			const payload = verify(
+				refreshToken,
+				jwtConfig.secretRefreshToken,
+			) as Record<string, unknown>;
+
+			const userId = String(payload.userId ?? '');
+			if (!userId) {
+				throw new OptionalException(
+					StatusCodes.UNAUTHORIZED,
+					'Invalid refresh token payload',
+				);
+			}
+
+			const [tokenRecord, user] = await Promise.all([
+				this.authRepository.findTokenByRefreshToken(refreshToken),
+				this.usersRepository.findUserById(userId),
+			]);
+
+			if (!tokenRecord) {
+				throw new OptionalException(
+					StatusCodes.UNAUTHORIZED,
+					'Refresh token is not recognized',
+				);
+			}
+
+			if (!user) {
+				throw new OptionalException(StatusCodes.UNAUTHORIZED, 'User not found');
+			}
+
+			if (user.status === UserStatusEnum.locked) {
+				throw new OptionalException(
+					StatusCodes.FORBIDDEN,
+					'Your account has been locked',
+				);
+			}
+
+			await this.authRepository.deleteTokenByRefreshToken(refreshToken);
+
+			return this.issueAuthTokens({
+				userId: user.id,
+				email: user.email,
+			});
+		} catch (error) {
+			if (error instanceof OptionalException) {
+				throw error;
+			}
+			if (error instanceof TokenExpiredError) {
+				throw new OptionalException(
+					StatusCodes.UNAUTHORIZED,
+					'Refresh token has expired',
+				);
+			}
+			if (error instanceof JsonWebTokenError) {
+				throw new OptionalException(
+					StatusCodes.UNAUTHORIZED,
+					'Invalid refresh token',
+				);
+			}
+			throw error;
+		}
+	}
+
+	async logout(
+		logoutDto: LogoutRequestDto,
+	): Promise<HttpResponseBodySuccessDto<{ message: string }> | Exception> {
+		if (logoutDto.refreshToken) {
+			await this.authRepository.deleteTokenByRefreshToken(logoutDto.refreshToken);
+		}
+
+		return {
+			success: true,
+			data: {
+				message: 'Logged out successfully',
+			},
+		};
+	}
+
+	async sendForgotPasswordOtp(
+		dto: ForgotPasswordRequestDto,
+	): Promise<HttpResponseBodySuccessDto<{ message: string }> | Exception> {
+		const normalizedEmail = dto.email.trim().toLowerCase();
+		const account = await this.authRepository.findAccount({
+			email: normalizedEmail,
+			status: UserStatusEnum.active,
 		});
 
-		await this.authRepository.createToken({
-			token: {
-				refreshToken: refreshToken,
-				user: {
-					connect: {
-						id: socialAccountInformation.userId,
-					},
+		if (!account || !account.user) {
+			return {
+				success: true,
+				data: {
+					message:
+						'If this email exists, a password reset OTP has been sent.',
 				},
-			},
+			};
+		}
+
+		const otp = await this.otpsService.generateOtp({ userId: account.user.id });
+
+		await this.mailsService.sendEmail({
+			recipients: [
+				{
+					address: account.user.email,
+					name: account.user.name || 'User',
+				},
+			],
+			subject: 'Password reset OTP',
+			html: `Your password reset OTP is "${otp.otp}". It will expire in ${otpsConfig.otpExpiresIn} minutes.`,
 		});
 
 		return {
 			success: true,
 			data: {
-				accessToken: accessToken,
-				refreshToken: refreshToken,
+				message: 'Password reset OTP sent successfully',
 			},
-			cookies: {
-				accessToken: accessToken,
-				refreshToken: refreshToken,
+		};
+	}
+
+	async resetPassword(
+		dto: ResetPasswordRequestDto,
+	): Promise<HttpResponseBodySuccessDto<{ message: string }> | Exception> {
+		const normalizedEmail = dto.email.trim().toLowerCase();
+		const account = await this.authRepository.findAccount({
+			email: normalizedEmail,
+			status: UserStatusEnum.active,
+		});
+
+		if (!account || !account.user) {
+			throw new NotFoundException('account');
+		}
+
+		const isValidOtp = await this.otpsService.verifyOtp({
+			userId: account.userId,
+			otp: dto.otp,
+		});
+
+		if (!isValidOtp) {
+			throw new OptionalException(StatusCodes.BAD_REQUEST, 'Invalid OTP');
+		}
+
+		const salt = await genSalt(10);
+		const password = await hash(dto.newPassword, salt);
+
+		await this.authRepository.updateAccountPassword({
+			userId: account.userId,
+			password,
+			salt,
+		});
+
+		await this.authRepository.deleteTokensByUserId(account.userId);
+
+		return {
+			success: true,
+			data: {
+				message: 'Password reset successfully',
 			},
 		};
 	}
 
 	async sendOtp(sendOtpRequestDto: SendOtpRequestDto): Promise<boolean | Exception> {
-		const { email } = sendOtpRequestDto;
-		const user = await this.usersRepository.findUser({ email: email });
+		const email = sendOtpRequestDto.email.trim().toLowerCase();
+		const user = await this.usersRepository.findUser({ email });
 		if (!user) {
-			console.log('User not found for email:', email);
 			throw new NotFoundException('email');
 		}
 
@@ -221,7 +382,8 @@ export class AuthService {
 	async verify(
 		verifyRequestDto: VerifyRequestDto,
 	): Promise<HttpResponseBodySuccessDto<AccountResponseDto> | Exception> {
-		const { email, otp } = verifyRequestDto;
+		const email = verifyRequestDto.email.trim().toLowerCase();
+		const { otp } = verifyRequestDto;
 		const account = await this.authRepository.findAccount({
 			email: email,
 			status: UserStatusEnum.active,
@@ -252,20 +414,8 @@ export class AuthService {
 			},
 		});
 
-		try {
-			const pendingInvitations =
-				await this.invitationsService.findPendingInvitationsByEmail(email);
-			if (pendingInvitations && pendingInvitations.data.length > 0) {
-				for (const invitation of pendingInvitations.data) {
-					await this.invitationsService.acceptInvitation(
-						invitation.token,
-						account.userId,
-					);
-				}
-			}
-		} catch (error) {
-			console.log('Error processing invitations during verification:', error);
-		}
+		// Invitations are no longer auto-accepted on verify.
+		// Users must explicitly accept/reject each invitation.
 		const accountResponse = new AccountResponseDto(account);
 		accountResponse.verify = true;
 

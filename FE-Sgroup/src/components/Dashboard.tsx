@@ -10,6 +10,7 @@ import { useProjectsStore } from "@/stores/projects.store";
 import { useState, useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { LayoutGrid, MoreHorizontal } from "lucide-react";
+import { getEntityRouteIdentifier } from "@/lib/entityIdentifiers";
 
 export function Dashboard() {
   const { projects, error, isLoading } = useProjects();
@@ -20,7 +21,9 @@ export function Dashboard() {
     x: number;
     y: number;
     boardId: string;
+    boardIdentifier: string;
     projectId: string;
+    projectIdentifier: string;
   } | null>(null);
 
   useEffect(() => {
@@ -29,18 +32,30 @@ export function Dashboard() {
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
-  const handleContextMenu = (e: React.MouseEvent, boardId: string, projectId: string) => {
+  const handleContextMenu = (
+    e: React.MouseEvent,
+    board: { id: string; slug?: string },
+    project: { id: string; slug?: string }
+  ) => {
     e.preventDefault();
     e.stopPropagation();
-    setContextMenu({ visible: true, x: e.clientX, y: e.clientY, boardId, projectId });
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      boardId: board.id,
+      boardIdentifier: getEntityRouteIdentifier(board),
+      projectId: project.id,
+      projectIdentifier: getEntityRouteIdentifier(project),
+    });
   };
 
   const handleDeleteBoard = async () => {
     if (!contextMenu) return;
-    const { boardId, projectId } = contextMenu;
+    const { boardId, boardIdentifier, projectId, projectIdentifier } = contextMenu;
 
     try {
-      await apiClient.delete(`/projects/${projectId}/boards/${boardId}`);
+      await apiClient.delete(`/projects/${projectIdentifier}/boards/${boardIdentifier}`);
       toast.success("Board deleted successfully");
       const updated = projects.map((project: any) =>
         project.id === projectId
@@ -115,8 +130,8 @@ export function Dashboard() {
                       {project.boards?.map((board: any) => (
                         <Link
                           key={board.id}
-                          to={`/boards/${board.id}`}
-                          onContextMenu={(e) => handleContextMenu(e, board.id, project.id)}
+                          to={`/boards/${getEntityRouteIdentifier(board)}`}
+                          onContextMenu={(e) => handleContextMenu(e, board, project)}
                           className="surface-card group relative p-5"
                         >
                           <div className="mb-3 flex items-start justify-between gap-3">

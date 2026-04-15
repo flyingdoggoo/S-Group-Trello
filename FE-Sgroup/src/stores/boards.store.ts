@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 interface Board {
   id: string;
+  slug?: string;
   title: string;
   description: string | null;
 }

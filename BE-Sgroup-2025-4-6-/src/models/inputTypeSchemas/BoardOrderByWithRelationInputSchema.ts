@@ -10,6 +10,7 @@ import { BoardMemberOrderByRelationAggregateInputSchema } from './BoardMemberOrd
 
 export const BoardOrderByWithRelationInputSchema: z.ZodType<Prisma.BoardOrderByWithRelationInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
+  slug: z.lazy(() => SortOrderSchema).optional(),
   projectId: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
   description: z.union([ z.lazy(() => SortOrderSchema), z.lazy(() => SortOrderInputSchema) ]).optional(),

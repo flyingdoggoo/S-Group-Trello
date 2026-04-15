@@ -8,6 +8,7 @@ import { InvitationsUncheckedCreateNestedManyWithoutProjectInputSchema } from '.
 
 export const projectUncheckedCreateInputSchema: z.ZodType<Prisma.projectUncheckedCreateInput> = z.strictObject({
   id: z.uuid().optional(),
+  slug: z.string(),
   title: z.string(),
   description: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),

@@ -11,6 +11,7 @@ import { ProjectCountOutputTypeArgsSchema } from "../outputTypeSchemas/ProjectCo
 
 export const projectSelectSchema: z.ZodType<Prisma.projectSelect> = z.object({
   id: z.boolean().optional(),
+  slug: z.boolean().optional(),
   title: z.boolean().optional(),
   description: z.boolean().optional(),
   createdAt: z.boolean().optional(),

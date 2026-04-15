@@ -81,4 +81,48 @@ export class AuthRepository {
 			data: token,
 		});
 	}
+
+	async findTokenByRefreshToken(refreshToken: string): Promise<tokens | null> {
+		return this.prismaService.tokens.findFirst({
+			where: {
+				refreshToken,
+			},
+		});
+	}
+
+	async deleteTokenByRefreshToken(refreshToken: string): Promise<number> {
+		const result = await this.prismaService.tokens.deleteMany({
+			where: {
+				refreshToken,
+			},
+		});
+
+		return result.count;
+	}
+
+	async deleteTokensByUserId(userId: string): Promise<number> {
+		const result = await this.prismaService.tokens.deleteMany({
+			where: {
+				userId,
+			},
+		});
+
+		return result.count;
+	}
+
+	async updateAccountPassword(params: {
+		userId: string;
+		password: string;
+		salt: string;
+	}): Promise<void> {
+		await this.prismaService.accounts.update({
+			where: {
+				userId: params.userId,
+			},
+			data: {
+				password: params.password,
+				salt: params.salt,
+			},
+		});
+	}
 }

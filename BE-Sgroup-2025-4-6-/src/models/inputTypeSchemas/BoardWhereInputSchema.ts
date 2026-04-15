@@ -18,6 +18,7 @@ export const BoardWhereInputSchema: z.ZodType<Prisma.BoardWhereInput> = z.strict
   OR: z.lazy(() => BoardWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => BoardWhereInputSchema), z.lazy(() => BoardWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
+  slug: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   projectId: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   title: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   description: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
