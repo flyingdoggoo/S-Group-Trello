@@ -46,6 +46,21 @@ export class BoardsService {
 		return actorMember;
 	}
 
+	private async assertUserCanAccessBoard(
+		projectId: string,
+		boardId: string,
+		userId: string,
+	) {
+		const [isProjectMember, isBoardMember] = await Promise.all([
+			this.projectMembersRepository.isUserMemberOfProject(projectId, userId),
+			this.boardMemberRepository.isUserMemberOfBoard(boardId, userId),
+		]);
+
+		if (!isProjectMember && !isBoardMember) {
+			throw new ForbiddenException();
+		}
+	}
+
 	async createBoard(
 		dto: CreateBoardRequestDto,
 		userId: string,
@@ -79,6 +94,33 @@ export class BoardsService {
 			userId,
 			boardAdmin.id,
 		);
+
+		const boardMemberRole = await this.rolesRepository.findByName(
+			RolesEnum.BOARD_MEMBER,
+		);
+		if (!boardMemberRole) {
+			throw new NotFoundException('BOARD_MEMBER role not found');
+		}
+
+		const projectMembers =
+			await this.projectMembersRepository.getProjectMembers(resolvedProjectId);
+		for (const member of projectMembers) {
+			if (member.user.id === userId) {
+				continue;
+			}
+
+			const roleId =
+				member.role.roleName === RolesEnum.PROJECT_ADMIN
+					? boardAdmin.id
+					: boardMemberRole.id;
+
+			await this.boardMemberRepository.assignUserRoleBoardIfMissing(
+				boardId,
+				member.user.id,
+				roleId,
+			);
+		}
+
 		return new ServiceResponse(
 			ResponseStatus.Success,
 			'Board created successfully',
@@ -92,20 +134,28 @@ export class BoardsService {
 		projectId: string,
 		userId: string,
 	): Promise<ServiceResponse<GetBoardsResponseDto>> {
-		// Ensure project exists
 		const project = await this.projectsRepository.findProjectById({ id: projectId });
 		if (!project) {
 			throw new NotFoundException('Project not found');
 		}
 		const resolvedProjectId = project.id;
-		// Membership check
-		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
+
+		const isProjectMember =
+			await this.projectMembersRepository.isUserMemberOfProject(
+				resolvedProjectId,
+				userId,
+			);
+		const isMemberOfAnyBoardInProject = isProjectMember
+			? true
+			: await this.boardMemberRepository.isUserMemberOfAnyBoardInProject(
 			resolvedProjectId,
 			userId,
-		);
-		if (!isMember) {
+			  );
+
+		if (!isMemberOfAnyBoardInProject) {
 			throw new ForbiddenException();
 		}
+
 		const page = dto.page ?? 1;
 		const limit = dto.limit ?? 30;
 		const skip = (page - 1) * limit;
@@ -116,6 +166,7 @@ export class BoardsService {
 			status: dto.status,
 			skip,
 			take: limit,
+			userId: isProjectMember ? undefined : userId,
 		});
 
 		const boardsResponse = boards.map((board) => new BoardResponseDto(board));
@@ -138,13 +189,6 @@ export class BoardsService {
 			throw new NotFoundException('Project not found');
 		}
 
-		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
-			project.id,
-			userId,
-		);
-		if (!isMember) {
-			throw new ForbiddenException();
-		}
 		const board = await this.boardsRepository.findBoardById({
 			id,
 			projectId: project.id,
@@ -153,6 +197,8 @@ export class BoardsService {
 		if (!board) {
 			throw new NotFoundException('Board not found');
 		}
+
+		await this.assertUserCanAccessBoard(project.id, board.id, userId);
 
 		return new ServiceResponse(
 			ResponseStatus.Success,
@@ -171,13 +217,7 @@ export class BoardsService {
 			throw new NotFoundException('Board not found');
 		}
 
-		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
-			board.projectId,
-			userId,
-		);
-		if (!isMember) {
-			throw new ForbiddenException();
-		}
+		await this.assertUserCanAccessBoard(board.projectId, board.id, userId);
 
 		return new ServiceResponse(
 			ResponseStatus.Success,
@@ -198,14 +238,6 @@ export class BoardsService {
 			throw new NotFoundException('Project not found');
 		}
 
-		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
-			project.id,
-			userId,
-		);
-		if (!isMember) {
-			throw new ForbiddenException();
-		}
-		// Ensure board belongs to the project
 		const existingBoard = await this.boardsRepository.findBoardById({
 			id,
 			projectId: project.id,
@@ -214,6 +246,8 @@ export class BoardsService {
 		if (!existingBoard) {
 			throw new NotFoundException('Board not found');
 		}
+
+		await this.assertUserCanAccessBoard(project.id, existingBoard.id, userId);
 
 		const board = await this.boardsRepository.updateBoard({
 			id,
@@ -240,14 +274,6 @@ export class BoardsService {
 			throw new NotFoundException('Project not found');
 		}
 
-		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
-			project.id,
-			userId,
-		);
-		if (!isMember) {
-			throw new ForbiddenException();
-		}
-		// Ensure board belongs to the project
 		const existingBoard = await this.boardsRepository.findBoardById({
 			id,
 			projectId: project.id,
@@ -256,6 +282,8 @@ export class BoardsService {
 		if (!existingBoard) {
 			throw new NotFoundException('Board not found');
 		}
+
+		await this.assertUserCanAccessBoard(project.id, existingBoard.id, userId);
 
 		await this.boardsRepository.deleteBoard({
 			id,
@@ -279,13 +307,11 @@ export class BoardsService {
 			throw new NotFoundException('Board not found');
 		}
 
-		const isMember = await this.projectMembersRepository.isUserMemberOfProject(
+		await this.assertUserCanAccessBoard(
 			existingBoard.projectId,
+			existingBoard.id,
 			userId,
 		);
-		if (!isMember) {
-			throw new ForbiddenException();
-		}
 
 		const members = await this.boardMemberRepository.getBoardMembers(existingBoard.id);
 

@@ -13,6 +13,23 @@ export class BoardMembersRepository {
 		});
 	}
 
+	async assignUserRoleBoardIfMissing(
+		boardId: string,
+		userId: string,
+		roleId: string,
+	) {
+		const existingMember = await this.prisma.boardMember.findFirst({
+			where: { boardId, userId },
+			select: { id: true },
+		});
+
+		if (existingMember) {
+			return existingMember;
+		}
+
+		return this.assignUserRoleBoard(boardId, userId, roleId);
+	}
+
 	async findBoardMemberWithRole(boardId: string, userId: string) {
 		return this.prisma.boardMember.findFirst({
 			where: { boardId, userId },
@@ -33,6 +50,24 @@ export class BoardMembersRepository {
 			select: { id: true },
 		});
 		return !!m;
+	}
+
+	async isUserMemberOfAnyBoardInProject(
+		projectId: string,
+		userId: string,
+	): Promise<boolean> {
+		const membership = await this.prisma.boardMember.findFirst({
+			where: {
+				userId,
+				board: {
+					projectId,
+					deletedAt: null,
+				},
+			},
+			select: { id: true },
+		});
+
+		return !!membership;
 	}
 
 	async getBoardMembers(boardId: string) {

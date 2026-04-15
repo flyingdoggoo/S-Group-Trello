@@ -11,6 +11,7 @@ import {
 	ResponseStatus,
 	ServiceResponse,
 } from '@/common';
+import { RolesEnum } from '@/common/enums';
 import { Exception } from '@/common/exceptions/base.exception';
 import { appEnv } from '@/configs';
 
@@ -292,6 +293,8 @@ export class InvitationService {
 			userId,
 		);
 
+		const invitationRole = await this.rolesRepository.findById(invitation.roleId);
+
 		if (invitation.projectId) {
 			const checkMember = await this.projectMembersRepository.isUserMemberOfProject(
 				invitation.projectId,
@@ -305,6 +308,29 @@ export class InvitationService {
 				userId,
 				invitation.roleId,
 			);
+
+			const boardIds = await this.boardsRepository.findBoardIdsByProjectId(
+				invitation.projectId,
+			);
+			if (boardIds.length > 0) {
+				const boardRoleName =
+					invitationRole?.roleName === RolesEnum.PROJECT_ADMIN
+						? RolesEnum.BOARD_ADMIN
+						: RolesEnum.BOARD_MEMBER;
+
+				const boardRole = await this.rolesRepository.findByName(boardRoleName);
+				if (!boardRole) {
+					throw new NotFoundException(`${boardRoleName} role not found`);
+				}
+
+				for (const boardId of boardIds) {
+					await this.boardMembersRepository.assignUserRoleBoardIfMissing(
+						boardId,
+						userId,
+						boardRole.id,
+					);
+				}
+			}
 		} else if (invitation.boardId) {
 			const checkMember = await this.boardMembersRepository.isUserMemberOfBoard(
 				invitation.boardId,

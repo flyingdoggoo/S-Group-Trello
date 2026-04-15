@@ -7,20 +7,27 @@ import { ServiceResponse, ResponseStatus } from '@/common/dtos';
 import { StatusCodes } from 'http-status-codes';
 import { ProjectMembersRepository } from '../projectMembers/projectMembers.repository';
 import { BoardsRepository } from '../boards/boards.repository';
+import { BoardMembersRepository } from '../boardMembers/boardMembers.repository';
 
 export class ListsService {
     constructor(
         private readonly listsRepository = new ListsRepository(),
         private readonly projectMembersRepository = new ProjectMembersRepository(),
-        private readonly boardsRepository = new BoardsRepository()
+        private readonly boardsRepository = new BoardsRepository(),
+        private readonly boardMembersRepository = new BoardMembersRepository(),
     ) { }
 
     /** Verify membership via board → project chain */
     private async verifyMembershipViaBoard(boardId: string, userId: string) {
         const board = await this.boardsRepository.findBoardByIdSimple(boardId);
         if (!board) throw new NotFoundException('Board not found');
-        const isMember = await this.projectMembersRepository.isUserMemberOfProject(board.projectId, userId);
-        if (!isMember) throw new ForbiddenException();
+
+        const [isProjectMember, isBoardMember] = await Promise.all([
+            this.projectMembersRepository.isUserMemberOfProject(board.projectId, userId),
+            this.boardMembersRepository.isUserMemberOfBoard(board.id, userId),
+        ]);
+
+        if (!isProjectMember && !isBoardMember) throw new ForbiddenException();
         return board;
     }
 
@@ -28,8 +35,16 @@ export class ListsService {
     private async verifyMembershipViaList(listId: string, userId: string) {
         const list = await this.listsRepository.findListByIdWithBoard(listId);
         if (!list || !list.board) throw new NotFoundException('List not found');
-        const isMember = await this.projectMembersRepository.isUserMemberOfProject(list.board.projectId, userId);
-        if (!isMember) throw new ForbiddenException();
+
+        const [isProjectMember, isBoardMember] = await Promise.all([
+            this.projectMembersRepository.isUserMemberOfProject(
+                list.board.projectId,
+                userId,
+            ),
+            this.boardMembersRepository.isUserMemberOfBoard(list.board.id, userId),
+        ]);
+
+        if (!isProjectMember && !isBoardMember) throw new ForbiddenException();
         return list;
     }
 

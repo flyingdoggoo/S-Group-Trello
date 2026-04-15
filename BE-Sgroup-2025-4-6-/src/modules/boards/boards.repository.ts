@@ -40,7 +40,7 @@ export class BoardsRepository {
         });
     }
 
-    async findBoards({ projectId, title, status, skip, take }: { projectId: string, title?: string, status?: BoardStatusEnum, skip: number, take: number }): Promise<[Board[], number]> {
+    async findBoards({ projectId, title, status, skip, take, userId }: { projectId: string, title?: string, status?: BoardStatusEnum, skip: number, take: number, userId?: string }): Promise<[Board[], number]> {
         const where: any = {};
         
         where.projectId = projectId;
@@ -54,6 +54,14 @@ export class BoardsRepository {
         }
 
         where.deletedAt = null;
+
+        if (userId) {
+            where.BoardMember = {
+                some: {
+                    userId,
+                },
+            };
+        }
         
 
         const result = await Promise.all([
@@ -71,6 +79,20 @@ export class BoardsRepository {
         ]);
         
         return result;
+    }
+
+    async findBoardIdsByProjectId(projectId: string): Promise<string[]> {
+        const boards = await this.prismaService.board.findMany({
+            where: {
+                projectId,
+                deletedAt: null,
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        return boards.map((board) => board.id);
     }
 
     async findBoardById({ id, projectId }: { id: string, projectId: string }): Promise<Board | null> {

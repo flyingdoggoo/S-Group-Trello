@@ -53,7 +53,23 @@ export class ProjectsRepository {
 
         where.deletedAt = null;
         if (userId) {
-            where.members = { some: { userId } };
+            where.OR = [
+                {
+                    members: {
+                        some: { userId },
+                    },
+                },
+                {
+                    Board: {
+                        some: {
+                            deletedAt: null,
+                            BoardMember: {
+                                some: { userId },
+                            },
+                        },
+                    },
+                },
+            ];
         }
         
 
@@ -66,6 +82,14 @@ export class ProjectsRepository {
                     createdAt: 'desc'
                 },
                 include: {
+                    ...(userId
+                        ? {
+                              members: {
+                                  where: { userId },
+                                  select: { id: true },
+                              },
+                          }
+                        : {}),
                     Board: {
                         where: {
                             deletedAt: null
@@ -74,7 +98,15 @@ export class ProjectsRepository {
                             id: true,
                             slug: true,
                             title: true,
-                            description: true
+                            description: true,
+                            ...(userId
+                                ? {
+                                      BoardMember: {
+                                          where: { userId },
+                                          select: { id: true },
+                                      },
+                                  }
+                                : {}),
                         }
                     }
                 }

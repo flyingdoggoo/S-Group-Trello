@@ -11,6 +11,7 @@ import { CardStatusEnum, NotificationTypeEnum } from '@prisma/client';
 import { NotificationRepository } from '../notifications';
 import { UsersRepository } from '../users/users.repository';
 import { OptionalException } from '@/common';
+import { BoardMembersRepository } from '../boardMembers/boardMembers.repository';
 
 export class CardsService {
     constructor(
@@ -19,14 +20,23 @@ export class CardsService {
         private readonly listsRepository = new ListsRepository(),
         private readonly notificationRepository = new NotificationRepository(),
         private readonly usersRepository = new UsersRepository(),
+        private readonly boardMembersRepository = new BoardMembersRepository(),
     ) { }
 
     /** Verify membership via list → board → project chain */
     private async verifyMembershipViaList(listId: string, userId: string) {
         const list = await this.listsRepository.findListByIdWithBoard(listId);
         if (!list || !list.board) throw new NotFoundException('List not found');
-        const isMember = await this.projectMembersRepository.isUserMemberOfProject(list.board.projectId, userId);
-        if (!isMember) throw new ForbiddenException();
+
+        const [isProjectMember, isBoardMember] = await Promise.all([
+            this.projectMembersRepository.isUserMemberOfProject(
+                list.board.projectId,
+                userId,
+            ),
+            this.boardMembersRepository.isUserMemberOfBoard(list.board.id, userId),
+        ]);
+
+        if (!isProjectMember && !isBoardMember) throw new ForbiddenException();
         return list;
     }
 
@@ -196,14 +206,21 @@ export class CardsService {
     async addMember(cardId: string, userId: string, memberUserId: string): Promise<ServiceResponse<any>> {
         const { card, list } = await this.verifyMembershipViaCard(cardId, userId);
 
-        const isMemberInProject = await this.projectMembersRepository.isUserMemberOfProject(
-            list.board.projectId,
-            memberUserId,
-        );
-        if (!isMemberInProject) {
+        const [isMemberInProject, isMemberInBoard] = await Promise.all([
+            this.projectMembersRepository.isUserMemberOfProject(
+                list.board.projectId,
+                memberUserId,
+            ),
+            this.boardMembersRepository.isUserMemberOfBoard(
+                list.board.id,
+                memberUserId,
+            ),
+        ]);
+
+        if (!isMemberInProject && !isMemberInBoard) {
             throw new OptionalException(
                 StatusCodes.BAD_REQUEST,
-                'User is not a member of the project',
+                'User is not a member of this board',
             );
         }
 

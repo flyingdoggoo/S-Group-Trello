@@ -15,12 +15,14 @@ import { ServiceResponse, ResponseStatus } from '@/common/dtos';
 import { StatusCodes } from 'http-status-codes';
 import { RolesRepository } from '../roles/roles.repository';
 import { ProjectMembersRepository } from '../projectMembers/projectMembers.repository';
+import { BoardMembersRepository } from '../boardMembers/boardMembers.repository';
 import { th } from 'zod/v4/locales';
 export class ProjectsService {
 	constructor(
 		private readonly projectsRepository = new ProjectsRepository(),
 		private readonly rolesRepository = new RolesRepository(),
 		private readonly projectMemberRepository = new ProjectMembersRepository(),
+		private readonly boardMemberRepository = new BoardMembersRepository(),
 	) {}
 
 	async createProject(
@@ -90,11 +92,16 @@ export class ProjectsService {
 
 		const projectsResponse = projects.map((project) => {
 			const boards = (project as any).Board || [];
-			const boardCount = boards.length;
+			const isProjectMember = ((project as any).members || []).length > 0;
+			const visibleBoards = isProjectMember
+				? boards
+				: boards.filter((board: any) => ((board as any).BoardMember || []).length > 0);
+			const boardCount = visibleBoards.length;
+
 			return new ProjectResponseDto({
 				...project,
 				boardCount,
-				boards: boards.map((b: any) => ({
+				boards: visibleBoards.map((b: any) => ({
 					id: b.id,
 					slug: b.slug,
 					title: b.title,
@@ -124,7 +131,13 @@ export class ProjectsService {
 			project.id,
 			userId,
 		);
-		if (!isMember) {
+		const isMemberOfAnyBoardInProject =
+			await this.boardMemberRepository.isUserMemberOfAnyBoardInProject(
+				project.id,
+				userId,
+			);
+
+		if (!isMember && !isMemberOfAnyBoardInProject) {
 			throw new ForbiddenException();
 		}
 
