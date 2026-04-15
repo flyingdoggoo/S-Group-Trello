@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
-import { apiClient, setAccessToken } from "@/api/apiClient";
+import { apiClient, getApiBaseUrl, setAccessToken } from "@/api/apiClient";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Lock, Mail, Sparkles, ArrowRight } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,16 +13,7 @@ import { faTrello } from "@fortawesome/free-brands-svg-icons";
 export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const configuredApiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "").trim();
-  const isLocalRuntime =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-  const resolvedApiBaseUrl =
-    configuredApiBaseUrl ||
-    (isLocalRuntime
-      ? "http://localhost:8000"
-      : "https://s-group-trello.vercel.app");
-  const googleLoginUrl = `${resolvedApiBaseUrl.replace(/\/+$/g, "")}/auth/google/login`;
+  const googleLoginUrl = `${getApiBaseUrl()}/auth/google/login`;
   const redirectTo = new URLSearchParams(location.search).get("redirect") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

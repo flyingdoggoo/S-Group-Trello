@@ -5,7 +5,16 @@ import axios, {
   type AxiosResponse,
 } from "axios";
 
-const configuredApiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "").trim();
+function normalizeApiBaseUrl(rawUrl: string): string {
+  return rawUrl
+    .trim()
+    .replace(/\/+$/g, "")
+    .replace(/\/api$/i, "");
+}
+
+const configuredApiBaseUrl = normalizeApiBaseUrl(
+  import.meta.env.VITE_API_BASE_URL || ""
+);
 const isBrowser = typeof window !== "undefined";
 const isLocalRuntime =
   isBrowser &&
@@ -17,6 +26,10 @@ const API_BASE_URL =
   (isLocalRuntime
     ? "http://localhost:8000"
     : "https://s-group-trello.vercel.app");
+
+export function getApiBaseUrl() {
+  return API_BASE_URL;
+}
 
 type AuthAxiosRequestConfig = AxiosRequestConfig & {
   _retry?: boolean;
