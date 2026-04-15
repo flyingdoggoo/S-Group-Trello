@@ -8,7 +8,7 @@ ALTER TABLE "boards" ADD COLUMN "slug" TEXT;
 -- Backfill deterministic slugs for existing data
 UPDATE "projects"
 SET "slug" = CONCAT(
-    COALESCE(NULLIF(TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER("title"), '[^a-z0-9]+', '-', 'g')), ''), 'project'),
+    LEFT(COALESCE(NULLIF(TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER("title"), '[^a-z0-9]+', '-', 'g')), ''), 'project'), 80),
     '-',
     SUBSTRING("id" FROM 1 FOR 8)
 )
@@ -16,7 +16,7 @@ WHERE "slug" IS NULL;
 
 UPDATE "boards"
 SET "slug" = CONCAT(
-    COALESCE(NULLIF(TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER("title"), '[^a-z0-9]+', '-', 'g')), ''), 'board'),
+    LEFT(COALESCE(NULLIF(TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER("title"), '[^a-z0-9]+', '-', 'g')), ''), 'board'), 80),
     '-',
     SUBSTRING("id" FROM 1 FOR 8)
 )
