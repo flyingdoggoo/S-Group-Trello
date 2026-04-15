@@ -45,6 +45,25 @@ export class AuthService {
 		private readonly rolesRepository = new RolesRepository(),
 	) {}
 
+	private async ensureDefaultUserRole(userId: string): Promise<void> {
+		const defaultUserRole = await this.rolesRepository.findByName(RolesEnum.USER);
+		if (!defaultUserRole) {
+			throw new NotFoundException('USER role');
+		}
+
+		const hasDefaultRole = await this.userRoleRepository.hasRole(
+			userId,
+			defaultUserRole.id,
+		);
+
+		if (!hasDefaultRole) {
+			await this.userRoleRepository.assignUserRoleProject(
+				userId,
+				defaultUserRole.id,
+			);
+		}
+	}
+
 	private async issueAuthTokens(params: {
 		userId: string;
 		email?: string;
@@ -171,6 +190,8 @@ export class AuthService {
 			throw new OptionalException(StatusCodes.UNAUTHORIZED, 'Invalid password');
 		}
 
+		await this.ensureDefaultUserRole(account.userId);
+
 		return this.issueAuthTokens({
 			userId: account.userId,
 			email: account.user?.email,
@@ -181,6 +202,8 @@ export class AuthService {
 		googleAuthData: CheckLoginWithGoogleOauthRequestDto,
 	): Promise<HttpResponseBodySuccessDto<LoginResponseDto> | Exception> {
 		const { socialAccountInformation } = googleAuthData;
+
+		await this.ensureDefaultUserRole(socialAccountInformation.userId);
 
 		return this.issueAuthTokens({
 			userId: socialAccountInformation.userId,

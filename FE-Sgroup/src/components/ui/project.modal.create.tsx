@@ -40,7 +40,8 @@ export function ProjectModalCreate() {
       if (error.response?.status === 403) {
         toast.error("You do not have permission to create a workspace.");
       } else {
-        toast.error("Failed to create workspace." + (error as any).message);
+        const serverMessage = error?.response?.data?.message;
+        toast.error(serverMessage || `Failed to create workspace. ${error?.message || ""}`);
       }
     } finally {
       setLoading(false);
