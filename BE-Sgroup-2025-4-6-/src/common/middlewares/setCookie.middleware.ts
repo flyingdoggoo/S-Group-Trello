@@ -28,7 +28,7 @@ export const setCookieMiddleware: RequestHandler = (req, res, next): void => {
 				const defaultOptions: ICookieOptions = {
 					httpOnly: true,
 					secure: appEnv.NODE_ENV === 'production',
-					sameSite: 'lax',
+					sameSite: appEnv.NODE_ENV === 'production' ? 'none' : 'lax',
 					path: '/',
 				};
 

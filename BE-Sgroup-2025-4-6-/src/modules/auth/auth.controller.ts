@@ -21,7 +21,7 @@ import type {
 	VerifyRequestDto,
 } from './dtos';
 import type { HttpResponseBodySuccessDto } from '@/common';
-import { appEnv } from '@/configs';
+import { appEnv, GoogleOauthConfig } from '@/configs';
 
 import {
 	HttpResponseDto,
@@ -34,6 +34,42 @@ import {
 
 export class AuthController {
 	constructor(private readonly authService = new AuthService()) {}
+
+	private resolveCookieSameSitePolicy(): 'lax' | 'none' {
+		return appEnv.NODE_ENV === 'production' ? 'none' : 'lax';
+	}
+
+	private resolveGoogleCallbackUrl(req: Request): string {
+		const configuredCallbackUrl = GoogleOauthConfig.redirectUri.trim();
+		const configuredUsesLocalhost = /localhost|127\.0\.0\.1/i.test(
+			configuredCallbackUrl,
+		);
+
+		if (
+			configuredCallbackUrl &&
+			(appEnv.NODE_ENV !== 'production' || !configuredUsesLocalhost)
+		) {
+			return configuredCallbackUrl;
+		}
+
+		const forwardedProto = req.headers['x-forwarded-proto'];
+		const forwardedHost = req.headers['x-forwarded-host'];
+
+		const protocol =
+			typeof forwardedProto === 'string' && forwardedProto.length > 0
+				? forwardedProto.split(',')[0].trim()
+				: req.protocol;
+		const host =
+			typeof forwardedHost === 'string' && forwardedHost.length > 0
+				? forwardedHost.split(',')[0].trim()
+				: req.get('host') || '';
+
+		if (host) {
+			return `${protocol}://${host}/auth/google/callback`;
+		}
+
+		return configuredCallbackUrl || `http://localhost:${appEnv.PORT}/auth/google/callback`;
+	}
 
 	async register(req: Request): Promise<Response> {
 		const registerDto = req.body as RegisterRequestDto;
@@ -81,7 +117,7 @@ export class AuthController {
 		const cookieOptions = {
 			httpOnly: true,
 			secure: appEnv.NODE_ENV === 'production',
-			sameSite: 'lax' as const,
+			sameSite: this.resolveCookieSameSitePolicy(),
 			path: '/',
 		};
 
@@ -115,12 +151,16 @@ export class AuthController {
 
 	// Redirect to Google OAuth (must return middleware invocation)
 	googleAuth = (req: Request, res: Response, next: NextFunction): void => {
-		return passport.authenticate('google', {
+		const callbackURL = this.resolveGoogleCallbackUrl(req);
+		const options: any = {
 			scope: ['profile', 'email'],
 			accessType: 'offline',
 			prompt: 'consent',
+			callbackURL,
 			session: false,
-		})(req, res, next);
+		};
+
+		return passport.authenticate('google', options)(req, res, next);
 	};
 
 	// Handle Google OAuth callback
@@ -129,12 +169,16 @@ export class AuthController {
 		res: Response,
 		next: NextFunction,
 	): Promise<Response | Exception> | void => {
+		const callbackURL = this.resolveGoogleCallbackUrl(req);
+		const options: any = {
+			session: false,
+			callbackURL,
+			failureRedirect: '/auth/google/login/failure',
+		};
+
 		passport.authenticate(
 			'google',
-			{
-				session: false,
-				failureRedirect: '/auth/google/login/failure',
-			},
+			options,
 			async (
 				err: Error | null,
 				user: CheckLoginWithGoogleOauthRequestDto,
@@ -160,7 +204,7 @@ export class AuthController {
 				const defaultCookieOptions = {
 					httpOnly: true,
 					secure: appEnv.NODE_ENV === 'production',
-					sameSite: 'lax' as const,
+					sameSite: this.resolveCookieSameSitePolicy(),
 					path: '/',
 				};
 				Object.entries(cookies).forEach(([name, value]) => {
