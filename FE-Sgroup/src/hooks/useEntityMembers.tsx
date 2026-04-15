@@ -34,10 +34,19 @@ export const useEntityMembers = (
 
       const response = await axiosClient.get(endpoint);
 
-      const sortedMembers = [...response.data.data].sort((a, b) => {
-        if (a.role.roleName === "PROJECT_ADMIN") return -1;
-        if (b.role.roleName === "PROJECT_ADMIN") return 1;
-        return a.user.name.localeCompare(b.user.name);
+      const adminRoleName = entityType === "board" ? "BOARD_ADMIN" : "PROJECT_ADMIN";
+      const mappedMembers: Member[] = (response.data.data || []).map((member: any) => ({
+        ...member,
+        user: {
+          ...member.user,
+          avatarUrl: member.user?.avatarUrl || member.user?.avatar || undefined,
+        },
+      }));
+
+      const sortedMembers = [...mappedMembers].sort((a, b) => {
+        if (a.role.roleName === adminRoleName) return -1;
+        if (b.role.roleName === adminRoleName) return 1;
+        return (a.user.name || "").localeCompare(b.user.name || "");
       });
       setMembers(sortedMembers);
       setError(null);

@@ -5,6 +5,7 @@ import z from "zod";
 export class CardResponseDto {
     id: string;
     listId: string;
+    boardId?: string;
     title: string;
     description?: string | null;
     position: number;
@@ -15,10 +16,12 @@ export class CardResponseDto {
     todos?: any[];
     members?: any[];
     comments?: any[];
+    commentCount?: number;
 
-    constructor(data: Card & { tags?: any[], todos?: any[], members?: any[], comments?: any[] }) {
+    constructor(data: Card & { list?: { boardId: string }, tags?: any[], todos?: any[], members?: any[], comments?: any[], _count?: { comments?: number } }) {
         this.id = data.id;
         this.listId = data.listId;
+        this.boardId = data.list?.boardId;
         this.title = data.title;
         this.description = data.description ?? null;
         this.position = data.position;
@@ -29,12 +32,14 @@ export class CardResponseDto {
         this.todos = data.todos || [];
         this.members = data.members || [];
         this.comments = data.comments || [];
+        this.commentCount = data._count?.comments ?? data.comments?.length ?? 0;
     }
 }
 
 export const CardResponseDtoSchema = z.object({
     id: z.string(),
     listId: z.string(),
+    boardId: z.string().optional(),
     title: z.string(),
     description: z.string().nullable().optional(),
     position: z.number(),

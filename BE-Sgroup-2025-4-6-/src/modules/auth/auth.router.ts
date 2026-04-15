@@ -54,6 +54,7 @@ router.post(
 
 router.get('/google/login', authController.googleAuth);
 router.get('/google/check-login', authController.googleCallback);
+router.get('/google/callback', authController.googleCallback);
 router.get('/google/login/failure', authController.authFailure);
 router.post(
 	'/verify',

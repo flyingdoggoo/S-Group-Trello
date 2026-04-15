@@ -18,6 +18,8 @@ import { RolesRepository } from '../roles/roles.repository';
 import { BoardMembersRepository } from '../boardMembers/boardMembers.repository';
 import { ProjectsRepository } from '../projects/projects.repository';
 import { ProjectMembersRepository } from '../projectMembers/projectMembers.repository';
+import { RolesEnum } from '@/common/enums';
+import { OptionalException } from '@/common';
 export class BoardsService {
 	constructor(
 		private readonly boardsRepository = new BoardsRepository(),
@@ -26,6 +28,23 @@ export class BoardsService {
 		private readonly projectsRepository = new ProjectsRepository(),
 		private readonly projectMembersRepository = new ProjectMembersRepository(),
 	) {}
+
+	private async assertActorIsBoardAdmin(boardId: string, actorUserId: string) {
+		const actorMember = await this.boardMemberRepository.findBoardMemberWithRole(
+			boardId,
+			actorUserId,
+		);
+
+		if (!actorMember) {
+			throw new ForbiddenException();
+		}
+
+		if (actorMember.role.roleName !== RolesEnum.BOARD_ADMIN) {
+			throw new ForbiddenException();
+		}
+
+		return actorMember;
+	}
 
 	async createBoard(
 		dto: CreateBoardRequestDto,
@@ -280,34 +299,104 @@ export class BoardsService {
 
 	async changeRoleOfMemberBoard(
 		boardId: string,
-		userId: string,
+		actorUserId: string,
+		targetUserId: string,
 		newRoleId: string,
 	): Promise<ServiceResponse<any>> {
 		const existingBoard = await this.boardsRepository.findBoardByIdSimple(boardId);
 		if (!existingBoard) {
 			throw new NotFoundException('Board not found');
 		}
-		if (!existingBoard) {
-			throw new NotFoundException('Board not found');
+
+		await this.assertActorIsBoardAdmin(existingBoard.id, actorUserId);
+
+		const targetMember = await this.boardMemberRepository.findBoardMemberWithRole(
+			existingBoard.id,
+			targetUserId,
+		);
+		if (!targetMember) {
+			throw new NotFoundException('Member not found in board');
 		}
 
-		const isMember = await this.boardMemberRepository.isUserMemberOfBoard(
-			existingBoard.id,
-			userId,
-		);
-		if (!isMember) {
-			throw new NotFoundException('Member not found in board');
+		const nextRole = await this.rolesRepository.findById(newRoleId);
+		if (!nextRole) {
+			throw new NotFoundException('Role not found');
+		}
+
+		if (!nextRole.roleName.startsWith('BOARD_')) {
+			throw new OptionalException(
+				StatusCodes.BAD_REQUEST,
+				'Role must be a board role',
+			);
+		}
+
+		if (
+			targetMember.role.roleName === RolesEnum.BOARD_ADMIN &&
+			nextRole.roleName !== RolesEnum.BOARD_ADMIN
+		) {
+			throw new ForbiddenException();
+		}
+
+		if (
+			targetUserId === actorUserId &&
+			nextRole.roleName !== RolesEnum.BOARD_ADMIN
+		) {
+			throw new OptionalException(
+				StatusCodes.BAD_REQUEST,
+				'Board admin cannot downgrade own role',
+			);
 		}
 
 		const changed = await this.boardMemberRepository.changeRoleOfMemberBoard(
 			existingBoard.id,
-			userId,
+			targetUserId,
 			newRoleId,
 		);
 		return new ServiceResponse(
 			ResponseStatus.Success,
 			'Member role changed successfully',
 			changed,
+			StatusCodes.OK,
+		);
+	}
+
+	async removeMemberBoard(
+		boardId: string,
+		actorUserId: string,
+		targetUserId: string,
+	): Promise<ServiceResponse<null>> {
+		const existingBoard = await this.boardsRepository.findBoardByIdSimple(boardId);
+		if (!existingBoard) {
+			throw new NotFoundException('Board not found');
+		}
+
+		await this.assertActorIsBoardAdmin(existingBoard.id, actorUserId);
+
+		const targetMember = await this.boardMemberRepository.findBoardMemberWithRole(
+			existingBoard.id,
+			targetUserId,
+		);
+		if (!targetMember) {
+			throw new NotFoundException('Member not found in board');
+		}
+
+		if (targetUserId === actorUserId) {
+			throw new OptionalException(
+				StatusCodes.BAD_REQUEST,
+				'Use leave-board flow instead of removing yourself',
+			);
+		}
+
+		if (targetMember.role.roleName === RolesEnum.BOARD_ADMIN) {
+			throw new ForbiddenException();
+		}
+
+		await this.boardMemberRepository.removeMember(existingBoard.id, targetUserId);
+
+		return new ServiceResponse(
+			ResponseStatus.Success,
+			'Member removed successfully',
+			null,
 			StatusCodes.OK,
 		);
 	}

@@ -2,12 +2,27 @@ import { PrismaService } from '../database/prisma.service';
 
 export class BoardMembersRepository {
 	constructor(private readonly prisma = new PrismaService()) {}
+
 	async assignUserRoleBoard(boardId: string, userId: string, roleId: string) {
 		return this.prisma.boardMember.create({
 			data: {
 				boardId,
 				userId,
 				roleId,
+			},
+		});
+	}
+
+	async findBoardMemberWithRole(boardId: string, userId: string) {
+		return this.prisma.boardMember.findFirst({
+			where: { boardId, userId },
+			include: {
+				role: {
+					select: {
+						id: true,
+						roleName: true,
+					},
+				},
 			},
 		});
 	}
@@ -46,6 +61,12 @@ export class BoardMembersRepository {
 		return this.prisma.boardMember.updateMany({
 			where: { boardId, userId },
 			data: { roleId: newRoleId },
+		});
+	}
+
+	async removeMember(boardId: string, userId: string) {
+		return this.prisma.boardMember.deleteMany({
+			where: { boardId, userId },
 		});
 	}
 }

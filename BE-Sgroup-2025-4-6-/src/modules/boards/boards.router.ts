@@ -64,4 +64,11 @@ router.put(
 	boardsController.changeRoleOfMemberBoard,
 );
 
+router.delete(
+	'/:boardId/members/remove',
+	authMiddleware.verifyToken,
+	authMiddleware.verifyPermission(BoardPermissionEnum.REMOVE_MEMBER),
+	boardsController.removeMemberBoard,
+);
+
 export const boardsRouter = router;

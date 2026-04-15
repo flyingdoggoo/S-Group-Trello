@@ -13,11 +13,16 @@ import { faTrello } from "@fortawesome/free-brands-svg-icons";
 export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const googleLoginUrl = `${(import.meta.env.VITE_API_BASE_URL || "http://localhost:8000").replace(/\/+$/g, "")}/auth/google/login`;
   const redirectTo = new URLSearchParams(location.search).get("redirect") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+
+  function handleGoogleLogin() {
+    window.location.href = googleLoginUrl;
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -128,6 +133,29 @@ export function Login() {
                   </>
                 )}
               </Button>
+
+              <div className="relative py-1">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-white/12" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase tracking-wide text-slate-400">
+                  <span className="bg-slate-900/90 px-2">Or continue with</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/14 bg-slate-900/70 text-sm font-medium text-slate-100 transition-all hover:border-blue-300/45 hover:bg-slate-800/90"
+              >
+                <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4">
+                  <path fill="#EA4335" d="M12 10.2v3.9h5.4c-.2 1.2-.9 2.2-1.9 2.9l3.1 2.4c1.8-1.7 2.8-4.2 2.8-7.2 0-.7-.1-1.4-.2-2H12z" />
+                  <path fill="#34A853" d="M12 21c2.6 0 4.8-.8 6.4-2.3l-3.1-2.4c-.9.6-2 .9-3.3.9-2.5 0-4.6-1.7-5.4-4l-3.2 2.5C5 18.8 8.2 21 12 21z" />
+                  <path fill="#4A90E2" d="M6.6 13.2c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2L3.4 6.7C2.7 8.1 2.3 9.6 2.3 11.2s.4 3.1 1.1 4.5l3.2-2.5z" />
+                  <path fill="#FBBC05" d="M12 5.1c1.4 0 2.6.5 3.6 1.4l2.7-2.7C16.8 2.3 14.6 1.4 12 1.4c-3.8 0-7 2.2-8.6 5.3l3.2 2.5c.8-2.3 2.9-4.1 5.4-4.1z" />
+                </svg>
+                Sign in with Google
+              </button>
             </form>
 
             <p className="mt-6 text-center text-sm text-slate-300">

@@ -15,7 +15,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 
 type NotificationItem = {
   id: string;
-  type: "INVITATION_SENT" | "INVITATION_ACCEPTED" | "INVITATION_REJECTED";
+  type: "INVITATION_SENT" | "INVITATION_ACCEPTED" | "INVITATION_REJECTED" | "CARD_ASSIGNED";
   title: string;
   message: string;
   isRead: boolean;

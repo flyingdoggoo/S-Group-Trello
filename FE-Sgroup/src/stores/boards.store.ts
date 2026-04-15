@@ -16,6 +16,8 @@ interface BoardsStore {
   
   setBoards: (projectId: string, boards: Board[]) => void;
   addBoard: (projectId: string, board: Board) => void;
+  updateBoard: (projectId: string, boardId: string, updates: Partial<Board>) => void;
+  removeBoard: (projectId: string, boardId: string) => void;
   getBoards: (projectId: string) => Board[];
   clearBoards: (projectId: string) => void;
 }
@@ -34,6 +36,22 @@ export const useBoardsStore = create<BoardsStore>((set, get) => ({
     boardsByProject: {
       ...state.boardsByProject,
       [projectId]: [...(state.boardsByProject[projectId] || []), board]
+    }
+  })),
+
+  updateBoard: (projectId, boardId, updates) => set((state) => ({
+    boardsByProject: {
+      ...state.boardsByProject,
+      [projectId]: (state.boardsByProject[projectId] || []).map((board) =>
+        board.id === boardId ? { ...board, ...updates } : board
+      )
+    }
+  })),
+
+  removeBoard: (projectId, boardId) => set((state) => ({
+    boardsByProject: {
+      ...state.boardsByProject,
+      [projectId]: (state.boardsByProject[projectId] || []).filter((board) => board.id !== boardId)
     }
   })),
   

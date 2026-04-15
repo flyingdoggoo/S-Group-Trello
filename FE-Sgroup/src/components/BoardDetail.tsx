@@ -6,23 +6,64 @@ import {
   KanbanCard,
 } from "@/components/ui/shadcn-io/kanban";
 import { useParams } from "react-router";
+import { useNavigate } from "react-router-dom";
 import useLists from "@/hooks/useLists";
 import type { ListItem } from "@/hooks/useLists";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { ListModalCreate } from "@/components/ui/list.modal.create";
 import { apiClient } from "@/api/apiClient";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layouts/Sidebar";
 import { HeaderEntity } from "./shared/headers/HeaderEntity";
 import { CardModal } from "./CardModal";
-import { GripVertical, MessageSquareText, Paperclip, Plus, MoreHorizontal, Trash2 } from "lucide-react";
+import {
+  GripVertical,
+  MessageSquareText,
+  Paperclip,
+  Plus,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
 import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useEntityMembers } from "@/hooks/useEntityMembers";
+import { getCurrentUserId } from "@/lib/auth";
+import { useBoardsStore } from "@/stores/boards.store";
+import { useProjectsStore } from "@/stores/projects.store";
+import { getEntityRouteIdentifier } from "@/lib/entityIdentifiers";
+
+type PreviewTag = {
+  id: string;
+  name: string;
+  color: string;
+};
+
+type PreviewMember = {
+  id: string;
+  name: string;
+  avatar: string | null;
+};
 
 type FeatureItem = {
   id: string;
   name: string;
   description?: string | null;
   column: string;
+  tags: PreviewTag[];
+  members: PreviewMember[];
+  commentCount: number;
+  attachmentCount: number;
 };
 
 const LIST_COLORS = ["#60a5fa", "#818cf8", "#34d399", "#f59e0b", "#f472b6", "#22d3ee"];
@@ -32,17 +73,54 @@ function titleCase(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-function hashText(value: string) {
-  let hash = 0;
-  for (let i = 0; i < value.length; i += 1) {
-    hash = (hash << 5) - hash + value.charCodeAt(i);
-    hash |= 0;
+function getInitials(name: string) {
+  if (!name) return "?";
+  return name
+    .trim()
+    .split(/\s+/)
+    .map((word) => word[0]?.toUpperCase())
+    .join("")
+    .slice(0, 2);
+}
+
+function mapCardToFeature(card: any, listId: string): FeatureItem {
+  return {
+    id: card.id,
+    name: card.title,
+    description: card.description ?? null,
+    column: listId,
+    tags: card.tags || [],
+    members: (card.members || []).map((member: any) => ({
+      id: member.user?.id || member.id,
+      name: member.user?.name || "Unknown",
+      avatar: member.user?.avatar || null,
+    })),
+    commentCount:
+      typeof card.commentCount === "number"
+        ? card.commentCount
+        : card.comments?.length || 0,
+    // Attachment feature is not in current scope, so keep preview truthful.
+    attachmentCount: 0,
+  };
+}
+
+function getErrorMessage(err: any, fallback: string, permissionMessage: string) {
+  if (err?.response?.status === 403) {
+    return permissionMessage;
   }
-  return Math.abs(hash);
+  return err?.response?.data?.message || fallback;
 }
 
 export default function BoardDetail() {
   const boardSlug = useParams().boardSlug as string;
+  const navigate = useNavigate();
+
+  const projects = useProjectsStore((state) => state.projects);
+  const updateBoardInProject = useProjectsStore((state) => state.updateBoardInProject);
+  const removeBoardFromProject = useProjectsStore((state) => state.removeBoardFromProject);
+  const updateBoardStore = useBoardsStore((state) => state.updateBoard);
+  const removeBoardStore = useBoardsStore((state) => state.removeBoard);
+
   const [currentBoard, setCurrentBoard] = useState<{
     id: string;
     slug?: string;
@@ -51,8 +129,36 @@ export default function BoardDetail() {
     description?: string | null;
   } | null>(null);
   const [boardLoading, setBoardLoading] = useState(true);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pendingBoardTitle, setPendingBoardTitle] = useState("");
+  const [isSubmittingBoardAction, setIsSubmittingBoardAction] = useState(false);
+
   const boardId = currentBoard?.id || boardSlug;
   const projectId = currentBoard?.projectId || "";
+
+  const { members: entityMembers } = useEntityMembers("board", boardId, projectId);
+  const currentUserId = getCurrentUserId();
+
+  const currentBoardRole = useMemo(() => {
+    if (!currentUserId) {
+      return null;
+    }
+    const currentMember = entityMembers.find((member) => member.user.id === currentUserId);
+    return currentMember?.role.roleName || null;
+  }, [entityMembers, currentUserId]);
+
+  const canManageBoard = currentBoardRole === "BOARD_ADMIN";
+  const canEditBoardContent =
+    currentBoardRole === "BOARD_ADMIN" || currentBoardRole === "BOARD_MEMBER";
+
+  const resolveProjectRouteIdentifier = useCallback(() => {
+    if (!currentBoard) {
+      return "";
+    }
+    const project = projects.find((item) => item.id === currentBoard.projectId);
+    return getEntityRouteIdentifier(project) || currentBoard.projectId;
+  }, [currentBoard, projects]);
 
   useEffect(() => {
     (async () => {
@@ -60,13 +166,14 @@ export default function BoardDetail() {
       try {
         const res = await apiClient.get(`boards/${boardSlug}`);
         setCurrentBoard(res.data?.data);
-      } catch (err) {
-        console.error(err);
+      } catch (err: any) {
+        toast.error(err?.response?.data?.message || "Board not found");
+        navigate("/dashboard", { replace: true });
       } finally {
         setBoardLoading(false);
       }
     })();
-  }, [boardSlug]);
+  }, [boardSlug, navigate]);
 
   const { lists, setLists, error: listError } = useLists({ boardId });
   const columns = useMemo(
@@ -99,15 +206,7 @@ export default function BoardDetail() {
           lists.map(async (list) => {
             const res = await apiClient.get(`cards?listId=${list.id}`);
             const raw = res.data?.data?.data || [];
-            return raw.map(
-              (card: any) =>
-                ({
-                  id: card.id,
-                  name: card.title,
-                  description: card.description ?? null,
-                  column: list.id,
-                } as FeatureItem)
-            );
+            return raw.map((card: any) => mapCardToFeature(card, list.id));
           })
         );
 
@@ -132,6 +231,11 @@ export default function BoardDetail() {
   }, [lists]);
 
   async function handleCreate(listId: string) {
+    if (!canEditBoardContent) {
+      toast.error("Bạn không có quyền tạo card.");
+      return;
+    }
+
     const title = (inputs[listId] || "").trim();
     if (!title) return;
 
@@ -139,39 +243,41 @@ export default function BoardDetail() {
       const res = await apiClient.post("cards", { title, listId });
       const card = res.data?.data;
       if (card) {
-        setFeatures((prev) => [
-          ...prev,
-          {
-            id: card.id,
-            name: card.title,
-            description: card.description ?? null,
-            column: listId,
-          },
-        ]);
+        setFeatures((prev) => [...prev, mapCardToFeature(card, listId)]);
         setCardToListMapping((prev) => ({ ...prev, [card.id]: listId }));
         setInputs((prev) => ({ ...prev, [listId]: "" }));
         setShowForm((prev) => ({ ...prev, [listId]: false }));
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Failed to create card");
+      toast.error(getErrorMessage(err, "Failed to create card", "Bạn không có quyền tạo card."));
     }
   }
 
   async function handleDeleteList(listId: string) {
+    if (!canEditBoardContent) {
+      toast.error("Bạn không có quyền xóa list.");
+      return;
+    }
+
     try {
       await apiClient.delete(`lists/${listId}`);
       setLists((prev: ListItem[]) => prev.filter((list) => list.id !== listId));
       setFeatures((prev) => prev.filter((card) => card.column !== listId));
       setShowMenu((prev) => ({ ...prev, [listId]: false }));
       toast.success("List deleted");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Delete list error:", err);
-      toast.error("Failed to delete list");
+      toast.error(getErrorMessage(err, "Failed to delete list", "Bạn không có quyền xóa list."));
     }
   }
 
   async function handleDragEnd(event: any) {
+    if (!canEditBoardContent) {
+      toast.error("Bạn không có quyền di chuyển card.");
+      return;
+    }
+
     const { active, over } = event;
     if (!over) return;
 
@@ -194,13 +300,94 @@ export default function BoardDetail() {
         setCardToListMapping((prev) => ({ ...prev, [active.id]: targetColumn }));
       } catch (err: any) {
         console.error("Error updating card:", err);
-        window.location.reload();
+        toast.error(getErrorMessage(err, "Failed to move card", "Bạn không có quyền di chuyển card."));
       }
     }, 80);
   }
 
+  function openEditBoardDialog() {
+    if (!canManageBoard) {
+      toast.error("Không có quyền edit board.");
+      return;
+    }
+    setPendingBoardTitle(currentBoard?.title || "");
+    setIsEditDialogOpen(true);
+  }
+
+  async function handleEditBoardTitle() {
+    if (!currentBoard) {
+      return;
+    }
+
+    const nextTitle = pendingBoardTitle.trim();
+    if (!nextTitle || nextTitle === currentBoard.title) {
+      setIsEditDialogOpen(false);
+      return;
+    }
+
+    setIsSubmittingBoardAction(true);
+    try {
+      await apiClient.put(
+        `projects/${currentBoard.projectId}/boards/${currentBoard.slug || currentBoard.id}`,
+        { title: nextTitle }
+      );
+
+      const projectRouteIdentifier = resolveProjectRouteIdentifier();
+      setCurrentBoard((prev) => (prev ? { ...prev, title: nextTitle } : prev));
+      updateBoardInProject(currentBoard.projectId, currentBoard.id, { title: nextTitle });
+      updateBoardStore(currentBoard.projectId, currentBoard.id, { title: nextTitle });
+      if (projectRouteIdentifier && projectRouteIdentifier !== currentBoard.projectId) {
+        updateBoardStore(projectRouteIdentifier, currentBoard.id, { title: nextTitle });
+      }
+
+      toast.success("Board title updated");
+      setIsEditDialogOpen(false);
+    } catch (err: any) {
+      toast.error(getErrorMessage(err, "Failed to update board title", "Không có quyền edit board."));
+    } finally {
+      setIsSubmittingBoardAction(false);
+    }
+  }
+
+  function openDeleteBoardDialog() {
+    if (!canManageBoard) {
+      toast.error("Không có quyền xóa board.");
+      return;
+    }
+    setIsDeleteDialogOpen(true);
+  }
+
+  async function handleDeleteBoard() {
+    if (!currentBoard) {
+      return;
+    }
+
+    setIsSubmittingBoardAction(true);
+    try {
+      await apiClient.delete(
+        `projects/${currentBoard.projectId}/boards/${currentBoard.slug || currentBoard.id}`
+      );
+
+      const projectRouteIdentifier = resolveProjectRouteIdentifier();
+      removeBoardFromProject(currentBoard.projectId, currentBoard.id);
+      removeBoardStore(currentBoard.projectId, currentBoard.id);
+      if (projectRouteIdentifier && projectRouteIdentifier !== currentBoard.projectId) {
+        removeBoardStore(projectRouteIdentifier, currentBoard.id);
+      }
+
+      toast.success("Board deleted");
+      setIsDeleteDialogOpen(false);
+      navigate(`/projects/${projectRouteIdentifier}`, { replace: true });
+    } catch (err: any) {
+      toast.error(getErrorMessage(err, "Failed to delete board", "Không có quyền xóa board."));
+    } finally {
+      setIsSubmittingBoardAction(false);
+    }
+  }
+
   return (
     <div className="min-h-screen">
+      <ToastContainer />
       <SidebarProvider>
         <AppSidebar />
         <main className="flex-1">
@@ -221,17 +408,36 @@ export default function BoardDetail() {
                     entityType="board"
                     entityId={boardId}
                     projectId={projectId}
+                    onEditTitle={canManageBoard ? openEditBoardDialog : undefined}
+                    canManageMembers={canManageBoard}
+                    additionalActions={
+                      canManageBoard ? (
+                        <button
+                          onClick={openDeleteBoardDialog}
+                          className="rounded-xl border border-red-300/30 bg-red-500/15 px-3 py-1.5 text-xs font-medium text-red-200 transition-all hover:bg-red-500/25"
+                        >
+                          Delete board
+                        </button>
+                      ) : undefined
+                    }
                   />
                   <p className="mt-3 text-sm text-slate-300">
                     {currentBoard?.description || "Drag cards between lists and keep work moving with clean visibility."}
                   </p>
                 </section>
 
-                <section className="surface-panel flex items-center gap-3 px-4 py-3 text-sm text-slate-300">
-                  <span className="rounded-lg border border-white/12 bg-slate-900/70 p-1.5 text-slate-200">
-                    <GripVertical className="h-4 w-4" />
-                  </span>
-                  Drag cards across lists to update workflow status instantly.
+                <section className="surface-panel flex items-center justify-between gap-3 px-4 py-3 text-sm text-slate-300">
+                  <div className="flex items-center gap-3">
+                    <span className="rounded-lg border border-white/12 bg-slate-900/70 p-1.5 text-slate-200">
+                      <GripVertical className="h-4 w-4" />
+                    </span>
+                    Drag cards across lists to update workflow status instantly.
+                  </div>
+                  {!canEditBoardContent && (
+                    <span className="rounded-lg border border-amber-300/30 bg-amber-500/15 px-2 py-1 text-xs text-amber-100">
+                      Read-only mode
+                    </span>
+                  )}
                 </section>
 
                 {listError && (
@@ -259,40 +465,40 @@ export default function BoardDetail() {
                                   <span className="truncate text-sm font-semibold text-slate-100">{column.name}</span>
                                 </div>
 
-                                <div className="relative">
-                                  <button
-                                    onClick={() => setShowMenu((prev) => ({ ...prev, [column.id]: !prev[column.id] }))}
-                                    className="rounded-lg border border-transparent p-1.5 text-slate-400 transition-all hover:border-white/12 hover:bg-slate-800/70 hover:text-slate-200"
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </button>
+                                {canEditBoardContent && (
+                                  <div className="relative">
+                                    <button
+                                      onClick={() => setShowMenu((prev) => ({ ...prev, [column.id]: !prev[column.id] }))}
+                                      className="rounded-lg border border-transparent p-1.5 text-slate-400 transition-all hover:border-white/12 hover:bg-slate-800/70 hover:text-slate-200"
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </button>
 
-                                  {showMenu[column.id] && (
-                                    <>
-                                      <div
-                                        className="fixed inset-0 z-10"
-                                        onClick={() => setShowMenu((prev) => ({ ...prev, [column.id]: false }))}
-                                      />
-                                      <div className="absolute right-0 top-9 z-20 min-w-[160px] rounded-xl border border-white/12 bg-slate-900/96 p-1.5 shadow-[0_18px_40px_-22px_rgba(2,6,23,0.95)] backdrop-blur-xl">
-                                        <button
-                                          onClick={() => handleDeleteList(column.id)}
-                                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-300 transition-colors hover:bg-red-500/10 hover:text-red-200"
-                                        >
-                                          <Trash2 className="h-4 w-4" />
-                                          Delete list
-                                        </button>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
+                                    {showMenu[column.id] && (
+                                      <>
+                                        <div
+                                          className="fixed inset-0 z-10"
+                                          onClick={() => setShowMenu((prev) => ({ ...prev, [column.id]: false }))}
+                                        />
+                                        <div className="absolute right-0 top-9 z-20 min-w-[160px] rounded-xl border border-white/12 bg-slate-900/96 p-1.5 shadow-[0_18px_40px_-22px_rgba(2,6,23,0.95)] backdrop-blur-xl">
+                                          <button
+                                            onClick={() => handleDeleteList(column.id)}
+                                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-300 transition-colors hover:bg-red-500/10 hover:text-red-200"
+                                          >
+                                            <Trash2 className="h-4 w-4" />
+                                            Delete list
+                                          </button>
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             </KanbanHeader>
 
                             <KanbanCards id={column.id} className="bg-transparent px-2 pt-3">
                               {(feature: FeatureItem) => {
-                                const attachmentCount = (hashText(feature.id) % 3) + 1;
-                                const commentCount = hashText(feature.name) % 4;
-                                const tag = feature.description ? "In scope" : "Quick task";
+                                const primaryTag = feature.tags[0];
 
                                 return (
                                   <KanbanCard
@@ -317,27 +523,55 @@ export default function BoardDetail() {
                                       </div>
 
                                       <div className="flex items-center justify-between gap-2">
-                                        <span className="inline-flex items-center rounded-full border border-blue-300/30 bg-blue-500/12 px-2 py-0.5 text-[11px] font-medium text-blue-200">
-                                          {tag}
-                                        </span>
+                                        {primaryTag ? (
+                                          <span
+                                            className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium text-white"
+                                            style={{ backgroundColor: primaryTag.color }}
+                                          >
+                                            {primaryTag.name}
+                                          </span>
+                                        ) : (
+                                          <span className="inline-flex items-center rounded-full border border-white/15 bg-slate-900/65 px-2 py-0.5 text-[11px] text-slate-300">
+                                            No tag
+                                          </span>
+                                        )}
+
                                         <div className="flex items-center gap-2 text-[11px] text-slate-400">
                                           <span className="inline-flex items-center gap-1">
                                             <Paperclip className="h-3 w-3" />
-                                            {attachmentCount}
+                                            {feature.attachmentCount}
                                           </span>
                                           <span className="inline-flex items-center gap-1">
                                             <MessageSquareText className="h-3 w-3" />
-                                            {commentCount}
+                                            {feature.commentCount}
                                           </span>
                                         </div>
                                       </div>
+
+                                      {feature.members.length > 0 && (
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex -space-x-2">
+                                            {feature.members.slice(0, 3).map((member) => (
+                                              <Avatar key={member.id} className="h-6 w-6 border border-slate-900 ring-1 ring-white/12">
+                                                <AvatarImage src={member.avatar || ""} alt={member.name} />
+                                                <AvatarFallback className="bg-slate-700 text-[10px] text-slate-100">
+                                                  {getInitials(member.name)}
+                                                </AvatarFallback>
+                                              </Avatar>
+                                            ))}
+                                          </div>
+                                          {feature.members.length > 3 && (
+                                            <span className="text-[11px] text-slate-400">+{feature.members.length - 3}</span>
+                                          )}
+                                        </div>
+                                      )}
                                     </div>
                                   </KanbanCard>
                                 );
                               }}
                             </KanbanCards>
 
-                            {!showForm[column.id] ? (
+                            {canEditBoardContent && (!showForm[column.id] ? (
                               <button
                                 onClick={() => setShowForm((prev) => ({ ...prev, [column.id]: true }))}
                                 className="mx-3 mb-3 inline-flex items-center justify-start gap-2 rounded-xl border border-dashed border-white/14 bg-slate-900/50 px-3 py-2.5 text-sm font-medium text-slate-300 transition-all hover:border-blue-300/40 hover:bg-slate-800/75 hover:text-slate-100"
@@ -382,14 +616,16 @@ export default function BoardDetail() {
                                   </button>
                                 </div>
                               </div>
-                            )}
+                            ))}
                           </KanbanBoard>
                         )}
                       </KanbanProvider>
 
-                      <div className="flex-shrink-0">
-                        <ListModalCreate boardId={boardId} lists={lists} setLists={setLists} />
-                      </div>
+                      {canEditBoardContent && (
+                        <div className="flex-shrink-0">
+                          <ListModalCreate boardId={boardId} lists={lists} setLists={setLists} />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </section>
@@ -399,9 +635,56 @@ export default function BoardDetail() {
         </main>
       </SidebarProvider>
 
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[420px]">
+          <DialogHeader>
+            <DialogTitle>Edit board title</DialogTitle>
+            <DialogDescription>
+              Update the board name. Members will see this change immediately.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Input
+              value={pendingBoardTitle}
+              onChange={(e) => setPendingBoardTitle(e.target.value)}
+              placeholder="Board title"
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleEditBoardTitle} disabled={isSubmittingBoardAction}>
+              {isSubmittingBoardAction ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[420px]">
+          <DialogHeader>
+            <DialogTitle>Delete board</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. All lists and cards in this board will no longer be accessible.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteBoard} disabled={isSubmittingBoardAction}>
+              {isSubmittingBoardAction ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {selectedCard && (
         <CardModal
           cardId={selectedCard.id}
+          readOnly={!canEditBoardContent}
           onClose={() => setSelectedCard(null)}
           onDelete={() => {
             setFeatures((prev) => prev.filter((feature) => feature.id !== selectedCard.id));

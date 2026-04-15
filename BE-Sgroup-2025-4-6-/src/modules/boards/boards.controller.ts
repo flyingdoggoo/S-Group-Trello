@@ -136,12 +136,35 @@ export class BoardsController {
 	async changeRoleOfMemberBoard(req: Request, res: Response, next: NextFunction) {
 		try {
 			const { boardId } = req.params;
+			const actorUserId = req.user?.id as string;
 			const { userId, newRoleId } = req.body;
 
 			const result = await this.boardsService.changeRoleOfMemberBoard(
 				boardId,
+				actorUserId,
 				userId,
 				newRoleId,
+			);
+
+			res.status(result.code).json({
+				success: result.success,
+				message: result.message,
+				data: result.data,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	async removeMemberBoard(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { boardId } = req.params;
+			const actorUserId = req.user?.id as string;
+			const { userId } = req.body;
+			const result = await this.boardsService.removeMemberBoard(
+				boardId,
+				actorUserId,
+				userId,
 			);
 
 			res.status(result.code).json({
