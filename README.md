@@ -87,7 +87,7 @@ DATABASE_URL="postgresql://<DB_USER>:<DB_PASSWORD>@localhost:<DB_PORT>/<DB_NAME>
 
 GOOGLE_CLIENT_ID=<YOUR_GOOGLE_CLIENT_ID>
 GOOGLE_CLIENT_SECRET=<YOUR_GOOGLE_CLIENT_SECRET>
-GOOGLE_REDIRECT_URI=http://localhost:8000/api/v1/auth/google/callback
+GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
 
 DEFAULT_USER_AVATAR_URL=https://via.placeholder.com/150
 

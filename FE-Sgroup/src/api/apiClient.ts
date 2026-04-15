@@ -5,7 +5,19 @@ import axios, {
   type AxiosResponse,
 } from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const configuredApiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "").trim();
+const isBrowser = typeof window !== "undefined";
+const isLocalRuntime =
+  isBrowser &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1");
+
+// Fallback to localhost only for local runtime; production fallback uses the deployed backend domain.
+const API_BASE_URL =
+  configuredApiBaseUrl ||
+  (isLocalRuntime
+    ? "http://localhost:8000"
+    : "https://s-group-trello.vercel.app");
 
 type AuthAxiosRequestConfig = AxiosRequestConfig & {
   _retry?: boolean;

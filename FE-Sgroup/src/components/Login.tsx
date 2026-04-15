@@ -13,7 +13,18 @@ import { faTrello } from "@fortawesome/free-brands-svg-icons";
 export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const googleLoginUrl = `${(import.meta.env.VITE_API_BASE_URL || "http://localhost:8000").replace(/\/+$/g, "")}/auth/google/login`;
+  const configuredApiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "").trim();
+  const isLocalRuntime =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+  const resolvedApiBaseUrl =
+    configuredApiBaseUrl ||
+    (isLocalRuntime
+      ? "http://localhost:8000"
+      : "https://s-group-trello.vercel.app");
+  const googleLoginUrl = resolvedApiBaseUrl
+    ? `${resolvedApiBaseUrl.replace(/\/+$/g, "")}/auth/google/login`
+    : "";
   const redirectTo = new URLSearchParams(location.search).get("redirect") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +32,13 @@ export function Login() {
   const [submitError, setSubmitError] = useState("");
 
   function handleGoogleLogin() {
+    if (!googleLoginUrl) {
+      const message = "Google login is not configured. Missing VITE_API_BASE_URL in production.";
+      setSubmitError(message);
+      toast.error(message);
+      return;
+    }
+
     window.location.href = googleLoginUrl;
   }
 
