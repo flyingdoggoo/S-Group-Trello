@@ -1,4 +1,3 @@
-import { verify } from 'jsonwebtoken';
 import { Exception } from '@/common/exceptions/base.exception';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -8,8 +7,12 @@ import { AuthService } from './auth.service';
 import {
 	LoginRequestDto,
 	LoginResponseDto,
+	ForgotPasswordRequestDto,
+	LogoutRequestDto,
 	RegisterRequestDto,
+	ResetPasswordRequestDto,
 	RegisterResponseDto,
+	RefreshTokenRequestDto,
 } from './dtos';
 
 import type {
@@ -25,6 +28,8 @@ import {
 	InternalServerException,
 	NotFoundException,
 	OptionalException,
+	getCookieValue,
+	getResponse,
 } from '@/common';
 
 export class AuthController {
@@ -46,6 +51,66 @@ export class AuthController {
 			return new HttpResponseDto().exception(result);
 		}
 		return new HttpResponseDto().success<LoginResponseDto>(result);
+	}
+
+	async refreshToken(req: Request): Promise<Response> {
+		const body = req.body as RefreshTokenRequestDto;
+		const tokenFromCookie = getCookieValue(req.headers.cookie, 'refreshToken');
+		const refreshToken = body.refreshToken || tokenFromCookie || '';
+
+		const result = await this.authService.refreshToken(refreshToken);
+		if (result instanceof Exception) {
+			return new HttpResponseDto().exception(result);
+		}
+
+		return new HttpResponseDto().success<LoginResponseDto>(result);
+	}
+
+	async logout(req: Request): Promise<Response> {
+		const body = req.body as LogoutRequestDto;
+		const tokenFromCookie = getCookieValue(req.headers.cookie, 'refreshToken');
+		const result = await this.authService.logout({
+			refreshToken: body.refreshToken || tokenFromCookie,
+		});
+
+		if (result instanceof Exception) {
+			return new HttpResponseDto().exception(result);
+		}
+
+		const res = getResponse();
+		const cookieOptions = {
+			httpOnly: true,
+			secure: appEnv.NODE_ENV === 'production',
+			sameSite: 'lax' as const,
+			path: '/',
+		};
+
+		res.clearCookie('accessToken', cookieOptions);
+		res.clearCookie('refreshToken', cookieOptions);
+
+		return new HttpResponseDto().success(result);
+	}
+
+	async forgotPasswordSendOtp(req: Request): Promise<Response> {
+		const dto = req.body as ForgotPasswordRequestDto;
+		const result = await this.authService.sendForgotPasswordOtp(dto);
+
+		if (result instanceof Exception) {
+			return new HttpResponseDto().exception(result);
+		}
+
+		return new HttpResponseDto().success(result);
+	}
+
+	async resetPassword(req: Request): Promise<Response> {
+		const dto = req.body as ResetPasswordRequestDto;
+		const result = await this.authService.resetPassword(dto);
+
+		if (result instanceof Exception) {
+			return new HttpResponseDto().exception(result);
+		}
+
+		return new HttpResponseDto().success(result);
 	}
 
 	// Redirect to Google OAuth (must return middleware invocation)

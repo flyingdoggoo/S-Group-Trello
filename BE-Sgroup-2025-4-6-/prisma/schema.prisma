@@ -69,6 +69,13 @@ enum InvitationStatusEnum {
   CANCELLED
 }
 
+enum NotificationTypeEnum {
+  INVITATION_SENT
+  INVITATION_ACCEPTED
+  INVITATION_REJECTED
+  CARD_ASSIGNED
+}
+
 model users {
   id        String         @id @default(uuid())
   email     String         @unique
@@ -98,6 +105,8 @@ model users {
   Invitations    Invitations[]
   CardMember     CardMember[]
   CardComment    CardComment[]
+  notifications  Notification[] @relation("NotificationRecipient")
+  actions        Notification[] @relation("NotificationActor")
 
   @@map("users")
 }
@@ -144,6 +153,7 @@ model otps {
 
 model project {
   id          String            @id @default(uuid())
+  slug        String            @unique
   title       String
   description String?
   createdAt   DateTime          @default(now()) @map("created_at")
@@ -224,6 +234,7 @@ model ProjectMember {
 
 model Board {
   id          String          @id @default(uuid())
+  slug        String          @unique
   projectId   String          @map("project_id")
   title       String
   description String?
@@ -352,7 +363,28 @@ model Invitations {
   acceptedAt DateTime?           @map("accepted_at")
   project   project?             @relation("ProjectInvitation", fields: [projectId], references: [id])
   board     Board?               @relation("BoardInvitation", fields: [boardId], references: [id])
+  notifications Notification[]
 
   @@index([email, status])
   @@map("Invitations")
+}
+
+model Notification {
+  id           String               @id @default(uuid())
+  userId       String               @map("user_id")
+  actorId      String?              @map("actor_id")
+  invitationId String?              @map("invitation_id")
+  type         NotificationTypeEnum
+  title        String
+  message      String
+  isRead       Boolean              @default(false) @map("is_read")
+  readAt       DateTime?            @map("read_at")
+  createdAt    DateTime             @default(now()) @map("created_at")
+  updatedAt    DateTime             @updatedAt @map("updated_at")
+  user         users                @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  actor        users?               @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+  invitation   Invitations?         @relation(fields: [invitationId], references: [id], onDelete: SetNull)
+
+  @@index([userId, isRead, createdAt])
+  @@map("notifications")
 }

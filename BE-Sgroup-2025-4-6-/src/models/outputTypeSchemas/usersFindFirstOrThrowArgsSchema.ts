@@ -15,6 +15,7 @@ import { BoardMemberFindManyArgsSchema } from "../outputTypeSchemas/BoardMemberF
 import { InvitationsFindManyArgsSchema } from "../outputTypeSchemas/InvitationsFindManyArgsSchema"
 import { CardMemberFindManyArgsSchema } from "../outputTypeSchemas/CardMemberFindManyArgsSchema"
 import { CardCommentFindManyArgsSchema } from "../outputTypeSchemas/CardCommentFindManyArgsSchema"
+import { NotificationFindManyArgsSchema } from "../outputTypeSchemas/NotificationFindManyArgsSchema"
 import { UsersCountOutputTypeArgsSchema } from "../outputTypeSchemas/UsersCountOutputTypeArgsSchema"
 // Select schema needs to be in file to prevent circular imports
 //------------------------------------------------------
@@ -41,6 +42,8 @@ export const usersSelectSchema: z.ZodType<Prisma.usersSelect> = z.object({
   Invitations: z.union([z.boolean(),z.lazy(() => InvitationsFindManyArgsSchema)]).optional(),
   CardMember: z.union([z.boolean(),z.lazy(() => CardMemberFindManyArgsSchema)]).optional(),
   CardComment: z.union([z.boolean(),z.lazy(() => CardCommentFindManyArgsSchema)]).optional(),
+  notifications: z.union([z.boolean(),z.lazy(() => NotificationFindManyArgsSchema)]).optional(),
+  actions: z.union([z.boolean(),z.lazy(() => NotificationFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UsersCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 

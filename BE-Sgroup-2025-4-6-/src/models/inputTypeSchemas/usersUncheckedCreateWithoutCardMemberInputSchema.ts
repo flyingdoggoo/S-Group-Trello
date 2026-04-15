@@ -11,6 +11,8 @@ import { UserRoleUncheckedCreateNestedManyWithoutUserInputSchema } from './UserR
 import { BoardMemberUncheckedCreateNestedManyWithoutUserInputSchema } from './BoardMemberUncheckedCreateNestedManyWithoutUserInputSchema';
 import { InvitationsUncheckedCreateNestedManyWithoutOwnerInputSchema } from './InvitationsUncheckedCreateNestedManyWithoutOwnerInputSchema';
 import { CardCommentUncheckedCreateNestedManyWithoutUserInputSchema } from './CardCommentUncheckedCreateNestedManyWithoutUserInputSchema';
+import { NotificationUncheckedCreateNestedManyWithoutUserInputSchema } from './NotificationUncheckedCreateNestedManyWithoutUserInputSchema';
+import { NotificationUncheckedCreateNestedManyWithoutActorInputSchema } from './NotificationUncheckedCreateNestedManyWithoutActorInputSchema';
 
 export const usersUncheckedCreateWithoutCardMemberInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutCardMemberInput> = z.strictObject({
   id: z.uuid().optional(),
@@ -33,6 +35,8 @@ export const usersUncheckedCreateWithoutCardMemberInputSchema: z.ZodType<Prisma.
   BoardMember: z.lazy(() => BoardMemberUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   Invitations: z.lazy(() => InvitationsUncheckedCreateNestedManyWithoutOwnerInputSchema).optional(),
   CardComment: z.lazy(() => CardCommentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  notifications: z.lazy(() => NotificationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  actions: z.lazy(() => NotificationUncheckedCreateNestedManyWithoutActorInputSchema).optional(),
 });
 
 export default usersUncheckedCreateWithoutCardMemberInputSchema;

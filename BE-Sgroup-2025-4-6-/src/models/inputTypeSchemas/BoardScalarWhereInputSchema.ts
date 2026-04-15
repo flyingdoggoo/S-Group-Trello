@@ -13,6 +13,7 @@ export const BoardScalarWhereInputSchema: z.ZodType<Prisma.BoardScalarWhereInput
   OR: z.lazy(() => BoardScalarWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => BoardScalarWhereInputSchema), z.lazy(() => BoardScalarWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
+  slug: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   projectId: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   title: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   description: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),

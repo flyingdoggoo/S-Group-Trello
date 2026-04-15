@@ -9,6 +9,7 @@ import { BoardMinOrderByAggregateInputSchema } from './BoardMinOrderByAggregateI
 
 export const BoardOrderByWithAggregationInputSchema: z.ZodType<Prisma.BoardOrderByWithAggregationInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
+  slug: z.lazy(() => SortOrderSchema).optional(),
   projectId: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
   description: z.union([ z.lazy(() => SortOrderSchema), z.lazy(() => SortOrderInputSchema) ]).optional(),

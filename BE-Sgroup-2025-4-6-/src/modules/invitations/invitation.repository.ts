@@ -47,7 +47,7 @@ export class InvitationRepository {
 		email: string,
 		projectId?: string,
 		boardId?: string,
-	): Promise<Invitations[]> {
+	): Promise<InvitationWithOwner[]> {
 		return this.prismaService.invitations.findMany({
 			where: {
 				email,

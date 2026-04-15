@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Settings, Sun, Moon, Github, LogOut } from "lucide-react";
 import { useThemeStore } from "@/stores/theme.store";
+import { apiClient, clearAccessToken } from "@/api/apiClient";
 
 interface DropUpSettingsProps {
   collapsed: boolean;
@@ -15,8 +16,13 @@ interface DropUpSettingsProps {
 export function DropUpSettings({ collapsed }: DropUpSettingsProps) {
   const { theme, toggleTheme } = useThemeStore();
 
-  function logout() {
-    localStorage.removeItem("accessToken");
+  async function logout() {
+    try {
+      await apiClient.post("/auth/logout", {});
+    } catch {
+      // Continue local logout even if API call fails.
+    }
+    clearAccessToken();
     window.location.href = "/";
   }
 

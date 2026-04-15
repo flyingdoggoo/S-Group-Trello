@@ -16,6 +16,7 @@ export const projectWhereInputSchema: z.ZodType<Prisma.projectWhereInput> = z.st
   OR: z.lazy(() => projectWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => projectWhereInputSchema), z.lazy(() => projectWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
+  slug: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   title: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   description: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),

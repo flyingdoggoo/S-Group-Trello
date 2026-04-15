@@ -25,7 +25,7 @@ export class CardsRepository {
         return last ? last.position + 1 : 0;
     }
 
-    async findCards({ listId, title, status, skip, take }: { listId: string, title?: string, status?: CardStatusEnum, skip: number, take: number }): Promise<[Card[], number]> {
+    async findCards({ listId, title, status, skip, take }: { listId: string, title?: string, status?: CardStatusEnum, skip: number, take: number }): Promise<[any[], number]> {
         const where: any = { listId, deletedAt: null };
         if (title) {
             where.title = { contains: title, mode: 'insensitive' };
@@ -39,7 +39,22 @@ export class CardsRepository {
                 where,
                 skip,
                 take,
-                orderBy: { position: 'asc' }
+                orderBy: { position: 'asc' },
+                include: {
+                    tags: true,
+                    members: {
+                        include: {
+                            user: {
+                                select: { id: true, name: true, avatar: true },
+                            },
+                        },
+                    },
+                    _count: {
+                        select: {
+                            comments: true,
+                        },
+                    },
+                },
             }),
             this.prismaService.card.count({ where })
         ]);
@@ -54,6 +69,12 @@ export class CardsRepository {
                 deletedAt: null
             },
             include: {
+                list: {
+                    select: {
+                        id: true,
+                        boardId: true,
+                    },
+                },
                 tags: true,
                 todos: { orderBy: { position: 'asc' } },
                 members: {
@@ -146,6 +167,18 @@ export class CardsRepository {
         });
     }
 
+    async findMemberOnCard(cardId: string, userId: string) {
+        return this.prismaService.cardMember.findFirst({
+            where: {
+                cardId,
+                userId,
+            },
+            select: {
+                id: true,
+            },
+        });
+    }
+
     async removeMember({ id }: { id: string }) {
         return this.prismaService.cardMember.delete({ where: { id } });
     }
@@ -176,6 +209,12 @@ export class CardsRepository {
         return this.prismaService.card.findFirst({
             where: { id, deletedAt: null },
             include: {
+                list: {
+                    select: {
+                        id: true,
+                        boardId: true,
+                    },
+                },
                 tags: true,
                 todos: { orderBy: { position: 'asc' } },
                 members: {

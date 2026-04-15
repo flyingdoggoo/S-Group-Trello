@@ -2,12 +2,14 @@ import { create } from "zustand";
 
 interface Board {
   id: string;
+  slug?: string;
   title: string;
   description: string | null;
 }
 
 interface Project {
   id: string;
+  slug?: string;
   title: string;
   description: string;
   boardCount?: number;
@@ -26,6 +28,8 @@ interface ProjectsStore {
   setProjects: (projects: Project[]) => void;
   addProject: (project: Project) => void;
   addBoardToProject: (projectId: string, board: Board) => void;
+  updateBoardInProject: (projectId: string, boardId: string, updates: Partial<Board>) => void;
+  removeBoardFromProject: (projectId: string, boardId: string) => void;
   updateProjectBoardCount: (projectId: string, count: number) => void;
   updateProjectMemberCount: (projectId: string, count: number) => void;
   setLoading: (isLoading: boolean) => void;
@@ -65,6 +69,33 @@ export const useProjectsStore = create<ProjectsStore>((set) => ({
               ...p,
               boards: [...(p.boards || []), board],
               boardCount: (p.boardCount || 0) + 1,
+            }
+          : p
+      ),
+    })),
+
+  updateBoardInProject: (projectId, boardId, updates) =>
+    set((state) => ({
+      projects: state.projects.map((p) =>
+        p.id === projectId
+          ? {
+              ...p,
+              boards: (p.boards || []).map((board) =>
+                board.id === boardId ? { ...board, ...updates } : board
+              ),
+            }
+          : p
+      ),
+    })),
+
+  removeBoardFromProject: (projectId, boardId) =>
+    set((state) => ({
+      projects: state.projects.map((p) =>
+        p.id === projectId
+          ? {
+              ...p,
+              boards: (p.boards || []).filter((board) => board.id !== boardId),
+              boardCount: Math.max((p.boardCount || 0) - 1, 0),
             }
           : p
       ),

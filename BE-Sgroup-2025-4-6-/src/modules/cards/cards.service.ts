@@ -7,21 +7,36 @@ import { ServiceResponse, ResponseStatus } from '@/common/dtos';
 import { StatusCodes } from 'http-status-codes';
 import { ProjectMembersRepository } from '../projectMembers/projectMembers.repository';
 import { ListsRepository } from '../Lists/lists.repository';
-import { CardStatusEnum } from '@prisma/client';
+import { CardStatusEnum, NotificationTypeEnum } from '@prisma/client';
+import { NotificationRepository } from '../notifications';
+import { UsersRepository } from '../users/users.repository';
+import { OptionalException } from '@/common';
+import { BoardMembersRepository } from '../boardMembers/boardMembers.repository';
 
 export class CardsService {
     constructor(
         private readonly cardsRepository = new CardsRepository(),
         private readonly projectMembersRepository = new ProjectMembersRepository(),
         private readonly listsRepository = new ListsRepository(),
+        private readonly notificationRepository = new NotificationRepository(),
+        private readonly usersRepository = new UsersRepository(),
+        private readonly boardMembersRepository = new BoardMembersRepository(),
     ) { }
 
     /** Verify membership via list → board → project chain */
     private async verifyMembershipViaList(listId: string, userId: string) {
         const list = await this.listsRepository.findListByIdWithBoard(listId);
         if (!list || !list.board) throw new NotFoundException('List not found');
-        const isMember = await this.projectMembersRepository.isUserMemberOfProject(list.board.projectId, userId);
-        if (!isMember) throw new ForbiddenException();
+
+        const [isProjectMember, isBoardMember] = await Promise.all([
+            this.projectMembersRepository.isUserMemberOfProject(
+                list.board.projectId,
+                userId,
+            ),
+            this.boardMembersRepository.isUserMemberOfBoard(list.board.id, userId),
+        ]);
+
+        if (!isProjectMember && !isBoardMember) throw new ForbiddenException();
         return list;
     }
 
@@ -45,10 +60,27 @@ export class CardsService {
 
         const card = await this.cardsRepository.createCard({ listId: dto.listId, title: dto.title, description: dto.description, position });
 
+        // New cards always start with default planning metadata.
+        await this.cardsRepository.createTag({
+            cardId: card.id,
+            name: 'To Do',
+            color: '#3b82f6',
+        });
+        await this.cardsRepository.createTodo({
+            cardId: card.id,
+            title: 'Task 1',
+            position: 0,
+        });
+
+        const hydratedCard = await this.cardsRepository.findCardByIdFull(card.id);
+        if (!hydratedCard) {
+            throw new NotFoundException('Card not found');
+        }
+
         return new ServiceResponse(
             ResponseStatus.Success,
             'Card created successfully',
-            new CardResponseDto(card),
+            new CardResponseDto(hydratedCard),
             StatusCodes.CREATED
         );
     }
@@ -172,8 +204,47 @@ export class CardsService {
 
     // Members
     async addMember(cardId: string, userId: string, memberUserId: string): Promise<ServiceResponse<any>> {
-        await this.verifyMembershipViaCard(cardId, userId);
+        const { card, list } = await this.verifyMembershipViaCard(cardId, userId);
+
+        const [isMemberInProject, isMemberInBoard] = await Promise.all([
+            this.projectMembersRepository.isUserMemberOfProject(
+                list.board.projectId,
+                memberUserId,
+            ),
+            this.boardMembersRepository.isUserMemberOfBoard(
+                list.board.id,
+                memberUserId,
+            ),
+        ]);
+
+        if (!isMemberInProject && !isMemberInBoard) {
+            throw new OptionalException(
+                StatusCodes.BAD_REQUEST,
+                'User is not a member of this board',
+            );
+        }
+
+        const existingMember = await this.cardsRepository.findMemberOnCard(cardId, memberUserId);
+        if (existingMember) {
+            throw new OptionalException(
+                StatusCodes.CONFLICT,
+                'User already assigned to card',
+            );
+        }
+
         const member = await this.cardsRepository.addMember({ cardId, userId: memberUserId });
+
+        if (memberUserId !== userId) {
+            const actor = await this.usersRepository.findUserById(userId);
+            await this.notificationRepository.createNotification({
+                userId: memberUserId,
+                actorId: userId,
+                type: NotificationTypeEnum.CARD_ASSIGNED,
+                title: 'Assigned to card',
+                message: `${actor?.name || actor?.email || 'Someone'} assigned you to card "${card.title}".`,
+            });
+        }
+
         return new ServiceResponse(ResponseStatus.Success, 'Member added', member, StatusCodes.CREATED);
     }
 

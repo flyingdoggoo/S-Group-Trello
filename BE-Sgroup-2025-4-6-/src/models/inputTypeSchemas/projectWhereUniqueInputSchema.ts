@@ -12,11 +12,21 @@ import { ProjectMemberListRelationFilterSchema } from './ProjectMemberListRelati
 import { BoardListRelationFilterSchema } from './BoardListRelationFilterSchema';
 import { InvitationsListRelationFilterSchema } from './InvitationsListRelationFilterSchema';
 
-export const projectWhereUniqueInputSchema: z.ZodType<Prisma.projectWhereUniqueInput> = z.object({
-  id: z.uuid(),
-})
+export const projectWhereUniqueInputSchema: z.ZodType<Prisma.projectWhereUniqueInput> = z.union([
+  z.object({
+    id: z.uuid(),
+    slug: z.string(),
+  }),
+  z.object({
+    id: z.uuid(),
+  }),
+  z.object({
+    slug: z.string(),
+  }),
+])
 .and(z.strictObject({
   id: z.uuid().optional(),
+  slug: z.string().optional(),
   AND: z.union([ z.lazy(() => projectWhereInputSchema), z.lazy(() => projectWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => projectWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => projectWhereInputSchema), z.lazy(() => projectWhereInputSchema).array() ]).optional(),

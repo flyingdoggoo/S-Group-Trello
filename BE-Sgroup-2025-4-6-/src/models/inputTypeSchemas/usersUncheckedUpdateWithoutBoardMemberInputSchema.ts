@@ -17,6 +17,8 @@ import { UserRoleUncheckedUpdateManyWithoutUserNestedInputSchema } from './UserR
 import { InvitationsUncheckedUpdateManyWithoutOwnerNestedInputSchema } from './InvitationsUncheckedUpdateManyWithoutOwnerNestedInputSchema';
 import { CardMemberUncheckedUpdateManyWithoutUserNestedInputSchema } from './CardMemberUncheckedUpdateManyWithoutUserNestedInputSchema';
 import { CardCommentUncheckedUpdateManyWithoutUserNestedInputSchema } from './CardCommentUncheckedUpdateManyWithoutUserNestedInputSchema';
+import { NotificationUncheckedUpdateManyWithoutUserNestedInputSchema } from './NotificationUncheckedUpdateManyWithoutUserNestedInputSchema';
+import { NotificationUncheckedUpdateManyWithoutActorNestedInputSchema } from './NotificationUncheckedUpdateManyWithoutActorNestedInputSchema';
 
 export const usersUncheckedUpdateWithoutBoardMemberInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutBoardMemberInput> = z.strictObject({
   id: z.union([ z.uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -39,6 +41,8 @@ export const usersUncheckedUpdateWithoutBoardMemberInputSchema: z.ZodType<Prisma
   Invitations: z.lazy(() => InvitationsUncheckedUpdateManyWithoutOwnerNestedInputSchema).optional(),
   CardMember: z.lazy(() => CardMemberUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   CardComment: z.lazy(() => CardCommentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  notifications: z.lazy(() => NotificationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  actions: z.lazy(() => NotificationUncheckedUpdateManyWithoutActorNestedInputSchema).optional(),
 });
 
 export default usersUncheckedUpdateWithoutBoardMemberInputSchema;

@@ -4,6 +4,7 @@ import z from "zod";
 
 export class BoardResponseDto {
     id: string;
+    slug: string;
     projectId: string;
     title: string;
     description: string | null;
@@ -13,6 +14,7 @@ export class BoardResponseDto {
 
     constructor(data: Board) {
         this.id = data.id;
+        this.slug = data.slug;
         this.projectId = data.projectId;
         this.title = data.title;
         this.description = data.description ?? null;
@@ -24,6 +26,7 @@ export class BoardResponseDto {
 
 export const BoardResponseDtoSchema = z.object({
     id: z.string(),
+    slug: z.string(),
     projectId: z.string(),
     title: z.string(),
     description: z.string().nullable(),

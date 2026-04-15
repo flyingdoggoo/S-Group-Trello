@@ -13,6 +13,7 @@ import { BoardCountOutputTypeArgsSchema } from "../outputTypeSchemas/BoardCountO
 
 export const BoardSelectSchema: z.ZodType<Prisma.BoardSelect> = z.object({
   id: z.boolean().optional(),
+  slug: z.boolean().optional(),
   projectId: z.boolean().optional(),
   title: z.boolean().optional(),
   description: z.boolean().optional(),

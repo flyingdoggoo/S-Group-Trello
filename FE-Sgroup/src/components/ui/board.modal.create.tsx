@@ -19,7 +19,15 @@ import { useBoardsStore } from "@/stores/boards.store";
 import { useProjectsStore } from "@/stores/projects.store";
 import { Plus } from "lucide-react";
 
-export function BoardModalCreate({ projectId }: { projectId: string }) {
+export function BoardModalCreate({
+  projectId,
+  boardsStoreKey,
+  projectStoreId,
+}: {
+  projectId: string;
+  boardsStoreKey?: string;
+  projectStoreId?: string;
+}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,8 +42,10 @@ export function BoardModalCreate({ projectId }: { projectId: string }) {
       const response = await apiClient.post(`projects/${projectId}/boards`, { title, description });
       if (response.data?.data) {
         const newBoard = response.data.data;
-        addBoard(projectId, newBoard);
-        addBoardToProject(projectId, newBoard);
+        const nextBoardsStoreKey = boardsStoreKey || projectId;
+        const nextProjectStoreId = projectStoreId || projectId;
+        addBoard(nextBoardsStoreKey, newBoard);
+        addBoardToProject(nextProjectStoreId, newBoard);
         setTitle("");
         setDescription("");
         toast.success("Board created successfully!");

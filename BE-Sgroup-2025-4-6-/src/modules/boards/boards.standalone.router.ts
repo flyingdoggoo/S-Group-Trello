@@ -32,4 +32,12 @@ router.put(
 	boardsController.changeRoleOfMemberBoard,
 );
 
+// DELETE /boards/:boardId/members/remove — flat endpoint
+router.delete(
+	'/:boardId/members/remove',
+	authMiddleware.verifyToken,
+	authMiddleware.verifyPermission(BoardPermissionEnum.REMOVE_MEMBER),
+	boardsController.removeMemberBoard,
+);
+
 export const boardsStandaloneRouter = router;

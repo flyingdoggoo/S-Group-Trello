@@ -40,6 +40,12 @@ export class UsersRepository {
 		});
 	}
 
+	async findUserById(id: string): Promise<users | null> {
+		return this.prismaService.users.findUnique({
+			where: { id },
+		});
+	}
+
 	async updateUser({
 		userId,
 		user,

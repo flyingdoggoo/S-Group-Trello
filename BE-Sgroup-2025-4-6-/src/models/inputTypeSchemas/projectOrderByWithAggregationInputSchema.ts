@@ -9,6 +9,7 @@ import { projectMinOrderByAggregateInputSchema } from './projectMinOrderByAggreg
 
 export const projectOrderByWithAggregationInputSchema: z.ZodType<Prisma.projectOrderByWithAggregationInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
+  slug: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
   description: z.union([ z.lazy(() => SortOrderSchema), z.lazy(() => SortOrderInputSchema) ]).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),

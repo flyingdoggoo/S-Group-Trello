@@ -4,12 +4,14 @@ import z from "zod";
 
 interface BoardPreview {
     id: string;
+    slug: string;
     title: string;
     description: string | null;
 }
 
 export class ProjectResponseDto {
     id: string;
+    slug: string;
     title: string;
     description: string | null;
     status: ProjectStatusEnum;
@@ -20,6 +22,7 @@ export class ProjectResponseDto {
 
     constructor(data: project & { boardCount?: number; boards?: BoardPreview[] }) {
         this.id = data.id;
+        this.slug = data.slug;
         this.title = data.title;
         this.description = data.description ?? null;
         this.status = data.status;
@@ -32,6 +35,7 @@ export class ProjectResponseDto {
 
 export const ProjectResponseDtoSchema = z.object({
     id: z.string(),
+    slug: z.string(),
     title: z.string(),
     description: z.string().nullable(),
     status: z.nativeEnum(ProjectStatusEnum),
@@ -40,6 +44,7 @@ export const ProjectResponseDtoSchema = z.object({
     boardCount: z.number().optional(),
     boards: z.array(z.object({
         id: z.string(),
+        slug: z.string(),
         title: z.string(),
         description: z.string().nullable(),
     })).optional(),

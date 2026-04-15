@@ -5,6 +5,7 @@ import { BoardStatusEnumSchema } from './BoardStatusEnumSchema';
 
 export const BoardCreateManyProjectInputSchema: z.ZodType<Prisma.BoardCreateManyProjectInput> = z.strictObject({
   id: z.uuid().optional(),
+  slug: z.string(),
   title: z.string(),
   description: z.string().optional().nullable(),
   status: z.lazy(() => BoardStatusEnumSchema).optional(),

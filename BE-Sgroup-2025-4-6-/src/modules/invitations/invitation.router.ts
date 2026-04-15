@@ -1,11 +1,9 @@
-import { Board } from './../../models/modelSchema/BoardSchema';
 import { InvitationController } from './invitation.controller';
 import { autoBindUtil, validateRequestMiddleware } from '@/common';
 import { BoardPermissionEnum, ProjectPermissionEnum } from '@/common/enums';
 import authMiddleware from '@/common/middlewares/auth.middleware';
 import { CreateInvitationRequestValidationSchema } from './dtos/requests/createInvitation.request';
 import express from 'express';
-import { AcceptInvitationRequestValidationSchema } from './dtos/requests';
 const invitationController = new InvitationController();
 
 const router = express.Router({ mergeParams: true });

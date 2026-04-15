@@ -13,6 +13,7 @@ import { ProjectNullableScalarRelationFilterSchema } from './ProjectNullableScal
 import { projectWhereInputSchema } from './projectWhereInputSchema';
 import { BoardNullableScalarRelationFilterSchema } from './BoardNullableScalarRelationFilterSchema';
 import { BoardWhereInputSchema } from './BoardWhereInputSchema';
+import { NotificationListRelationFilterSchema } from './NotificationListRelationFilterSchema';
 
 export const InvitationsWhereInputSchema: z.ZodType<Prisma.InvitationsWhereInput> = z.strictObject({
   AND: z.union([ z.lazy(() => InvitationsWhereInputSchema), z.lazy(() => InvitationsWhereInputSchema).array() ]).optional(),
@@ -32,6 +33,7 @@ export const InvitationsWhereInputSchema: z.ZodType<Prisma.InvitationsWhereInput
   owner: z.union([ z.lazy(() => UsersScalarRelationFilterSchema), z.lazy(() => usersWhereInputSchema) ]).optional(),
   project: z.union([ z.lazy(() => ProjectNullableScalarRelationFilterSchema), z.lazy(() => projectWhereInputSchema) ]).optional().nullable(),
   board: z.union([ z.lazy(() => BoardNullableScalarRelationFilterSchema), z.lazy(() => BoardWhereInputSchema) ]).optional().nullable(),
+  notifications: z.lazy(() => NotificationListRelationFilterSchema).optional(),
 });
 
 export default InvitationsWhereInputSchema;
