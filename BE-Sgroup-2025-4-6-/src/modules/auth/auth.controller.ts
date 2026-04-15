@@ -213,6 +213,14 @@ export class AuthController {
 
 				// Redirect to frontend after success
 				const frontendUrl = appEnv.CORS_ORIGIN || 'http://localhost:5173';
+				const accessToken = success?.data?.accessToken;
+
+				if (accessToken) {
+					return res.redirect(
+						`${frontendUrl}#accessToken=${encodeURIComponent(accessToken)}`,
+					);
+				}
+
 				return res.redirect(frontendUrl);
 			},
 		)(req, res, next);

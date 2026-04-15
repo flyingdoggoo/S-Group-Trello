@@ -27,12 +27,75 @@ type AuthAxiosRequestConfig = AxiosRequestConfig & {
 let accessToken: string | null = null;
 let refreshPromise: Promise<boolean> | null = null;
 
+const ACCESS_TOKEN_STORAGE_KEY = "sgroup_access_token";
+
+function readStoredAccessToken(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    return window.sessionStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredAccessToken(token: string | null) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    if (token) {
+      window.sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, token);
+    } else {
+      window.sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+    }
+  } catch {
+    // Ignore storage failures (private mode/quota), token still lives in memory.
+  }
+}
+
+function bootstrapAccessTokenFromUrlHash(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const hash = window.location.hash || "";
+  if (!hash.startsWith("#")) {
+    return null;
+  }
+
+  const hashParams = new URLSearchParams(hash.slice(1));
+  const hashAccessToken = hashParams.get("accessToken");
+
+  if (!hashAccessToken) {
+    return null;
+  }
+
+  hashParams.delete("accessToken");
+  const remainingHash = hashParams.toString();
+  const nextHash = remainingHash ? `#${remainingHash}` : "";
+  const nextUrl = `${window.location.pathname}${window.location.search}${nextHash}`;
+  window.history.replaceState({}, document.title, nextUrl);
+
+  return hashAccessToken;
+}
+
+const tokenFromHash = bootstrapAccessTokenFromUrlHash();
+accessToken = tokenFromHash || readStoredAccessToken();
+if (tokenFromHash) {
+  writeStoredAccessToken(tokenFromHash);
+}
+
 function extractAccessToken(response: AxiosResponse<any>): string | null {
   return response?.data?.data?.accessToken ?? null;
 }
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
+  writeStoredAccessToken(token);
 }
 
 export function getAccessToken() {
@@ -41,6 +104,7 @@ export function getAccessToken() {
 
 export function clearAccessToken() {
   accessToken = null;
+  writeStoredAccessToken(null);
 }
 
 export const axiosClient = axios.create({
